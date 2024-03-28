@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useRef } from "react";
+import { ReactNode, useRef, useCallback } from "react";
 import DayBox from "./dayBox";
 import { LocalMonth } from "./calendar";
 
@@ -10,7 +10,7 @@ export interface CalDate {
 	year: number;
 }
 
-export default function MonthBox({ monthObj, monthInd }: { monthObj: LocalMonth; monthInd: number }): ReactNode {
+export default function MonthBox({ monthObj, monthInd, innerRef }: { monthObj: LocalMonth; monthInd: number; innerRef: any }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
@@ -31,9 +31,26 @@ export default function MonthBox({ monthObj, monthInd }: { monthObj: LocalMonth;
 		transform: `translateY(${monthInd * -13.75}vh)`,
 	};
 
+	const observer = useRef();
+	observer.current = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				entry.target.classList.toggle("focusMonthCal", entry.isIntersecting);
+			});
+		},
+		{ threshold: 0.7 }
+	);
+
+	const addObserver = useCallback(
+		(node) => {
+			observer?.current?.observe(node);
+		},
+		[alignMonths]
+	);
+
 	return (
 		<div style={alignMonths} className="grid grid-cols-3 monthBox ">
-			<div className="col-start-1 grid content-center monthLabels">
+			<div ref={innerRef} className="col-start-1 grid content-center">
 				<h1 className="calLabelText">{monthObj.monthName}</h1>
 			</div>
 			<div className="grid grid-cols-7 ">
@@ -41,7 +58,7 @@ export default function MonthBox({ monthObj, monthInd }: { monthObj: LocalMonth;
 					<DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />
 				))}
 			</div>
-			<div className="col-start-3 grid content-center yearLabels">
+			<div ref={innerRef} className="col-start-3 grid content-center">
 				<h1 className="calLabelText">{monthObj.year}</h1>
 			</div>
 		</div>

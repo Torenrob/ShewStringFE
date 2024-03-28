@@ -12,10 +12,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 		</NextUIProvider>
 	</React.StrictMode>
 );
-
-//Brings the current date into view on Calendar
-window.onload = () => document.getElementById(`${new Date().toLocaleDateString()}`)?.scrollIntoView();
-
-let monthLabels: Element[] = Array.from(document.getElementsByClassName("monthLabels"));
-
-console.log(monthLabels);

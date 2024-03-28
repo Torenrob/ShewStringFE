@@ -42,3 +42,8 @@ export function getMonthName(num: number) {
 
 	return name;
 }
+
+export function focusToday() {
+	//Brings the current date into view on Calendar
+	window.onload = () => document.getElementById(`${new Date().toLocaleDateString()}`)?.scrollIntoView();
+}

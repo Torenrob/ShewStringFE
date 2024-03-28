@@ -1,6 +1,6 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useRef, useCallback } from "react";
 import MonthBox from "./monthBox";
-import { getMonthName } from "../../utils/utils";
+import { focusToday, getMonthName } from "../../utils/utils";
 
 export interface LocalMonth {
 	month: number;
@@ -52,13 +52,37 @@ export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState(
 		[...Array(7)].map((_, index) => {
 			const month: LocalMonth = calcMonth({ index: index + 1 });
-			return <MonthBox monthObj={month} key={`${month.monthName}${month.year}`} monthInd={index} />;
+			const monthBoxObj = {
+				monthObj: month,
+				key: `${month.monthName}${month.year}`,
+				monthInd: index,
+			};
+			return monthBoxObj;
 		})
+	);
+
+	const observer = useRef();
+	observer.current = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				entry.target.classList.toggle("focusLabel", entry.isIntersecting);
+			});
+		},
+		{ threshold: 0.7 }
+	);
+
+	const addObserver = useCallback(
+		(node) => {
+			observer?.current?.observe(node);
+		},
+		[monthComps]
 	);
 
 	return (
 		<div key="Calendar" className={`calendar`}>
-			{monthComps.map((monthDiv) => monthDiv)}
+			{monthComps.map((monthBoxObj) => {
+				return <MonthBox innerRef={addObserver} monthObj={monthBoxObj.monthObj} key={monthBoxObj.key} monthInd={monthBoxObj.monthInd} />;
+			})}
 		</div>
 	);
 }

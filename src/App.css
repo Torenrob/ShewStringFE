@@ -44,6 +44,15 @@
 	font-size: larger;
 }
 
+.focusLabel {
+	background-color: brown;
+	color: white;
+}
+
+.focusMonthCal {
+	background-color: ;
+}
+
 .monthBox {
 	grid-template-columns: max-content auto max-content;
 }
