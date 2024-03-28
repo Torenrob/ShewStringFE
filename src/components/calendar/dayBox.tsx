@@ -1,6 +1,6 @@
-import { ReactNode, useCallback } from "react";
+import { ReactNode, useCallback, useRef } from "react";
 import { CalDate } from "./monthBox";
-import { Card, CardBody, Divider } from "@nextui-org/react";
+import { Card, CardBody, Divider, checkbox } from "@nextui-org/react";
 
 export default function DayBox({ date, dateObj }: { date: number; dateObj: CalDate }): ReactNode {
 	const dateString: string = `${dateObj.month}/${dateObj.date}/${dateObj.year}`;
@@ -8,7 +8,6 @@ export default function DayBox({ date, dateObj }: { date: number; dateObj: CalDa
 	const gridStyle = {
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
-		backgroundColor: "lightGray",
 	};
 
 	return (

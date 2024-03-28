@@ -1,3 +1,9 @@
+:root {
+	--60color: rgb(133, 66, 163);
+	--30color: rgb(103, 103, 192);
+	--10color: white;
+}
+
 .logo {
 	background-color: black;
 }
@@ -31,11 +37,16 @@
 }
 
 .dayBox {
-	min-height: 13.75vh;
+	min-height: 128px;
 }
 
 .dateGrid {
 	flex-basis: 93%;
+}
+
+.calLabelContainer {
+	display: grid;
+	align-content: center;
 }
 
 .calLabelText {
@@ -45,12 +56,25 @@
 }
 
 .focusLabel {
-	background-color: brown;
+	transition: all 600ms;
+	font-weight: bolder;
+	background-color: var(--60color);
 	color: white;
+	z-index: 1;
+}
+
+.focusLabelLeft {
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+}
+
+.focusLabelRight {
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
 }
 
 .focusMonthCal {
-	background-color: ;
+	background-color: white;
 }
 
 .monthBox {

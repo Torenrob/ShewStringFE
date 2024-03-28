@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useCallback } from "react";
+import { ReactNode, useRef, useCallback, LegacyRef } from "react";
 import DayBox from "./dayBox";
 import { LocalMonth } from "./calendar";
 
@@ -10,7 +10,17 @@ export interface CalDate {
 	year: number;
 }
 
-export default function MonthBox({ monthObj, monthInd, innerRef }: { monthObj: LocalMonth; monthInd: number; innerRef: any }): ReactNode {
+export default function MonthBox({
+	monthObj,
+	monthInd,
+	monthYearLabelRef,
+	infiniteScrollRef,
+}: {
+	monthObj: LocalMonth;
+	monthInd: number;
+	monthYearLabelRef: LegacyRef<HTMLDivElement>;
+	infiniteScrollRef?: LegacyRef<HTMLDivElement>;
+}): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
@@ -28,38 +38,23 @@ export default function MonthBox({ monthObj, monthInd, innerRef }: { monthObj: L
 	}
 
 	const alignMonths = {
-		transform: `translateY(${monthInd * -13.75}vh)`,
+		transform: `translateY(${monthInd * -128}px)`,
 	};
 
-	const observer = useRef();
-	observer.current = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((entry) => {
-				entry.target.classList.toggle("focusMonthCal", entry.isIntersecting);
-			});
-		},
-		{ threshold: 0.7 }
-	);
-
-	const addObserver = useCallback(
-		(node) => {
-			observer?.current?.observe(node);
-		},
-		[alignMonths]
-	);
+	const infScroll: string = monthInd > 2 ? "Future" : "Past";
 
 	return (
-		<div style={alignMonths} className="grid grid-cols-3 monthBox ">
-			<div ref={innerRef} className="col-start-1 grid content-center">
-				<h1 className="calLabelText">{monthObj.monthName}</h1>
+		<div ref={infiniteScrollRef} style={alignMonths} className={`grid grid-cols-3 monthBox scroll${infScroll}`}>
+			<div ref={monthYearLabelRef} className="col-start-1 calLabelContainer">
+				<h1 className="calLabelText">{monthObj.year}</h1>
 			</div>
-			<div className="grid grid-cols-7 ">
+			<div className="grid grid-cols-7">
 				{[...Array(getDaysOfMonth(monthObj))].map((_, i) => (
 					<DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />
 				))}
 			</div>
-			<div ref={innerRef} className="col-start-3 grid content-center">
-				<h1 className="calLabelText">{monthObj.year}</h1>
+			<div ref={monthYearLabelRef} className="col-start-3 calLabelContainer">
+				<h1 className="calLabelText">{monthObj.monthName}</h1>
 			</div>
 		</div>
 	);
