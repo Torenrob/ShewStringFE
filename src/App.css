@@ -1,0 +1,49 @@
+.logo {
+	background-color: black;
+}
+
+.loginCard,
+.signUpCard {
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.loginBtn {
+	width: 100%;
+	min-width: fit-content;
+}
+
+.calendar {
+	height: 82.5vh;
+	width: 80vw;
+	overflow-y: scroll;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.calendar::-webkit-scrollbar {
+	display: none;
+}
+
+.calTitleGrid {
+	grid-template-columns: repeat(auto-fit);
+}
+
+.dayBox {
+	min-height: 13.75vh;
+}
+
+.dateGrid {
+	flex-basis: 93%;
+}
+
+.calLabelText {
+	writing-mode: vertical-rl;
+	text-orientation: upright;
+	font-size: larger;
+}
+
+.monthBox {
+	grid-template-columns: max-content auto max-content;
+}
