@@ -28,11 +28,11 @@ function _getMonth(): LocalMonth {
 }
 
 //Calculate Month Comp arr on initialization
-function calcInitMonth({ index }: { index: number }): LocalMonth {
-	if (index == 24) return _getMonth();
-	const monthObject: LocalMonth = _getMonth();
+function calcInitMonth({ index, currentMonth }: { index: number; currentMonth: LocalMonth }): LocalMonth {
+	if (index == 24) return currentMonth;
+	const monthObject: LocalMonth = currentMonth;
 	const monthDiff: number = monthObject?.month + (index - 24);
-	let yearDiff: number = Math.floor(monthDiff / 12);
+	let yearDiff: number = monthDiff % 12 === 0 ? Math.floor(monthDiff / 12) - 1 : Math.floor(monthDiff / 12);
 	if (monthDiff <= 12 && monthDiff >= 1) {
 		monthObject.month = monthDiff;
 		monthObject.monthName = getMonthName(monthObject?.month);
@@ -44,9 +44,7 @@ function calcInitMonth({ index }: { index: number }): LocalMonth {
 			monthObject.year = monthObject.year + yearDiff;
 			return monthObject;
 		} else {
-			console.log(monthDiff);
 			monthObject.month = 12 + monthDiff == 0 ? 12 : monthDiff > -12 ? 12 + monthDiff : 12 + (monthDiff % 12);
-			console.log(monthObject.month);
 			monthObject.monthName = getMonthName(monthObject?.month);
 			if (monthObject.month === 12) {
 				yearDiff--;
@@ -57,35 +55,11 @@ function calcInitMonth({ index }: { index: number }): LocalMonth {
 	}
 }
 
-//Calculate Month Comp arr when scrolling
-function calcScrollMonth({ monthArr, scrollDirection, pastScrollCount }: { monthArr: MonthComponentInfo[]; scrollDirection: 1 | 0; pastScrollCount: number }): MonthComponentInfo[] {
-	if (scrollDirection === 1) {
-		const month: LocalMonth = calcInitMonth({ index: monthArr.length + 1 });
-		const monthBoxObj: MonthComponentInfo = {
-			monthObj: month,
-			key: `${month?.monthName}${month?.year}`,
-		};
-		return monthArr.concat(monthBoxObj);
-	} else {
-		const additionalMonths: MonthComponentInfo[] = [];
-		for (let i = 0; i < 4; i++) {
-			const month: LocalMonth = calcInitMonth({ index: pastScrollCount });
-			const monthBoxObj: MonthComponentInfo = {
-				monthObj: month,
-				key: `${month?.monthName}${month?.year}`,
-			};
-			additionalMonths.push(monthBoxObj);
-			pastScrollCount--;
-		}
-		return additionalMonths.concat(monthArr);
-	}
-}
-
 export default function Calendar(): ReactNode {
 	const [calLoaded, setCalLoaded] = useState(false);
 	const [monthComps, setMonthComps] = useState(
 		[...Array(47)].map((_, index) => {
-			const month: LocalMonth = calcInitMonth({ index: index + 1 });
+			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth() });
 			const monthBoxObj: MonthComponentInfo = {
 				monthObj: month,
 				key: `${month?.monthName}${month?.year}`,
@@ -125,23 +99,21 @@ export default function Calendar(): ReactNode {
 		}
 	}, []);
 
-	const futureScrollObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
-	futureScrollObserver.current = new IntersectionObserver(
-		(entry: IntersectionObserverEntry[]) => {
-			if (!entry[0]?.isIntersecting) return;
-			const month: MonthComponentInfo[] = calcScrollMonth({ monthArr: monthComps, scrollDirection: 1, pastScrollCount: 0 });
-			const newMonthArr = month.slice();
-			setMonthComps(newMonthArr);
-		},
-		{ threshold: 0.9 }
-	);
+	const endObserver: MutableRefObject<IntersectionObserver | null> = useRef(null);
 
-	const addFutureScrollObserver: LegacyRef<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
-		futureScrollObserver.current?.disconnect();
-		try {
-			await futureScrollObserver?.current?.observe(node);
-		} catch {
-			return;
+	const addEndRefObserver: LegacyRef<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
+		if (endObserver.current) endObserver.current?.disconnect();
+		endObserver.current = new IntersectionObserver(
+			(entry: IntersectionObserverEntry[]) => {
+				const bcr = entry[0].boundingClientRect;
+				console.log(bcr.top);
+				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
+			},
+			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
+		);
+		if (node) {
+			console.log(endObserver.current);
+			endObserver.current.observe(node);
 		}
 	}, []);
 
@@ -149,13 +121,10 @@ export default function Calendar(): ReactNode {
 		<div key="Calendar" className={`calendar`}>
 			<Skeleton isLoaded={calLoaded} className="rounded-lg">
 				{monthComps.map((monthBoxObj, index) => {
-					if (monthComps?.length === index + 2) {
-						return (
-							<MonthBox id="FutureScroll" infiniteScrollRef={addFutureScrollObserver} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />
-						);
-					} else {
-						return <MonthBox monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
+					if (monthComps.length === index + 1) {
+						return <MonthBox ta={true} endRef={addEndRefObserver} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} id="lastMonth" />;
 					}
+					return <MonthBox monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
 				})}
 			</Skeleton>
 		</div>

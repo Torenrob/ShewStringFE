@@ -14,13 +14,15 @@ export default function MonthBox({
 	monthObj,
 	monthInd,
 	monthYearLabelRef,
-	infiniteScrollRef,
+	endRef,
+	ta,
 	id,
 }: {
 	monthObj: LocalMonth;
 	monthInd: number;
 	monthYearLabelRef: LegacyRef<HTMLDivElement>;
-	infiniteScrollRef?: LegacyRef<HTMLDivElement>;
+	endRef?: LegacyRef<HTMLDivElement>;
+	ta?: boolean;
 	id?: string;
 }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
@@ -39,23 +41,30 @@ export default function MonthBox({
 		return dateObj;
 	}
 
+	const monthLength: number = getDaysOfMonth(monthObj);
+
 	const alignMonths = {
 		transform: `translateY(${monthInd * -128}px)`,
 	};
 
 	return (
-		<div id={id} ref={infiniteScrollRef} style={alignMonths} className={`grid grid-cols-3 monthBox`}>
+		<div id={id} style={alignMonths} className={`grid grid-cols-3 monthBox`}>
 			<div ref={monthYearLabelRef} className="col-start-1 calLabelContainer unfocusedLabel">
 				<h1 className="calLabelText">{monthObj.year}</h1>
 			</div>
 			<div className="grid grid-cols-7">
-				{[...Array(getDaysOfMonth(monthObj))].map((_, i) => (
-					<DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />
-				))}
+				{[...Array(monthLength)].map((_, i) => {
+					if (monthLength === i + 1) {
+						return <DayBox ta={ta} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+					} else {
+						return <DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+					}
+				})}
 			</div>
 			<div ref={monthYearLabelRef} className="col-start-3 calLabelContainer unfocusedLabel">
 				<h1 className="calLabelText">{monthObj.monthName}</h1>
 			</div>
+			{endRef && <div className="h-px w-px" ref={endRef}></div>}
 		</div>
 	);
 }
