@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useCallback, LegacyRef } from "react";
+import { ReactNode, LegacyRef } from "react";
 import DayBox from "./dayBox";
 import { LocalMonth } from "./calendar";
 
@@ -15,11 +15,13 @@ export default function MonthBox({
 	monthInd,
 	monthYearLabelRef,
 	infiniteScrollRef,
+	id,
 }: {
 	monthObj: LocalMonth;
 	monthInd: number;
 	monthYearLabelRef: LegacyRef<HTMLDivElement>;
 	infiniteScrollRef?: LegacyRef<HTMLDivElement>;
+	id?: string;
 }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
@@ -41,11 +43,9 @@ export default function MonthBox({
 		transform: `translateY(${monthInd * -128}px)`,
 	};
 
-	const infScroll: string = monthInd > 2 ? "Future" : "Past";
-
 	return (
-		<div ref={infiniteScrollRef} style={alignMonths} className={`grid grid-cols-3 monthBox scroll${infScroll}`}>
-			<div ref={monthYearLabelRef} className="col-start-1 calLabelContainer">
+		<div id={id} ref={infiniteScrollRef} style={alignMonths} className={`grid grid-cols-3 monthBox`}>
+			<div ref={monthYearLabelRef} className="col-start-1 calLabelContainer unfocusedLabel">
 				<h1 className="calLabelText">{monthObj.year}</h1>
 			</div>
 			<div className="grid grid-cols-7">
@@ -53,7 +53,7 @@ export default function MonthBox({
 					<DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />
 				))}
 			</div>
-			<div ref={monthYearLabelRef} className="col-start-3 calLabelContainer">
+			<div ref={monthYearLabelRef} className="col-start-3 calLabelContainer unfocusedLabel">
 				<h1 className="calLabelText">{monthObj.monthName}</h1>
 			</div>
 		</div>

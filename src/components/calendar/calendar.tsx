@@ -1,6 +1,7 @@
 import { ReactNode, useState, useRef, useCallback, MutableRefObject, LegacyRef, useEffect } from "react";
 import MonthBox from "./monthBox";
 import { focusToday, getMonthName } from "../../utils/utils";
+import { Skeleton } from "@nextui-org/react";
 
 export interface LocalMonth {
 	month: number;
@@ -28,59 +29,90 @@ function _getMonth(): LocalMonth {
 
 //Calculate Month Comp arr on initialization
 function calcInitMonth({ index }: { index: number }): LocalMonth {
-	if (index == 4) return _getMonth();
+	if (index == 24) return _getMonth();
 	const monthObject: LocalMonth = _getMonth();
-	const diff: number = monthObject?.month + (index - 4);
-	if (diff <= 12 && diff >= 1) {
-		monthObject.month = diff;
+	const monthDiff: number = monthObject?.month + (index - 24);
+	let yearDiff: number = Math.floor(monthDiff / 12);
+	if (monthDiff <= 12 && monthDiff >= 1) {
+		monthObject.month = monthDiff;
 		monthObject.monthName = getMonthName(monthObject?.month);
 		return monthObject;
 	} else {
-		if (diff > 12) {
-			monthObject.month = diff - 12;
+		if (monthDiff > 12) {
+			monthObject.month = monthDiff % 12 === 0 ? 12 : monthDiff % 12;
 			monthObject.monthName = getMonthName(monthObject?.month);
-			monthObject.year++;
+			monthObject.year = monthObject.year + yearDiff;
 			return monthObject;
 		} else {
-			monthObject.month = 12 + diff;
+			console.log(monthDiff);
+			monthObject.month = 12 + monthDiff == 0 ? 12 : monthDiff > -12 ? 12 + monthDiff : 12 + (monthDiff % 12);
+			console.log(monthObject.month);
 			monthObject.monthName = getMonthName(monthObject?.month);
-			monthObject.year--;
+			if (monthObject.month === 12) {
+				yearDiff--;
+			}
+			monthObject.year = monthObject.year + yearDiff;
 			return monthObject;
 		}
 	}
 }
 
 //Calculate Month Comp arr when scrolling
-function calcScrollMonth({ monthArr, scrollDirection }: { monthArr: MonthComponentInfo[]; scrollDirection: 1 | 0 }): MonthComponentInfo[] {}
+function calcScrollMonth({ monthArr, scrollDirection, pastScrollCount }: { monthArr: MonthComponentInfo[]; scrollDirection: 1 | 0; pastScrollCount: number }): MonthComponentInfo[] {
+	if (scrollDirection === 1) {
+		const month: LocalMonth = calcInitMonth({ index: monthArr.length + 1 });
+		const monthBoxObj: MonthComponentInfo = {
+			monthObj: month,
+			key: `${month?.monthName}${month?.year}`,
+		};
+		return monthArr.concat(monthBoxObj);
+	} else {
+		const additionalMonths: MonthComponentInfo[] = [];
+		for (let i = 0; i < 4; i++) {
+			const month: LocalMonth = calcInitMonth({ index: pastScrollCount });
+			const monthBoxObj: MonthComponentInfo = {
+				monthObj: month,
+				key: `${month?.monthName}${month?.year}`,
+			};
+			additionalMonths.push(monthBoxObj);
+			pastScrollCount--;
+		}
+		return additionalMonths.concat(monthArr);
+	}
+}
 
 export default function Calendar(): ReactNode {
+	const [calLoaded, setCalLoaded] = useState(false);
 	const [monthComps, setMonthComps] = useState(
-		[...Array(7)].map((_, index) => {
+		[...Array(47)].map((_, index) => {
 			const month: LocalMonth = calcInitMonth({ index: index + 1 });
-			const monthBoxObj = {
+			const monthBoxObj: MonthComponentInfo = {
 				monthObj: month,
 				key: `${month?.monthName}${month?.year}`,
 			};
 			return monthBoxObj;
 		})
 	);
-
-	useEffect(() => focusToday(), []);
+	useEffect(() => {
+		focusToday();
+		setTimeout(() => setCalLoaded(true), 1000);
+	}, []);
 
 	//Intersect Observer to highlight current month/year label
 	const labelObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
 	labelObserver.current = new IntersectionObserver(
-		(entries: IntersectionObserverEntry[]) => {
-			entries?.forEach((entry) => {
+		async (entries: IntersectionObserverEntry[]) => {
+			for (const entry of entries) {
 				const targetClassList = entry?.target?.classList;
 				targetClassList?.toggle("focusLabel", entry?.isIntersecting);
 				targetClassList?.toggle("shadow-xl", entry?.isIntersecting);
+				targetClassList?.toggle("unfocusedLabel", entry?.isIntersecting);
 				if (targetClassList?.contains("col-start-1")) {
 					targetClassList?.toggle("focusLabelLeft", entry?.isIntersecting);
 				} else if (targetClassList?.contains("col-start-3")) {
 					targetClassList?.toggle("focusLabelRight", entry?.isIntersecting);
 				}
-			});
+			}
 		},
 		{ threshold: 0.65 }
 	);
@@ -93,56 +125,39 @@ export default function Calendar(): ReactNode {
 		}
 	}, []);
 
-	// const calInfiniteScrollObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
-	// calInfiniteScrollObserver.current = new IntersectionObserver(
-	// 	(entries: IntersectionObserverEntry[]) => {
-	// 		entries.forEach((entry) => {
-	// 			if (!entry?.isIntersecting) return;
-	// 			const targetClassList = entry.target.classList;
-	// 			if (targetClassList.contains("scrollFuture")) {
-	// 				const month: LocalMonth = calcInitMonth({ monthArr: monthComps, scrollDirection: 1 });
-	// 				const monthBoxObj = {
-	// 					monthObj: month,
-	// 					key: `${month.monthName}${month.year}`,
-	// 				};
-	// 				setMonthComps((prev) => prev.concat(monthBoxObj));
-	// 			} else if (targetClassList.contains("scrollPast")) {
-	// 				const month: LocalMonth = calcInitMonth({ index: 1 });
-	// 				const monthBoxObj = [
-	// 					{
-	// 						monthObj: month,
-	// 						key: `${month.monthName}${month.year}`,
-	// 					},
-	// 				];
-	// 				setMonthComps((prev) => {
-	// 					const arr = monthBoxObj.concat(prev);
-	// 					return arr;
-	// 				});
-	// 			}
-	// 		});
-	// 	},
-	// 	{ threshold: 0.65 }
-	// );
+	const futureScrollObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
+	futureScrollObserver.current = new IntersectionObserver(
+		(entry: IntersectionObserverEntry[]) => {
+			if (!entry[0]?.isIntersecting) return;
+			const month: MonthComponentInfo[] = calcScrollMonth({ monthArr: monthComps, scrollDirection: 1, pastScrollCount: 0 });
+			const newMonthArr = month.slice();
+			setMonthComps(newMonthArr);
+		},
+		{ threshold: 0.9 }
+	);
 
-	// const addCalInfiniteScrollObserver: LegacyRef<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
-	// 	try {
-	// 		await calInfiniteScrollObserver?.current?.observe(node);
-	// 	} catch {
-	// 		return;
-	// 	}
-	// }, []);
+	const addFutureScrollObserver: LegacyRef<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
+		futureScrollObserver.current?.disconnect();
+		try {
+			await futureScrollObserver?.current?.observe(node);
+		} catch {
+			return;
+		}
+	}, []);
 
 	return (
 		<div key="Calendar" className={`calendar`}>
-			{monthComps.map((monthBoxObj, index) => {
-				// if (monthComps?.length === index + 2) {
-				// 	return <MonthBox infiniteScrollRef={addCalInfiniteScrollObserver} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
-				// } else if (index === 1) {
-				// 	return <MonthBox infiniteScrollRef={addCalInfiniteScrollObserver} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
-				// } else {
-				return <MonthBox monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
-				// }
-			})}
+			<Skeleton isLoaded={calLoaded} className="rounded-lg">
+				{monthComps.map((monthBoxObj, index) => {
+					if (monthComps?.length === index + 2) {
+						return (
+							<MonthBox id="FutureScroll" infiniteScrollRef={addFutureScrollObserver} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />
+						);
+					} else {
+						return <MonthBox monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} monthInd={index} />;
+					}
+				})}
+			</Skeleton>
 		</div>
 	);
 }

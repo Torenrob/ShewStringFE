@@ -27,6 +27,7 @@
 	overflow-y: scroll;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	z-index: 1;
 }
 .calendar::-webkit-scrollbar {
 	display: none;
@@ -47,6 +48,8 @@
 .calLabelContainer {
 	display: grid;
 	align-content: center;
+	background-color: black;
+	color: white;
 }
 
 .calLabelText {
@@ -55,12 +58,19 @@
 	font-size: larger;
 }
 
+div:has(> .unfocusedLabel) {
+	z-index: 1;
+}
+
+div:has(> .focusedLabel) {
+	z-index: 2;
+}
+
 .focusLabel {
 	transition: all 600ms;
 	font-weight: bolder;
 	background-color: var(--60color);
 	color: white;
-	z-index: 1;
 }
 
 .focusLabelLeft {
@@ -79,4 +89,5 @@
 
 .monthBox {
 	grid-template-columns: max-content auto max-content;
+	position: relative;
 }
