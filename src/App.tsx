@@ -1,9 +1,10 @@
 import "./App.css";
+import Calendar from "./components/calendar/calendar";
 import Login from "./components/loginPage";
 import { ReactNode } from "react";
 
 function App(): ReactNode {
-	return <Login />;
+	return <Calendar />;
 }
 
 export default App;

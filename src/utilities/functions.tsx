@@ -1,3 +1,5 @@
+import { LocalMonth } from "../types/types";
+
 export function getMonthName(num: number) {
 	let name: string = "";
 
@@ -45,5 +47,16 @@ export function getMonthName(num: number) {
 
 export function focusToday() {
 	//Brings the current date into view on Calendar
-	window.onload = () => document.getElementById(`${new Date().toLocaleDateString()}`)?.scrollIntoView({ behavior: "instant" });
+	document.getElementById(`${new Date().toLocaleDateString()}`)?.scrollIntoView({ behavior: "instant" });
+}
+
+//Function to control Yaxis transition keeping months aligned in sync
+export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMonth): number {
+	const firstDay = new Date(monthObj.year, monthObj.month - 1, 1).getDay();
+	if (index === 0) return prevYtrans;
+	if (firstDay === 0) {
+		return prevYtrans;
+	} else {
+		return prevYtrans + 128;
+	}
 }

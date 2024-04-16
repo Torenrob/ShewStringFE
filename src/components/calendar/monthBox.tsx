@@ -1,42 +1,44 @@
-import { ReactNode, LegacyRef } from "react";
+import { ReactNode, Ref } from "react";
 import DayBox from "./dayBox";
-import { LocalMonth } from "./calendar";
-
-export interface CalDate {
-	date: number;
-	dayOfWeek: number;
-	month: number;
-	monthName: string;
-	year: number;
-}
+import { BudgetTransaction, LocalMonth } from "../../types/types";
+import { DateComponentInfo } from "../../types/types";
 
 export default function MonthBox({
 	monthObj,
-	monthInd,
 	monthYearLabelRef,
 	endRef,
-	ta,
+	transactions,
 	id,
 }: {
 	monthObj: LocalMonth;
-	monthInd: number;
-	monthYearLabelRef: LegacyRef<HTMLDivElement>;
-	endRef?: LegacyRef<HTMLDivElement>;
-	ta?: boolean;
+	monthYearLabelRef: Ref<HTMLDivElement>;
+	transactions: BudgetTransaction[];
+	endRef?: Ref<HTMLDivElement>;
 	id?: string;
 }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
 
-	function getDate({ month, date }: { month: LocalMonth; date: number }): CalDate {
+	function getTransactions({ date, transactions }: { date: number; transactions: BudgetTransaction[] }): BudgetTransaction[] {
+		const dateTransactions: BudgetTransaction[] = [];
+		transactions.forEach((trans) => {
+			if (trans.date === date) {
+				dateTransactions.push(trans);
+			}
+		});
+		return dateTransactions;
+	}
+
+	function getDate({ month, date }: { month: LocalMonth; date: number }): DateComponentInfo {
 		const day = new Date(month.year, monthObj.month - 1, date).getDay();
-		const dateObj: CalDate = {
+		const dateObj: DateComponentInfo = {
 			date: date,
 			dayOfWeek: day + 1,
 			month: month.month,
 			monthName: month.monthName,
 			year: month.year,
+			transactions: getTransactions({ date: date, transactions: transactions }),
 		};
 		return dateObj;
 	}
@@ -44,7 +46,7 @@ export default function MonthBox({
 	const monthLength: number = getDaysOfMonth(monthObj);
 
 	const alignMonths = {
-		transform: `translateY(${monthInd * -128}px)`,
+		transform: `translateY(-${monthObj.styleYtransition}px)`,
 	};
 
 	return (
@@ -55,7 +57,7 @@ export default function MonthBox({
 			<div className="grid grid-cols-7">
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
-						return <DayBox ta={ta} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					} else {
 						return <DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					}

@@ -72,7 +72,7 @@ div:has(> .focusedLabel) {
 }
 
 .focusLabel {
-	transition: all 600ms;
+	transition: all 300ms;
 	font-weight: bolder;
 	background-color: var(--60color);
 	color: white;

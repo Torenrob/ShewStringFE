@@ -1,0 +1,12 @@
+.transaction {
+	font-size: 0.65rem;
+	padding: 0% 2px;
+}
+
+.transactionMarquee {
+	max-width: 70%;
+}
+
+.transaction > span {
+	min-width: fit-content;
+}
