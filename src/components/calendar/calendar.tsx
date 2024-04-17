@@ -1,8 +1,8 @@
-import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo } from "react";
+import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext } from "react";
 import MonthBox from "./monthBox";
 import { focusToday, getMonthName, setYtrans } from "../../utilities/functions";
 import { BudgetTransaction, LocalMonth, MonthComponentInfo } from "../../types/types";
-import { Skeleton } from "@nextui-org/react";
+import { Skeleton, Input, Select, SelectItem } from "@nextui-org/react";
 import { supabase } from "../../utilities/supabase";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
@@ -53,6 +53,12 @@ function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; cur
 
 export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
+	const [open, setOpen] = useState<boolean>(false);
+
+	function toggleDrawer() {
+		const isOpen = !open;
+		setOpen(isOpen);
+	}
 
 	function assignTransactions(monthInfo: LocalMonth, transactionData: BudgetTransaction[]) {
 		const transactionArray: BudgetTransaction[] = [];
@@ -96,8 +102,6 @@ export default function Calendar(): ReactNode {
 			for (const entry of entries) {
 				const targetClassList = entry?.target?.classList;
 				targetClassList?.toggle("focusLabel", entry?.isIntersecting);
-				targetClassList?.toggle("shadow-xl", entry?.isIntersecting);
-				targetClassList?.toggle("unfocusedLabel", entry?.isIntersecting);
 				if (targetClassList?.contains("col-start-1")) {
 					targetClassList?.toggle("focusLabelLeft", entry?.isIntersecting);
 				} else if (targetClassList?.contains("col-start-3")) {
@@ -133,22 +137,33 @@ export default function Calendar(): ReactNode {
 	}, []);
 
 	return (
-		<div key="Calendar" className={`calendar`}>
+		<div key="Calendar" id="calendar">
 			<Skeleton isLoaded={calendarLoaded.current} className="rounded-lg">
 				{monthComps.map((monthBoxObj, index) => {
 					if (monthComps.length === index + 1) {
 						return (
-							<MonthBox
-								transactions={monthBoxObj.transactions}
-								endRef={addEndRefObserver}
-								monthYearLabelRef={addLabelObserver}
-								monthObj={monthBoxObj?.monthObj}
-								key={monthBoxObj?.key}
-								id="lastMonth"
-							/>
+							<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+								<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
+									<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+								</div>
+								<MonthBox transactions={monthBoxObj.transactions} endRef={addEndRefObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} id="lastMonth" />
+								<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
+									<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+								</div>
+							</div>
 						);
 					}
-					return <MonthBox transactions={monthBoxObj.transactions} monthYearLabelRef={addLabelObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />;
+					return (
+						<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+							<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel">
+								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+							</div>
+							<MonthBox transactions={monthBoxObj.transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
+							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer unfocusedLabel">
+								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+							</div>
+						</div>
+					);
 				})}
 			</Skeleton>
 		</div>

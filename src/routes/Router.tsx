@@ -7,7 +7,7 @@ import Calendar from "../components/calendar/calendar";
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <Calendar />,
+		element: <App />,
 	},
 	{
 		path: "/sign-up",

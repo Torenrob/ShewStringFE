@@ -2,20 +2,9 @@ import { ReactNode, Ref } from "react";
 import DayBox from "./dayBox";
 import { BudgetTransaction, LocalMonth } from "../../types/types";
 import { DateComponentInfo } from "../../types/types";
+import { Dropdown, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 
-export default function MonthBox({
-	monthObj,
-	monthYearLabelRef,
-	endRef,
-	transactions,
-	id,
-}: {
-	monthObj: LocalMonth;
-	monthYearLabelRef: Ref<HTMLDivElement>;
-	transactions: BudgetTransaction[];
-	endRef?: Ref<HTMLDivElement>;
-	id?: string;
-}): ReactNode {
+export default function MonthBox({ monthObj, endRef, transactions, id }: { monthObj: LocalMonth; transactions: BudgetTransaction[]; endRef?: Ref<HTMLDivElement>; id?: string }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
@@ -50,10 +39,7 @@ export default function MonthBox({
 	};
 
 	return (
-		<div id={id} style={alignMonths} className={`grid grid-cols-3 monthBox`}>
-			<div ref={monthYearLabelRef} className="col-start-1 calLabelContainer unfocusedLabel">
-				<h1 className="calLabelText">{monthObj.year}</h1>
-			</div>
+		<div id={id} className="monthBox">
 			<div className="grid grid-cols-7">
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
@@ -63,9 +49,7 @@ export default function MonthBox({
 					}
 				})}
 			</div>
-			<div ref={monthYearLabelRef} className="col-start-3 calLabelContainer unfocusedLabel">
-				<h1 className="calLabelText">{monthObj.monthName}</h1>
-			</div>
+			{/* Hidden div to keep calendar from scrolling past last month rendered */}
 			{endRef && <div className="h-px w-px" ref={endRef}></div>}
 		</div>
 	);

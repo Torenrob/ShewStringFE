@@ -47,7 +47,9 @@ export function getMonthName(num: number) {
 
 export function focusToday() {
 	//Brings the current date into view on Calendar
-	document.getElementById(`${new Date().toLocaleDateString()}`)?.scrollIntoView({ behavior: "instant" });
+	let currentDate = new Date().toLocaleDateString();
+	currentDate = currentDate.split("/").join("-");
+	document.getElementById(`Date${currentDate}`)?.scrollIntoView({ behavior: "instant" });
 }
 
 //Function to control Yaxis transition keeping months aligned in sync

@@ -25,9 +25,10 @@
 	min-width: fit-content;
 }
 
-.calendar {
-	height: 82.5vh;
-	width: 80vw;
+#calendar {
+	position: relative;
+	height: 768.89px;
+	width: 1536px;
 	overflow-y: scroll;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
@@ -44,6 +45,8 @@
 
 .dayBox {
 	min-height: 128px;
+	cursor: pointer;
+	pointer-events: auto;
 }
 
 .dateGrid {
@@ -53,7 +56,7 @@
 .calLabelContainer {
 	display: grid;
 	align-content: center;
-	background-color: black;
+	background-color: transparent;
 	color: white;
 }
 
@@ -61,14 +64,6 @@
 	writing-mode: vertical-rl;
 	text-orientation: upright;
 	font-size: larger;
-}
-
-div:has(> .unfocusedLabel) {
-	z-index: 1;
-}
-
-div:has(> .focusedLabel) {
-	z-index: 2;
 }
 
 .focusLabel {
@@ -93,6 +88,34 @@ div:has(> .focusedLabel) {
 }
 
 .monthBox {
-	grid-template-columns: max-content auto max-content;
 	position: relative;
+	pointer-events: none;
+}
+
+.labelGridContainer {
+	grid-template-columns: max-content auto max-content;
+	pointer-events: none;
+	/* background-color: rgba(43, 43, 43, 0.384); */
+}
+
+.transactionDrawer {
+	height: 22.5%;
+	-webkit-box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
+	-moz-box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
+	box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
+	transition: all 500ms;
+}
+
+.transactionForm {
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: min-content;
+}
+
+.calendarContainer {
+	height: 768.89px;
+	width: 1536px;
+}
+
+.drawerClosed {
+	transform: translateY(250px);
 }
