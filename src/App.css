@@ -27,7 +27,7 @@
 
 #calendar {
 	position: relative;
-	height: 768.89px;
+	height: 800px;
 	width: 1536px;
 	overflow-y: scroll;
 	scrollbar-width: none;
@@ -71,16 +71,17 @@
 	font-weight: bolder;
 	background-color: var(--60color);
 	color: white;
+	transform: scaleY(1.04);
 }
 
 .focusLabelLeft {
-	border-top-left-radius: 15px;
-	border-bottom-left-radius: 15px;
+	border-top-right-radius: 7px;
+	border-bottom-right-radius: 7px;
 }
 
 .focusLabelRight {
-	border-top-right-radius: 15px;
-	border-bottom-right-radius: 15px;
+	border-top-left-radius: 7px;
+	border-bottom-left-radius: 7px;
 }
 
 .focusMonthCal {
@@ -95,27 +96,34 @@
 .labelGridContainer {
 	grid-template-columns: max-content auto max-content;
 	pointer-events: none;
-	/* background-color: rgba(43, 43, 43, 0.384); */
 }
 
 .transactionDrawer {
-	height: 22.5%;
-	-webkit-box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
-	-moz-box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
-	box-shadow: 0px -9px 6px -4px rgba(107, 107, 107, 0.8);
+	height: fit-content;
 	transition: all 500ms;
 }
 
 .transactionForm {
-	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-columns: 0.5fr 0.5fr 0.75fr 1fr;
 	grid-template-rows: min-content;
 }
 
 .calendarContainer {
-	height: 768.89px;
+	height: 800px;
 	width: 1536px;
 }
 
 .drawerClosed {
 	transform: translateY(250px);
+}
+
+div > .weekdayLabel {
+	z-index: 5;
+}
+
+.weekdayLabel {
+	width: 100%;
+	background-color: rgb(0, 0, 0);
+	color: white;
+	text-align: center;
 }

@@ -76,7 +76,6 @@ export default function Calendar(): ReactNode {
 		const res = await supabase.from("transaction").select();
 		let yTrans: number = 0;
 		const monthArr = [...Array(47)].map((_, index) => {
-			console.log(yTrans);
 			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
 			yTrans = month.styleYtransition;
 			const monthBoxObj: MonthComponentInfo = {
@@ -109,7 +108,7 @@ export default function Calendar(): ReactNode {
 				}
 			}
 		},
-		{ threshold: 0.65 }
+		{ threshold: 0.7 }
 	);
 
 	const addLabelObserver: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
