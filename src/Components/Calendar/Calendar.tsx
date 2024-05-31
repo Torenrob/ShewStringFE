@@ -1,9 +1,10 @@
 import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext } from "react";
-import MonthBox from "./monthBox";
-import { focusToday, getMonthName, setYtrans } from "../../utilities/functions";
-import { BudgetTransaction, LocalMonth, MonthComponentInfo } from "../../types/types";
+import MonthBox from "./MonthBox";
+import { focusToday, getMonthName, setYtrans } from "../../Utilities/Functions";
+import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
+import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { Skeleton, Input, Select, SelectItem } from "@nextui-org/react";
-import { supabase } from "../../utilities/supabase";
+import { getAllTransactionsAPI } from "../../Services/TransactionAPI";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getMonth(): LocalMonth {
@@ -22,12 +23,12 @@ function _getMonth(): LocalMonth {
 
 //Calculate Month Comp arr on initialization
 function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; currentMonth: LocalMonth; prevYtrans: number }): LocalMonth {
-	if (index == 24) {
+	if (index == 12) {
 		currentMonth.styleYtransition = setYtrans(index, prevYtrans, currentMonth);
 		return currentMonth;
 	}
 	const monthObject: LocalMonth = currentMonth;
-	const monthDiff: number = monthObject?.month + (index - 24);
+	const monthDiff: number = monthObject?.month + (index - 12);
 	const yearDiff: number = monthDiff % 12 === 0 ? Math.floor(monthDiff / 12) - 1 : Math.floor(monthDiff / 12);
 	if (monthDiff <= 12 && monthDiff >= 1) {
 		monthObject.month = monthDiff;
@@ -60,10 +61,11 @@ export default function Calendar(): ReactNode {
 		setOpen(isOpen);
 	}
 
-	function assignTransactions(monthInfo: LocalMonth, transactionData: BudgetTransaction[]) {
-		const transactionArray: BudgetTransaction[] = [];
+	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
+		const transactionArray: TransactionAPIData[] = [];
 		transactionData?.forEach((trans) => {
-			if (trans.month === monthInfo.month && trans.year === monthInfo.year) {
+			const monthYrMnth = monthInfo.year.toString() + "-" + monthInfo.month.toString().padStart(2, "0");
+			if (trans.date.substring(0, 7) === monthYrMnth) {
 				transactionArray.push(trans);
 			}
 		});
@@ -73,14 +75,14 @@ export default function Calendar(): ReactNode {
 	const calendarLoaded = useRef(false);
 
 	const getTransactionData = useCallback(async () => {
-		const res = await supabase.from("transaction").select();
+		const res: TransactionAPIData[] | null = await getAllTransactionsAPI();
 		let yTrans: number = 0;
-		const monthArr = [...Array(47)].map((_, index) => {
+		const monthArr = [...Array(23)].map((_, index) => {
 			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
 			yTrans = month.styleYtransition;
 			const monthBoxObj: MonthComponentInfo = {
 				monthObj: month,
-				transactions: assignTransactions(month, res.data as BudgetTransaction[]),
+				transactions: assignTransactions(month, res),
 				key: `${month?.monthName}${month?.year}`,
 			};
 			return monthBoxObj;

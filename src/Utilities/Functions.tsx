@@ -1,4 +1,4 @@
-import { LocalMonth } from "../types/types";
+import { LocalMonth } from "../types/CalendarTypes";
 
 export function getMonthName(num: number) {
 	let name: string = "";

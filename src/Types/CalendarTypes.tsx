@@ -1,12 +1,4 @@
-export interface BudgetTransaction {
-	id: string;
-	title: string;
-	date: number;
-	month: number;
-	year: number;
-	amount: number;
-	type: "debit" | "credit";
-}
+import { TransactionAPIData } from "./APIDataTypes";
 
 export interface LocalMonth {
 	month: number;
@@ -17,7 +9,7 @@ export interface LocalMonth {
 
 export interface MonthComponentInfo {
 	monthObj: LocalMonth;
-	transactions: BudgetTransaction[];
+	transactions: TransactionAPIData[];
 	key: string;
 }
 
@@ -27,7 +19,7 @@ export interface DateComponentInfo {
 	month: number;
 	monthName: string;
 	year: number;
-	transactions: BudgetTransaction[];
+	transactions: TransactionAPIData[];
 }
 
 export interface CalendarRenderInfo {

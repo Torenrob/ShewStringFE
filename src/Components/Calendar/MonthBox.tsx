@@ -1,18 +1,18 @@
 import { ReactNode, Ref } from "react";
-import DayBox from "./dayBox";
-import { BudgetTransaction, LocalMonth } from "../../types/types";
-import { DateComponentInfo } from "../../types/types";
+import DayBox from "./DayBox";
+import { TransactionAPIData } from "../../Types/APIDataTypes";
+import { DateComponentInfo, LocalMonth } from "../../Types/CalendarTypes";
 import { Dropdown, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 
-export default function MonthBox({ monthObj, endRef, transactions, id }: { monthObj: LocalMonth; transactions: BudgetTransaction[]; endRef?: Ref<HTMLDivElement>; id?: string }): ReactNode {
+export default function MonthBox({ monthObj, endRef, transactions, id }: { monthObj: LocalMonth; transactions: TransactionAPIData[]; endRef?: Ref<HTMLDivElement>; id?: string }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
 
-	function getTransactions({ date, transactions }: { date: number; transactions: BudgetTransaction[] }): BudgetTransaction[] {
-		const dateTransactions: BudgetTransaction[] = [];
+	function getTransactions({ date, transactions }: { date: number; transactions: TransactionAPIData[] }): TransactionAPIData[] {
+		const dateTransactions: TransactionAPIData[] = [];
 		transactions.forEach((trans) => {
-			if (trans.date === date) {
+			if (trans.date.substring(8) === date.toString().padStart(2, "0")) {
 				dateTransactions.push(trans);
 			}
 		});
