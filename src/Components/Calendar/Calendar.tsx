@@ -56,11 +56,6 @@ export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
 	const [open, setOpen] = useState<boolean>(false);
 
-	function toggleDrawer() {
-		const isOpen = !open;
-		setOpen(isOpen);
-	}
-
 	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
 		const transactionArray: TransactionAPIData[] = [];
 		transactionData?.forEach((trans) => {
@@ -87,8 +82,8 @@ export default function Calendar(): ReactNode {
 			};
 			return monthBoxObj;
 		});
-		setMonthComps(monthArr);
 		focusToday();
+		setMonthComps(monthArr);
 		calendarLoaded.current = true;
 	}, []);
 

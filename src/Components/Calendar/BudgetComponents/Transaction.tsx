@@ -35,13 +35,14 @@ export default function Transaction({ transaction }: { transaction?: Transaction
 			color={transaction?.transactionType === "Credit" ? "success" : "danger"}
 			radius="none"
 			size="sm"
-			className="transaction flex content-between border-0 mt-1 h-4 w-auto">
+			className="transaction flex content-between border-0 mb-1 h-4 w-auto">
 			<span>
-				{transaction?.transactionType === "Credit" ? "+" : "("}
+				${transaction?.transactionType === "Credit" ? "" : "("}
 				{Number.parseFloat(transaction?.amount.toString() as string).toFixed(2)}
 				{transaction?.transactionType === "Debit" && ")"}
 			</span>
-			<Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={marqueePlay}></Marquee>
+			{marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
+			{!marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>}
 		</Button>
 	);
 }

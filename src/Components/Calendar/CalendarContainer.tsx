@@ -1,13 +1,20 @@
-import { useContext, createContext, useState, useCallback } from "react";
+import { createContext, useState, SetStateAction, Dispatch, useRef, MutableRefObject, Ref, RefObject } from "react";
 import Calendar from "./Calendar";
-import { Input, Select, SelectItem, Textarea, DateInput, Card, CardBody, Chip } from "@nextui-org/react";
-import styled from "styled-components";
-import CalendarDrawer from "./CalendarDrawer";
+import { DateInput, DateValue } from "@nextui-org/react";
+import TransactionInputDrawer, { TransactionInputDrawerRef } from "./CalendarDrawer";
+import { parseDate } from "@internationalized/date";
 
-export const CalendarContext = createContext<(() => void) | undefined>(undefined);
+export type CalendarContextType = {
+	toggle: (newDate: DateValue) => void;
+};
+
+export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
 export default function CalContainer() {
-	function toggleDrawer() {
+	const childref = useRef<TransactionInputDrawerRef>(null!);
+
+	function toggleDrawer(newDate: DateValue) {
+		childref.current.updateDate(newDate);
 		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
 		if (drawer.classList.contains("drawerClosed")) {
 			drawer.classList.remove("drawerClosed");
@@ -25,8 +32,8 @@ export default function CalContainer() {
 				<div className="weekdayLabel">Friday</div>
 				<div className="weekdayLabel">Saturday</div>
 			</div>
-			<CalendarDrawer />
-			<CalendarContext.Provider value={toggleDrawer}>
+			<TransactionInputDrawer ref={childref} />
+			<CalendarContext.Provider value={{ toggle: toggleDrawer }}>
 				<Calendar />
 			</CalendarContext.Provider>
 		</div>

@@ -5,6 +5,7 @@ import Transaction from "./BudgetComponents/Transaction";
 import { CalendarContext } from "./CalendarContainer";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import AddTransactionIcon from "./Icons/AddTransactionIcon";
+import { parseDate } from "@internationalized/date";
 
 export default function DayBox({ date, dateObj, endRef }: { date: number; dateObj: DateComponentInfo; endRef?: Ref<HTMLDivElement> }): ReactNode {
 	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
@@ -21,31 +22,33 @@ export default function DayBox({ date, dateObj, endRef }: { date: number; dateOb
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
 
-	const openDrawer = useContext(CalendarContext);
+	const { toggle: openDrawer } = useContext(CalendarContext);
 
-	function dateClick() {
-		console.log("Card Clicked");
+	function clickAddTransaction() {
+		openDrawer(parseDate(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`));
 	}
 
 	return (
 		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 outline-black`}>
-			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="p-1 py-0 overflow-x-hidden overflow-y-hidden">
+			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="px-1 py-0 overflow-x-hidden overflow-y-hidden">
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
 				<div className="transactionContainer overflow-y-scroll">
 					{dateObj.transactions &&
 						dateObj.transactions.map((trans: TransactionAPIData, i: number) => <Transaction transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} />)}
 				</div>
-				<Button
-					onClick={openDrawer}
-					variant="flat"
-					isIconOnly
-					radius="full"
-					color="danger"
-					size="sm"
-					className={`absolute addTransactionBtn ${addTransactionBtnVisible ? "addTransactionBtnVisible" : ""}`}>
-					<AddTransactionIcon />
-				</Button>
+				{addTransactionBtnVisible && (
+					<Button
+						onClick={clickAddTransaction}
+						variant="flat"
+						isIconOnly
+						radius="full"
+						color="danger"
+						size="sm"
+						className={`absolute addTransactionBtn ${addTransactionBtnVisible ? "addTransactionBtnVisible" : ""}`}>
+						<AddTransactionIcon />
+					</Button>
+				)}
 			</CardBody>
 		</Card>
 	);

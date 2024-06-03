@@ -119,7 +119,7 @@
 
 .transactionDrawer {
 	height: fit-content;
-	transition: all 500ms;
+	transition: all 400ms;
 }
 
 .transactionForm {
@@ -150,10 +150,22 @@ div > .weekdayLabel {
 .addTransactionBtn {
 	position: absolute;
 	bottom: 3px;
-	right: -30px;
+	right: -33px;
 	transition: all 300ms;
 }
 
 .addTransactionBtnVisible {
 	right: 3px;
+}
+
+.rfm-marquee {
+	margin: 0px 3px 0px 0px;
+}
+
+.resetMarquee {
+	transform: translateX(100px);
+}
+
+.invalidAmount {
+	font-size: xx-small;
 }

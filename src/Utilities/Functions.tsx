@@ -1,4 +1,4 @@
-import { LocalMonth } from "../types/CalendarTypes";
+import { LocalMonth } from "../Types/CalendarTypes";
 
 export function getMonthName(num: number) {
 	let name: string = "";
@@ -49,7 +49,10 @@ export function focusToday() {
 	//Brings the current date into view on Calendar
 	let currentDate = new Date().toLocaleDateString();
 	currentDate = currentDate.split("/").join("-");
-	document.getElementById(`Date${currentDate}`)?.scrollIntoView({ behavior: "instant" });
+	setTimeout(() => {
+		const elem = document.getElementById(`Date${currentDate}`);
+		elem?.scrollIntoView({ behavior: "instant" });
+	}, 0.5);
 }
 
 //Function to control Yaxis transition keeping months aligned in sync

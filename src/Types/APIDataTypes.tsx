@@ -19,6 +19,16 @@ export interface TransactionAPIData {
 	repeatGroupId: number | null;
 }
 
+export interface PostTransactionAPIData {
+	title: string | null;
+	transactionType: "Debit" | "Credit";
+	amount: number;
+	date: string;
+	category: string;
+	description: string | null;
+	bankAccountId: number;
+}
+
 export interface RepeatGroupInBankAccountAPIData {
 	id: number;
 }
