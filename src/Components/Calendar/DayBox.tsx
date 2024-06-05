@@ -9,8 +9,9 @@ import { parseDate } from "@internationalized/date";
 
 export default function DayBox({ date, dateObj, endRef }: { date: number; dateObj: DateComponentInfo; endRef?: Ref<HTMLDivElement> }): ReactNode {
 	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
+	console.log(dateObj);
 
-	const dateString: string = `Date${dateObj.month}-${dateObj.date}-${dateObj.year}`;
+	const dateString: string = `Date${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
 
 	function toggleAddTransactionBtn(event: MouseEvent) {
 		if (event.type === "mouseenter") setAddTransactionBtnVisible(true);
@@ -33,7 +34,7 @@ export default function DayBox({ date, dateObj, endRef }: { date: number; dateOb
 			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="px-1 py-0 overflow-x-hidden overflow-y-hidden">
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
-				<div className="transactionContainer overflow-y-scroll">
+				<div id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll">
 					{dateObj.transactions &&
 						dateObj.transactions.map((trans: TransactionAPIData, i: number) => <Transaction transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} />)}
 				</div>

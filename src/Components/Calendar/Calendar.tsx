@@ -1,10 +1,10 @@
 import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext } from "react";
 import MonthBox from "./MonthBox";
-import { focusToday, getMonthName, setYtrans } from "../../Utilities/Functions";
+import { focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponent";
 import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { Skeleton, Input, Select, SelectItem } from "@nextui-org/react";
-import { getAllTransactionsAPI } from "../../Services/TransactionAPI";
+import { getAllTransactionsAPI } from "../../Services/API/TransactionAPI";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getMonth(): LocalMonth {
@@ -123,7 +123,7 @@ export default function Calendar(): ReactNode {
 		endObserver.current = new IntersectionObserver(
 			(entry: IntersectionObserverEntry[]) => {
 				const bcr = entry[0].boundingClientRect;
-				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
+				if (bcr.top < 800) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
 			},
 			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
 		);
@@ -133,7 +133,7 @@ export default function Calendar(): ReactNode {
 	}, []);
 
 	return (
-		<div key="Calendar" id="calendar">
+		<div key="Calendar" id="calendar" className="row-start-2">
 			<Skeleton isLoaded={calendarLoaded.current} className="rounded-lg">
 				{monthComps.map((monthBoxObj, index) => {
 					if (monthComps.length === index + 1) {

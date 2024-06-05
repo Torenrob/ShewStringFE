@@ -3,8 +3,9 @@ import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
+import ReactDOM from "react-dom";
 
-export default function Transaction({ transaction }: { transaction: TransactionAPIData }) {
+export default function TransactionPortal({ transaction, containerID }: { transaction: TransactionAPIData; containerID: string }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
 
 	function shouldMarqueePlay(): boolean {
@@ -27,7 +28,7 @@ export default function Transaction({ transaction }: { transaction: TransactionA
 		position: "relative",
 	};
 
-	return (
+	return ReactDOM.createPortal(
 		<Button
 			onMouseEnter={marqueeSwitch}
 			onMouseLeave={marqueeSwitch}
@@ -43,6 +44,7 @@ export default function Transaction({ transaction }: { transaction: TransactionA
 			</span>
 			{marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
 			{!marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>}
-		</Button>
+		</Button>,
+		document.getElementById(containerID) as HTMLElement
 	);
 }

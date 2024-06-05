@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { ErrorHandler } from "../Helpers/ErrorHandler";
-import { PostTransactionAPIData, TransactionAPIData } from "../Types/APIDataTypes";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 
 const api = import.meta.env.VITE_API_URL + "/transactions";
 

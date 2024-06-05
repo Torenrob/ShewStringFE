@@ -27,7 +27,6 @@
 
 #calendar {
 	position: relative;
-	height: 800px;
 	width: 1536px;
 	overflow-y: scroll;
 	scrollbar-width: none;
@@ -120,6 +119,7 @@
 .transactionDrawer {
 	height: fit-content;
 	transition: all 400ms;
+	bottom: 0px;
 }
 
 .transactionForm {
@@ -133,7 +133,7 @@
 }
 
 .drawerClosed {
-	transform: translateY(250px);
+	transform: translateY(130px);
 }
 
 div > .weekdayLabel {
@@ -145,6 +145,7 @@ div > .weekdayLabel {
 	background-color: rgb(0, 0, 0);
 	color: white;
 	text-align: center;
+	padding: 0px 26px;
 }
 
 .addTransactionBtn {
@@ -156,14 +157,6 @@ div > .weekdayLabel {
 
 .addTransactionBtnVisible {
 	right: 3px;
-}
-
-.rfm-marquee {
-	margin: 0px 3px 0px 0px;
-}
-
-.resetMarquee {
-	transform: translateX(100px);
 }
 
 .invalidAmount {

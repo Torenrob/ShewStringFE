@@ -1,7 +1,7 @@
 import { createContext, useState, SetStateAction, Dispatch, useRef, MutableRefObject, Ref, RefObject } from "react";
 import Calendar from "./Calendar";
 import { DateInput, DateValue } from "@nextui-org/react";
-import TransactionInputDrawer, { TransactionInputDrawerRef } from "./CalendarDrawer";
+import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { parseDate } from "@internationalized/date";
 
 export type CalendarContextType = {
@@ -19,21 +19,23 @@ export default function CalContainer() {
 		if (drawer.classList.contains("drawerClosed")) {
 			drawer.classList.remove("drawerClosed");
 		}
+		const titleInput: HTMLInputElement = document.getElementById("TransactionDrawerTitle") as HTMLInputElement;
+		titleInput.focus();
 	}
 
 	return (
-		<div className="relative flex calendarContainer overflow-hidden">
-			<div className="absolute grid grid-cols-7 w-full h-fit text-xs font-semibold" style={{ padding: "0px 26px" }}>
-				<div className="weekdayLabel">Sunday</div>
-				<div className="weekdayLabel">Monday</div>
-				<div className="weekdayLabel">Tuesday</div>
-				<div className="weekdayLabel">Wednesday</div>
-				<div className="weekdayLabel">Thursday</div>
-				<div className="weekdayLabel">Friday</div>
-				<div className="weekdayLabel">Saturday</div>
+		<div className="relative flex flex-col calendarContainer overflow-clip">
+			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
+				<div>Sunday</div>
+				<div>Monday</div>
+				<div>Tuesday</div>
+				<div>Wednesday</div>
+				<div>Thursday</div>
+				<div>Friday</div>
+				<div>Saturday</div>
 			</div>
-			<TransactionInputDrawer ref={childref} />
 			<CalendarContext.Provider value={{ toggle: toggleDrawer }}>
+				<TransactionInputDrawer ref={childref} />
 				<Calendar />
 			</CalendarContext.Provider>
 		</div>

@@ -48,7 +48,9 @@ export function getMonthName(num: number) {
 export function focusToday() {
 	//Brings the current date into view on Calendar
 	let currentDate = new Date().toLocaleDateString();
-	currentDate = currentDate.split("/").join("-");
+	console.log(currentDate);
+	const currentDateArr = currentDate.split("/");
+	currentDate = currentDateArr[2] + "-" + currentDateArr[0].padStart(2, "0") + "-" + currentDateArr[1].padStart(2, "0");
 	setTimeout(() => {
 		const elem = document.getElementById(`Date${currentDate}`);
 		elem?.scrollIntoView({ behavior: "instant" });

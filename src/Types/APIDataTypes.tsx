@@ -21,7 +21,7 @@ export interface TransactionAPIData {
 
 export interface PostTransactionAPIData {
 	title: string | null;
-	transactionType: "Debit" | "Credit";
+	transactionType: 0 | 1;
 	amount: number;
 	date: string;
 	category: string;
