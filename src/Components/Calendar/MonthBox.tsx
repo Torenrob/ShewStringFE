@@ -1,10 +1,22 @@
-import { ReactNode, Ref } from "react";
+import { Dispatch, ReactNode, Ref, SetStateAction } from "react";
 import DayBox from "./DayBox";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { DateComponentInfo, LocalMonth } from "../../Types/CalendarTypes";
 import { Dropdown, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 
-export default function MonthBox({ monthObj, endRef, transactions, id }: { monthObj: LocalMonth; transactions: TransactionAPIData[]; endRef?: Ref<HTMLDivElement>; id?: string }): ReactNode {
+export default function MonthBox({
+	monthObj,
+	endRef,
+	transactions,
+	setTransactionPassDown,
+	id,
+}: {
+	monthObj: LocalMonth;
+	transactions: TransactionAPIData[];
+	setTransactionPassDown: Dispatch<SetStateAction<TransactionAPIData[] | null>>;
+	endRef?: Ref<HTMLDivElement>;
+	id?: string;
+}): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
 	}
@@ -43,9 +55,9 @@ export default function MonthBox({ monthObj, endRef, transactions, id }: { month
 			<div className="grid grid-cols-7">
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
-						return <DayBox endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox setTransPassDown={setTransactionPassDown} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					} else {
-						return <DayBox date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox setTransPassDown={setTransactionPassDown} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					}
 				})}
 			</div>

@@ -3,6 +3,7 @@ import Calendar from "./Calendar";
 import { DateInput, DateValue } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { parseDate } from "@internationalized/date";
+import { TransactionAPIData } from "../../Types/APIDataTypes";
 
 export type CalendarContextType = {
 	toggle: (newDate: DateValue) => void;
@@ -10,7 +11,7 @@ export type CalendarContextType = {
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
-export default function CalContainer() {
+export default function CalendarContainer() {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
 	function toggleDrawer(newDate: DateValue) {

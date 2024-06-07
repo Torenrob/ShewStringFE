@@ -1,6 +1,6 @@
 import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext } from "react";
 import MonthBox from "./MonthBox";
-import { focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponent";
+import { focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponentUtils";
 import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { Skeleton, Input, Select, SelectItem } from "@nextui-org/react";
@@ -52,9 +52,15 @@ function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; cur
 	}
 }
 
+let transactionData: TransactionAPIData[] | null;
+
+async function getTransactionData() {
+	transactionData = await getAllTransactionsAPI();
+}
+
 export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
-	const [open, setOpen] = useState<boolean>(false);
+	const [transactions, setTransactions] = useState<TransactionAPIData[] | null>(transactionData);
 
 	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
 		const transactionArray: TransactionAPIData[] = [];
@@ -84,7 +90,9 @@ export default function Calendar(): ReactNode {
 		});
 		focusToday();
 		setMonthComps(monthArr);
-		calendarLoaded.current = true;
+		setTimeout(() => {
+			calendarLoaded.current = true;
+		}, 150);
 	}, []);
 
 	useEffect(() => {
@@ -105,7 +113,7 @@ export default function Calendar(): ReactNode {
 				}
 			}
 		},
-		{ threshold: 0.7 }
+		{ threshold: 0.62 }
 	);
 
 	const addLabelObserver: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
@@ -123,7 +131,7 @@ export default function Calendar(): ReactNode {
 		endObserver.current = new IntersectionObserver(
 			(entry: IntersectionObserverEntry[]) => {
 				const bcr = entry[0].boundingClientRect;
-				if (bcr.top < 800) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
+				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
 			},
 			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
 		);
@@ -132,36 +140,43 @@ export default function Calendar(): ReactNode {
 		}
 	}, []);
 
+	function DragEnd() {}
+
 	return (
 		<div key="Calendar" id="calendar" className="row-start-2">
-			<Skeleton isLoaded={calendarLoaded.current} className="rounded-lg">
-				{monthComps.map((monthBoxObj, index) => {
-					if (monthComps.length === index + 1) {
-						return (
-							<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-								<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
-									<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
-								</div>
-								<MonthBox transactions={monthBoxObj.transactions} endRef={addEndRefObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} id="lastMonth" />
-								<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
-									<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
-								</div>
-							</div>
-						);
-					}
+			{monthComps.map((monthBoxObj, index) => {
+				if (monthComps.length === index + 1) {
 					return (
 						<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-							<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel">
-								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+							<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
+								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
-							<MonthBox transactions={monthBoxObj.transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
-							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer unfocusedLabel">
-								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + " - " + monthBoxObj.monthObj.year}</h1>
+							<MonthBox
+								setTransactionPassDown={setTransactions}
+								transactions={monthBoxObj.transactions}
+								endRef={addEndRefObserver}
+								monthObj={monthBoxObj?.monthObj}
+								key={monthBoxObj?.key}
+								id="lastMonth"
+							/>
+							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
+								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
 						</div>
 					);
-				})}
-			</Skeleton>
+				}
+				return (
+					<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+						<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel">
+							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+						</div>
+						<MonthBox setTransactionPassDown={setTransactions} transactions={monthBoxObj.transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
+						<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer unfocusedLabel">
+							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+						</div>
+					</div>
+				);
+			})}
 		</div>
 	);
 }

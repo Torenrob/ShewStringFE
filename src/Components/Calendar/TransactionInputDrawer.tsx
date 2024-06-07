@@ -35,6 +35,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [transactionPortals, setTransactionPortals] = useState<TransactionPortalProps[]>([]);
+	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
 	useImperativeHandle(ref, () => ({
 		updateDate(newDate: DateValue) {
@@ -90,28 +91,33 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 		const postResponse = await postTransactionAPI(transactionData);
 
-		if (postResponse?.statusText === "OK") {
+		if (!postResponse) {
 			setTimeout(() => {
+				setErrorMessage(true);
 				setSubmittingTransaction(false);
+				return;
 			}, 500);
+		} else {
+			setTimeout(() => {
+				const TransactionData: TransactionAPIData = postResponse?.data;
 
-			const TransactionData: TransactionAPIData = postResponse.data;
+				const dateContainerID: string = `Date${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
 
-			const dateContainerID: string = `Date${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
+				const newPortal: TransactionPortalProps = {
+					transaction: TransactionData,
+					containerID: dateContainerID,
+				};
 
-			const newPortal: TransactionPortalProps = {
-				transaction: TransactionData,
-				containerID: dateContainerID,
-			};
+				const saveDate = date as DateValue;
 
-			const saveDate = date as DateValue;
-
-			setTransactionPortals([...transactionPortals, newPortal]);
-			const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
-			form.reset();
-			setDate(saveDate);
-			// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
-			form.title.focus();
+				setTransactionPortals([...transactionPortals, newPortal]);
+				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
+				form.reset();
+				setDate(saveDate);
+				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
+				form.title.focus();
+				setSubmittingTransaction(false);
+			}, 100);
 		}
 	}
 
@@ -130,6 +136,10 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		}
 	}
 
+	function clearErrorMessage() {
+		setErrorMessage(false);
+	}
+
 	return (
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={drawerStyle}>
 			<div style={{ padding: "0px 27px" }} className="grid">
@@ -137,6 +147,16 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 					<ArrowDownIcon />
 				</Button>
 				<form className="w-full px-64 pt-2.5 pb-0.5 grid grid-col-4 grid-rows-2 gap-3 transactionForm" style={formStyle} onSubmit={SubmitTransaction}>
+					<div className="absolute -translate-x-32 w-28 text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
+						{errorMessage && (
+							<span className="text-right">
+								Error Submitting Transaction <br /> Try Again
+								<Button className="h-4" radius="none" color="danger" onClick={clearErrorMessage}>
+									Clear
+								</Button>
+							</span>
+						)}
+					</div>
 					<div className=" col-start-1 row-start-1 col-span-3 flex gap-3">
 						<Input required radius="none" size="sm" className="w-3/5 text-slate-500 basis-3/6" type="text" label="Title" name="title" isClearable id="TransactionDrawerTitle" />
 						<DateInput className="col-start-2 row-start-1 basis-1/6" radius="none" label="Date" name="date" size="sm" value={date} onChange={setDate} />
@@ -151,15 +171,14 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 					<div className="col-start-1 row-start-2 col-span-2 flex gap-3">
 						<Button
 							isIconOnly
-							disabled={validateAmount ? true : false}
-							color={validateAmount ? "default" : "primary"}
+							disabled={validateAmount || errorMessage ? true : false}
+							color={validateAmount || errorMessage ? "default" : "primary"}
 							size="md"
 							isLoading={submittingTransaction}
 							radius="none"
 							className={`self-center ${validateAmount ? "mb-6" : "mb-2"}`}
 							type="submit">
-							{!validateAmount && <SubmitTransactionIcon />}
-							{validateAmount && <InvalidSubmitIcon />}
+							{errorMessage ? <InvalidSubmitIcon /> : validateAmount ? <InvalidSubmitIcon /> : <SubmitTransactionIcon />}
 						</Button>
 						<Input
 							required

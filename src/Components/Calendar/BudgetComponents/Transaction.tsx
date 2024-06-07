@@ -1,10 +1,11 @@
-import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref } from "react";
+import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
+import { motion } from "framer-motion";
 
-export default function Transaction({ transaction }: { transaction: TransactionAPIData }) {
+export default function Transaction({ transaction, index }: { transaction: TransactionAPIData; index: number }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
 
 	function shouldMarqueePlay(): boolean {
@@ -27,22 +28,34 @@ export default function Transaction({ transaction }: { transaction: TransactionA
 		position: "relative",
 	};
 
+	const btnRef = useRef<HTMLDivElement>(null);
+
+	const MotionBtn = motion(Button);
+
 	return (
-		<Button
-			onMouseEnter={marqueeSwitch}
-			onMouseLeave={marqueeSwitch}
-			variant="ghost"
-			color={transaction?.transactionType === "Credit" ? "success" : "danger"}
-			radius="none"
-			size="sm"
-			className="transaction flex content-between border-0 mb-1 h-4 w-auto">
-			<span>
-				${transaction?.transactionType === "Credit" ? "" : "("}
-				{Number.parseFloat(transaction?.amount.toString() as string).toFixed(2)}
-				{transaction?.transactionType === "Debit" && ")"}
-			</span>
-			{marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
-			{!marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>}
-		</Button>
+		// <motion.div ref={conref} drag>
+		// 	<motion.span>Hello</motion.span>
+		// </motion.div>
+		<motion.div ref={btnRef} drag>
+			<Button
+				onMouseEnter={marqueeSwitch}
+				onMouseLeave={marqueeSwitch}
+				variant="ghost"
+				color={transaction?.transactionType === "Credit" ? "success" : "danger"}
+				radius="none"
+				size="sm"
+				className="transaction flex content-between border-0 mb-1 h-4 w-auto">
+				<span>
+					${transaction?.transactionType === "Credit" ? "" : "("}
+					{Number.parseFloat(transaction?.amount.toString() as string).toFixed(2)}
+					{transaction?.transactionType === "Debit" && ")"}
+				</span>
+				{marqueePlay ? (
+					<Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>
+				) : (
+					<Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>
+				)}
+			</Button>
+		</motion.div>
 	);
 }

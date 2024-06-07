@@ -1,11 +1,13 @@
 import "./app.css";
 import Calendar from "./Components/Calendar/Calendar";
-import CalContainer from "./Components/Calendar/CalendarContainer";
+import CalendarContainer from "./Components/Calendar/CalendarContainer";
 import Login from "./Components/LoginPage";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { getAllTransactionsAPI } from "./Services/API/TransactionAPI";
+import { TransactionAPIData } from "./Types/APIDataTypes";
 
 function App(): ReactNode {
-	return <CalContainer />;
+	return <CalendarContainer />;
 }
 
 export default App;
