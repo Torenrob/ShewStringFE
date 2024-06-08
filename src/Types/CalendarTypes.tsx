@@ -9,7 +9,6 @@ export interface LocalMonth {
 
 export interface MonthComponentInfo {
 	monthObj: LocalMonth;
-	transactions: TransactionAPIData[];
 	key: string;
 }
 
@@ -19,7 +18,6 @@ export interface DateComponentInfo {
 	month: number;
 	monthName: string;
 	year: number;
-	transactions: TransactionAPIData[];
 }
 
 export interface CalendarRenderInfo {

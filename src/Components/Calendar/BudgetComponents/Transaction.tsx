@@ -38,6 +38,7 @@ export default function Transaction({ transaction, index }: { transaction: Trans
 		// </motion.div>
 		<motion.div ref={btnRef} drag>
 			<Button
+				draggable
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
 				variant="ghost"

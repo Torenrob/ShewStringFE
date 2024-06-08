@@ -1,4 +1,4 @@
-import { Ref, ReactNode, useContext, useState, MouseEvent, createRef, useEffect, useRef, MutableRefObject, useCallback, DragEventHandler, SetStateAction, Dispatch } from "react";
+import { Ref, ReactNode, useContext, useState, MouseEvent, createRef, useEffect, useRef, MutableRefObject, useCallback, DragEventHandler, SetStateAction, Dispatch, useMemo } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider, Input, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
@@ -10,17 +10,22 @@ import { parseDate } from "@internationalized/date";
 export default function DayBox({
 	date,
 	dateObj,
-	setTransPassDown,
+	transactions,
 	endRef,
 }: {
 	date: number;
 	dateObj: DateComponentInfo;
-	setTransPassDown: Dispatch<SetStateAction<TransactionAPIData[] | null>>;
+	transactions: Map<string, TransactionAPIData[]>;
 	endRef?: Ref<HTMLDivElement>;
 }): ReactNode {
 	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
 
-	const dateString: string = `Date${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
+	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
+
+	const getDatesTransactions = useMemo((): TransactionAPIData[] | undefined => {
+		const todayTransactions = transactions.get(dateString);
+		return todayTransactions;
+	}, [transactions, dateString]);
 
 	function toggleAddTransactionBtn(event: MouseEvent) {
 		if (event.type === "mouseenter") setAddTransactionBtnVisible(true);
@@ -49,8 +54,8 @@ export default function DayBox({
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
 				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll">
-					{dateObj.transactions &&
-						dateObj.transactions.map((trans: TransactionAPIData, i: number) => <Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} />)}
+					{getDatesTransactions &&
+						getDatesTransactions.map((trans: TransactionAPIData, i: number) => <Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} />)}
 				</div>
 				{addTransactionBtnVisible && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>

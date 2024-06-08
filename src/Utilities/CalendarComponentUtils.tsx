@@ -51,7 +51,7 @@ export function focusToday() {
 	const currentDateArr = currentDate.split("/");
 	currentDate = currentDateArr[2] + "-" + currentDateArr[0].padStart(2, "0") + "-" + currentDateArr[1].padStart(2, "0");
 	setTimeout(() => {
-		const elem = document.getElementById(`Date${currentDate}`);
+		const elem = document.getElementById(currentDate);
 		elem?.scrollIntoView({ behavior: "instant" });
 	}, 0.5);
 }

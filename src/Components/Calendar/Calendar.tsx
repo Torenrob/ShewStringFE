@@ -52,15 +52,9 @@ function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; cur
 	}
 }
 
-let transactionData: TransactionAPIData[] | null;
-
-async function getTransactionData() {
-	transactionData = await getAllTransactionsAPI();
-}
-
 export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
-	const [transactions, setTransactions] = useState<TransactionAPIData[] | null>(transactionData);
+	const [transactions, setTransactions] = useState<Map<string, TransactionAPIData[]>>(new Map<string, TransactionAPIData[]>());
 
 	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
 		const transactionArray: TransactionAPIData[] = [];
@@ -73,26 +67,21 @@ export default function Calendar(): ReactNode {
 		return transactionArray;
 	}
 
-	const calendarLoaded = useRef(false);
-
 	const getTransactionData = useCallback(async () => {
-		const res: TransactionAPIData[] | null = await getAllTransactionsAPI();
+		const res: Map<string, TransactionAPIData[]> | null = await getAllTransactionsAPI();
+		setTransactions(res as Map<string, TransactionAPIData[]>);
 		let yTrans: number = 0;
 		const monthArr = [...Array(23)].map((_, index) => {
 			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
 			yTrans = month.styleYtransition;
 			const monthBoxObj: MonthComponentInfo = {
 				monthObj: month,
-				transactions: assignTransactions(month, res),
 				key: `${month?.monthName}${month?.year}`,
 			};
 			return monthBoxObj;
 		});
 		focusToday();
 		setMonthComps(monthArr);
-		setTimeout(() => {
-			calendarLoaded.current = true;
-		}, 150);
 	}, []);
 
 	useEffect(() => {
@@ -140,8 +129,6 @@ export default function Calendar(): ReactNode {
 		}
 	}, []);
 
-	function DragEnd() {}
-
 	return (
 		<div key="Calendar" id="calendar" className="row-start-2">
 			{monthComps.map((monthBoxObj, index) => {
@@ -151,14 +138,7 @@ export default function Calendar(): ReactNode {
 							<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
 								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
-							<MonthBox
-								setTransactionPassDown={setTransactions}
-								transactions={monthBoxObj.transactions}
-								endRef={addEndRefObserver}
-								monthObj={monthBoxObj?.monthObj}
-								key={monthBoxObj?.key}
-								id="lastMonth"
-							/>
+							<MonthBox transactions={transactions} endRef={addEndRefObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} id="lastMonth" />
 							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
 								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
@@ -170,7 +150,7 @@ export default function Calendar(): ReactNode {
 						<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel">
 							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 						</div>
-						<MonthBox setTransactionPassDown={setTransactions} transactions={monthBoxObj.transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
+						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
 						<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer unfocusedLabel">
 							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 						</div>

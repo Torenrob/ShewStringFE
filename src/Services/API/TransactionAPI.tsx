@@ -4,10 +4,11 @@ import { PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataT
 
 const api = import.meta.env.VITE_API_URL + "/transactions";
 
-export const getAllTransactionsAPI = async (): Promise<TransactionAPIData[] | null> => {
+export const getAllTransactionsAPI = async (): Promise<Map<string, TransactionAPIData[]> | null> => {
 	try {
 		const data = await axios.get(api);
-		return data.data;
+		const dataMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(data.data));
+		return dataMap;
 	} catch (error) {
 		ErrorHandler(error);
 		return null;

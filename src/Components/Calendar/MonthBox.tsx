@@ -8,12 +8,10 @@ export default function MonthBox({
 	monthObj,
 	endRef,
 	transactions,
-	setTransactionPassDown,
 	id,
 }: {
 	monthObj: LocalMonth;
-	transactions: TransactionAPIData[];
-	setTransactionPassDown: Dispatch<SetStateAction<TransactionAPIData[] | null>>;
+	transactions: Map<string, TransactionAPIData[]>;
 	endRef?: Ref<HTMLDivElement>;
 	id?: string;
 }): ReactNode {
@@ -39,7 +37,6 @@ export default function MonthBox({
 			month: month.month,
 			monthName: month.monthName,
 			year: month.year,
-			transactions: getTransactions({ date: date, transactions: transactions }),
 		};
 		return dateObj;
 	}
@@ -55,9 +52,9 @@ export default function MonthBox({
 			<div className="grid grid-cols-7">
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
-						return <DayBox setTransPassDown={setTransactionPassDown} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox transactions={transactions} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					} else {
-						return <DayBox setTransPassDown={setTransactionPassDown} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					}
 				})}
 			</div>
