@@ -50,7 +50,7 @@ export default function DayBox({
 
 	return (
 		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 outline-black`}>
-			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="px-1 py-0 overflow-x-hidden overflow-y-hidden">
+			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="px-1 py-0 overflow-x-hidden overflow-y-hidden" style={{ position: "static" }}>
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
 				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll">

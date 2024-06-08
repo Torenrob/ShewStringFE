@@ -48,8 +48,8 @@ export default function MonthBox({
 	};
 
 	return (
-		<div id={id} className="monthBox">
-			<div className="grid grid-cols-7">
+		<div id={id} className="monthBox" style={{ position: "static" }}>
+			<div className="grid grid-cols-7" style={{ position: "static" }}>
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
 						return <DayBox transactions={transactions} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;

@@ -36,9 +36,8 @@ export default function Transaction({ transaction, index }: { transaction: Trans
 		// <motion.div ref={conref} drag>
 		// 	<motion.span>Hello</motion.span>
 		// </motion.div>
-		<motion.div ref={btnRef} drag>
+		<motion.div ref={btnRef} dragSnapToOrigin drag whileDrag={{ position: "absolute", zIndex: 10 }}>
 			<Button
-				draggable
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
 				variant="ghost"
