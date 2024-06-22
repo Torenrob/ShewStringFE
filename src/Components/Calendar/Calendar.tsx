@@ -130,31 +130,46 @@ export default function Calendar(): ReactNode {
 	}, []);
 
 	return (
-		<div key="Calendar" id="calendar" className="row-start-2">
+		<div key="Calendar" id="calendar" className="row-start-2 grid grid-column-3 labelGridContainer">
 			{monthComps.map((monthBoxObj, index) => {
 				if (monthComps.length === index + 1) {
 					return (
-						<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+						// <div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+						<>
 							<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
 								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
-							<MonthBox transactions={transactions} endRef={addEndRefObserver} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} id="lastMonth" />
+							<MonthBox
+								transactions={transactions}
+								endRef={addEndRefObserver}
+								monthObj={monthBoxObj?.monthObj}
+								key={monthBoxObj?.key}
+								id="lastMonth"
+								translateY={monthBoxObj.monthObj.styleYtransition}
+							/>
 							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
 								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 							</div>
-						</div>
+						</>
+						// </div>
 					);
 				}
 				return (
-					<div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-						<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel">
+					// <div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+					<>
+						<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
 							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 						</div>
-						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} />
-						<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer unfocusedLabel">
+						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
+						<div
+							key={`rightLabel${index}`}
+							ref={addLabelObserver}
+							className="col-start-3 calLabelContainer unfocusedLabel"
+							style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
 							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
 						</div>
-					</div>
+					</>
+					// </div>
 				);
 			})}
 		</div>

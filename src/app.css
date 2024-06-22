@@ -61,6 +61,7 @@
 
 .calLabelContainer {
 	display: grid;
+	position: relative;
 	align-content: center;
 	background-color: transparent;
 	color: white;

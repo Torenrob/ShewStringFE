@@ -9,9 +9,11 @@ export default function MonthBox({
 	endRef,
 	transactions,
 	id,
+	translateY,
 }: {
 	monthObj: LocalMonth;
 	transactions: Map<string, TransactionAPIData[]>;
+	translateY: number;
 	endRef?: Ref<HTMLDivElement>;
 	id?: string;
 }): ReactNode {
@@ -48,7 +50,7 @@ export default function MonthBox({
 	};
 
 	return (
-		<div id={id} className="monthBox" style={{ position: "static" }}>
+		<div id={id} className="monthBox" style={{ top: -translateY }}>
 			<div className="grid grid-cols-7" style={{ position: "static" }}>
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
