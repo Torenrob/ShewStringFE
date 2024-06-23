@@ -1,6 +1,6 @@
 import { Ref, ReactNode, useContext, useState, MouseEvent, createRef, useEffect, useRef, MutableRefObject, useCallback, DragEventHandler, SetStateAction, Dispatch, useMemo } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
-import { Button, Card, CardBody, Divider, Input, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Button, Card, CardBody, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
 import { CalendarContext } from "./CalendarContainer";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
@@ -19,6 +19,8 @@ export default function DayBox({
 	endRef?: Ref<HTMLDivElement>;
 }): ReactNode {
 	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
+	const [dragActive, setDragActive] = useState<boolean>(false);
+	const [transactionPage, setTransactionPage] = useState<number>(0);
 
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
 
@@ -26,6 +28,17 @@ export default function DayBox({
 		const todayTransactions = transactions.get(dateString);
 		return todayTransactions;
 	}, [transactions, dateString]);
+
+	const transactionsPaginated = useMemo((): TransactionAPIData[][] | undefined => {
+		if (!getDatesTransactions) return getDatesTransactions;
+		if (getDatesTransactions.length <= 5) return [getDatesTransactions];
+		const transactionsPaginated: TransactionAPIData[][] = [];
+		do {
+			const fourTransactions = getDatesTransactions.splice(0, 4);
+			transactionsPaginated.push(fourTransactions);
+		} while (getDatesTransactions.length > 0);
+		return transactionsPaginated;
+	}, [getDatesTransactions]);
 
 	function toggleAddTransactionBtn(event: MouseEvent) {
 		if (event.type === "mouseenter") setAddTransactionBtnVisible(true);
@@ -46,17 +59,29 @@ export default function DayBox({
 	function handleDrop() {}
 	function handleDragOver() {}
 	function handleDragLeave() {}
-	function handleDragStart() {}
+	function handleDragStart() {
+		setDragActive(true);
+	}
+	function handleDragEnd() {
+		setDragActive(false);
+	}
 
 	return (
 		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 outline-black`}>
-			<CardBody onMouseEnter={toggleAddTransactionBtn} onMouseLeave={toggleAddTransactionBtn} className="px-1 py-0 overflow-x-hidden overflow-y-hidden" style={{ position: "static" }}>
+			<CardBody
+				onMouseEnter={toggleAddTransactionBtn}
+				onMouseLeave={toggleAddTransactionBtn}
+				className="px-1 py-0 overflow-x-hidden overflow-y-hidden"
+				style={{ position: `${dragActive ? "static" : "relative"}` }}>
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
 				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll">
-					{getDatesTransactions &&
-						getDatesTransactions.map((trans: TransactionAPIData, i: number) => <Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} />)}
+					{transactionsPaginated &&
+						transactionsPaginated[0].map((trans: TransactionAPIData, i: number) => (
+							<Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} />
+						))}
 				</div>
+				{transactionsPaginated && transactionsPaginated.length > 1 && <Pagination total={transactionsPaginated.length} />}
 				{addTransactionBtnVisible && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />
