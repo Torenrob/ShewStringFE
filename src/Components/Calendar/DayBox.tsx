@@ -1,4 +1,4 @@
-import { Ref, ReactNode, useContext, useState, MouseEvent, createRef, useEffect, useRef, MutableRefObject, useCallback, DragEventHandler, SetStateAction, Dispatch, useMemo } from "react";
+import { Ref, ReactNode, useContext, useState, MouseEvent, DragEvent, useMemo } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
@@ -6,6 +6,8 @@ import { CalendarContext } from "./CalendarContainer";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import AddTransactionIcon from "./Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
+import CustomPaginator from "./CustomPaginator";
+import { postTransactionAPI } from "../../Services/API/TransactionAPI";
 
 export default function DayBox({
 	date,
@@ -29,15 +31,19 @@ export default function DayBox({
 		return todayTransactions;
 	}, [transactions, dateString]);
 
-	const transactionsPaginated = useMemo((): TransactionAPIData[][] | undefined => {
-		if (!getDatesTransactions) return getDatesTransactions;
-		if (getDatesTransactions.length <= 5) return [getDatesTransactions];
-		const transactionsPaginated: TransactionAPIData[][] = [];
-		do {
-			const fourTransactions = getDatesTransactions.splice(0, 4);
-			transactionsPaginated.push(fourTransactions);
-		} while (getDatesTransactions.length > 0);
-		return transactionsPaginated;
+	const transactionsPaginated = useMemo((): TransactionAPIData[][] | null => {
+		if (!getDatesTransactions) return null;
+		else if (getDatesTransactions.length <= 5) {
+			return [getDatesTransactions];
+		} else {
+			const transactionsPaginated: TransactionAPIData[][] = [];
+			const transactionCopy = [...getDatesTransactions];
+			do {
+				const fourTransactions = transactionCopy.splice(0, 4);
+				transactionsPaginated.push(fourTransactions);
+			} while (transactionCopy.length > 0);
+			return transactionsPaginated;
+		}
 	}, [getDatesTransactions]);
 
 	function toggleAddTransactionBtn(event: MouseEvent) {
@@ -56,8 +62,14 @@ export default function DayBox({
 		openDrawer(parseDate(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`));
 	}
 
+	function pageChangeHandler(page: number) {
+		setTransactionPage(page - 1);
+	}
+
 	function handleDrop() {}
-	function handleDragOver() {}
+	function handleDragOver(e: DragEvent<HTMLElement>) {
+		console.log("ran");
+	}
 	function handleDragLeave() {}
 	function handleDragStart() {
 		setDragActive(true);
@@ -75,13 +87,15 @@ export default function DayBox({
 				style={{ position: `${dragActive ? "static" : "relative"}` }}>
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
-				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll">
+				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-1">
 					{transactionsPaginated &&
-						transactionsPaginated[0].map((trans: TransactionAPIData, i: number) => (
+						transactionsPaginated[transactionPage].map((trans: TransactionAPIData, i: number) => (
 							<Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} />
 						))}
 				</div>
-				{transactionsPaginated && transactionsPaginated.length > 1 && <Pagination total={transactionsPaginated.length} />}
+				{transactionsPaginated && transactionsPaginated.length > 1 && !dragActive && (
+					<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
+				)}
 				{addTransactionBtnVisible && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />

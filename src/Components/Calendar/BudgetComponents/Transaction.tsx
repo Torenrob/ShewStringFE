@@ -53,7 +53,14 @@ export default function Transaction({
 		// <motion.div ref={conref} drag>
 		// 	<motion.span>Hello</motion.span>
 		// </motion.div>
-		<motion.div ref={btnRef} onDragStart={handleDragStart} onDragEnd={handleDragEnd} drag dragSnapToOrigin whileDrag={{ position: "absolute", zIndex: 10 }} id={`transaction${transaction.id}`}>
+		<motion.div
+			ref={btnRef}
+			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
+			drag
+			dragSnapToOrigin
+			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none" }}
+			id={`transaction${transaction.id}`}>
 			<Button
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}

@@ -101,7 +101,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			setTimeout(() => {
 				const TransactionData: TransactionAPIData = postResponse?.data;
 
-				const dateContainerID: string = `Date${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
+				const dateContainerID: string = `${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
 
 				const newPortal: TransactionPortalProps = {
 					transaction: TransactionData,

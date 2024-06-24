@@ -116,11 +116,11 @@
 }
 
 .transactionContainer::-webkit-scrollbar {
-	width: 3px;
+	display: none;
 }
 
 .transactionContainer::-webkit-scrollbar-thumb {
-	background: var(--60color);
+	display: none;
 }
 
 .transactionDrawer {
