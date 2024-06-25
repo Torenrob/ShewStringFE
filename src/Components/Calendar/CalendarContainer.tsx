@@ -6,13 +6,19 @@ import { parseDate } from "@internationalized/date";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 
 export type CalendarContextType = {
-	toggle: (newDate: DateValue) => void;
+	toggle: (arg0: DateValue) => void;
+	activeDrag: MutableRefObject<boolean>;
+	setDateTransactionsRef: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
 };
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
 export default function CalendarContainer() {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
+
+	const dragActive = useRef<boolean>(false);
+
+	const setDateTransactionsRef = useRef(undefined);
 
 	function toggleDrawer(newDate: DateValue) {
 		childref.current.updateDate(newDate);
@@ -26,6 +32,7 @@ export default function CalendarContainer() {
 
 	return (
 		<div className="relative flex flex-col calendarContainer overflow-clip">
+			<div id="topCalBound"></div>
 			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
 				<div>Sunday</div>
 				<div>Monday</div>
@@ -35,10 +42,11 @@ export default function CalendarContainer() {
 				<div>Friday</div>
 				<div>Saturday</div>
 			</div>
-			<CalendarContext.Provider value={{ toggle: toggleDrawer }}>
+			<CalendarContext.Provider value={{ toggle: toggleDrawer, activeDrag: dragActive, setDateTransactionsRef: setDateTransactionsRef }}>
 				<TransactionInputDrawer ref={childref} />
 				<Calendar />
 			</CalendarContext.Provider>
+			<div id="bottomCalBound"></div>
 		</div>
 	);
 }

@@ -3,7 +3,7 @@ import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
-import { motion } from "framer-motion";
+import { MotionStyle, motion } from "framer-motion";
 
 export default function Transaction({
 	transaction,
@@ -17,6 +17,7 @@ export default function Transaction({
 	handleDragEnd: () => void;
 }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
+	const [dragActive, setDragActive] = useState(false);
 
 	function shouldMarqueePlay(): boolean {
 		const transactionTitle = transaction?.title as string;
@@ -36,6 +37,7 @@ export default function Transaction({
 	const marqueeStyle: CSSProperties = {
 		marginRight: "3px",
 		position: "relative",
+		fontWeight: "bold",
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
@@ -49,27 +51,42 @@ export default function Transaction({
 		return elementPosition as number;
 	}
 
+	function handleStartDrag() {
+		handleDragStart();
+		setDragActive(true);
+	}
+
+	function handleEndDrag() {
+		handleDragEnd();
+		setDragActive(false);
+	}
+
+	const dragStyle: MotionStyle = {
+		position: "absolute",
+		zIndex: 100,
+	};
+
 	return (
 		// <motion.div ref={conref} drag>
 		// 	<motion.span>Hello</motion.span>
 		// </motion.div>
 		<motion.div
 			ref={btnRef}
-			onDragStart={handleDragStart}
-			onDragEnd={handleDragEnd}
+			onDragStart={handleStartDrag}
+			onDragEnd={handleEndDrag}
 			drag
 			dragSnapToOrigin
-			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none" }}
+			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 			id={`transaction${transaction.id}`}>
 			<Button
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
-				variant="ghost"
+				variant={dragActive ? "solid" : "ghost"}
 				color={transaction?.transactionType === "Credit" ? "success" : "danger"}
 				radius="none"
 				size="sm"
-				className="transaction flex content-between border-0 mb-1 h-4 w-auto">
-				<span>
+				className="transaction flex content-between border-0 mb-0.5 h-4 w-auto">
+				<span style={{ fontWeight: "bold" }}>
 					${transaction?.transactionType === "Credit" ? "" : "("}
 					{Number.parseFloat(transaction?.amount.toString() as string).toFixed(2)}
 					{transaction?.transactionType === "Debit" && ")"}

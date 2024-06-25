@@ -16,44 +16,30 @@ export default function CustomPaginator({ total, currentPage, onChange }: { tota
 	});
 
 	return (
-		<div className="flex flex-col gap-2" style={{ position: "absolute", bottom: "7px", left: "-8px", transform: "scale(0.65)" }}>
-			<ul className="flex gap-2 items-center">
-				{range.map((page) => {
-					if (page === PaginationItemType.NEXT) {
-						return (
-							<li key={page} aria-label="next page" className="w-4 h-4">
-								<button className="w-full h-full bg-default-200 rounded-full" onClick={onNext}>
-									<ChevronIcon className="rotate-180" />
-								</button>
-							</li>
-						);
-					}
+		<ul className="flex gap-1">
+			{range.map((page) => {
+				if (page === PaginationItemType.NEXT) {
+					return <li key={page} onClick={onNext} aria-label="next page" className="w-1.5 h-1.5 nextTransactionPage"></li>;
+				}
 
-					if (page === PaginationItemType.PREV) {
-						return (
-							<li key={page} aria-label="previous page" className="w-4 h-4">
-								<button className="w-full h-full bg-default-200 rounded-full" onClick={onPrevious}>
-									<ChevronIcon />
-								</button>
-							</li>
-						);
-					}
+				if (page === PaginationItemType.PREV) {
+					return <li key={page} onClick={onPrevious} aria-label="previous page" className="w-1.5 h-1.5 prevTransactionPage"></li>;
+				}
 
-					if (page === PaginationItemType.DOTS) {
-						return (
-							<li key={page} className="w-4 h-4">
-								...
-							</li>
-						);
-					}
-
+				if (page === PaginationItemType.DOTS) {
 					return (
-						<li key={page} aria-label={`page ${page}`} className="w-4 h-4">
-							<button className={cn("w-full h-full bg-default-300 rounded-full", activePage === page && "bg-secondary")} onClick={() => setPage(page)} />
+						<li key={page} className="w-2 h-2">
+							...
 						</li>
 					);
-				})}
-			</ul>
-		</div>
+				}
+
+				return (
+					<li key={page} aria-label={`page ${page}`} className="w-2 h-2">
+						<button className={cn("w-full h-full bg-default-300 rounded-full", activePage === page && "bg-secondary")} onClick={() => setPage(page)} />
+					</li>
+				);
+			})}
+		</ul>
 	);
 }

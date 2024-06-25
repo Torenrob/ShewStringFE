@@ -1,4 +1,4 @@
-import { Ref, ReactNode, useContext, useState, MouseEvent, DragEvent, useMemo } from "react";
+import { Ref, ReactNode, useContext, useState, MouseEvent, DragEvent, useMemo, MutableRefObject, Dispatch, SetStateAction, useRef, useEffect, useCallback } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
@@ -23,28 +23,47 @@ export default function DayBox({
 	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
 	const [dragActive, setDragActive] = useState<boolean>(false);
 	const [transactionPage, setTransactionPage] = useState<number>(0);
+	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[]>(
+		transactions.get(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`)
+			? transactions.get(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`)!
+			: []
+	);
+
+	const firstRender = useRef<boolean>(true);
+
+	const { toggle: openDrawer, activeDrag, setDateTransactionsRef } = useContext(CalendarContext);
+
+	const updateDateTransactions = useCallback(
+		(transactions: TransactionAPIData) => {
+			setTodaysTransactions([...(todaysTransactions as TransactionAPIData[]), transactions]);
+		},
+		[todaysTransactions]
+	);
+
+	useEffect(() => {
+		if (firstRender.current) {
+			firstRender.current = false;
+			return;
+		}
+		setDateTransactionsRef.current = updateDateTransactions;
+	}, [todaysTransactions, setDateTransactionsRef, updateDateTransactions]);
 
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
 
-	const getDatesTransactions = useMemo((): TransactionAPIData[] | undefined => {
-		const todayTransactions = transactions.get(dateString);
-		return todayTransactions;
-	}, [transactions, dateString]);
-
 	const transactionsPaginated = useMemo((): TransactionAPIData[][] | null => {
-		if (!getDatesTransactions) return null;
-		else if (getDatesTransactions.length <= 5) {
-			return [getDatesTransactions];
+		if (!todaysTransactions) return null;
+		else if (todaysTransactions.length <= 5) {
+			return [todaysTransactions];
 		} else {
 			const transactionsPaginated: TransactionAPIData[][] = [];
-			const transactionCopy = [...getDatesTransactions];
+			const transactionCopy = [...todaysTransactions];
 			do {
-				const fourTransactions = transactionCopy.splice(0, 4);
+				const fourTransactions = transactionCopy.splice(0, 5);
 				transactionsPaginated.push(fourTransactions);
 			} while (transactionCopy.length > 0);
 			return transactionsPaginated;
 		}
-	}, [getDatesTransactions]);
+	}, [todaysTransactions]);
 
 	function toggleAddTransactionBtn(event: MouseEvent) {
 		if (event.type === "mouseenter") setAddTransactionBtnVisible(true);
@@ -56,10 +75,10 @@ export default function DayBox({
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
 
-	const { toggle: openDrawer } = useContext(CalendarContext);
-
 	function clickAddTransaction() {
 		openDrawer(parseDate(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`));
+		setDateTransactionsRef.current = updateDateTransactions;
+		console.log(setDateTransactionsRef);
 	}
 
 	function pageChangeHandler(page: number) {
@@ -68,6 +87,7 @@ export default function DayBox({
 
 	function handleDrop() {}
 	function handleDragOver(e: DragEvent<HTMLElement>) {
+		if (!activeDrag) return;
 		console.log("ran");
 	}
 	function handleDragLeave() {}
@@ -87,15 +107,17 @@ export default function DayBox({
 				style={{ position: `${dragActive ? "static" : "relative"}` }}>
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
-				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-1">
+				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
 					{transactionsPaginated &&
 						transactionsPaginated[transactionPage].map((trans: TransactionAPIData, i: number) => (
 							<Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} />
 						))}
 				</div>
-				{transactionsPaginated && transactionsPaginated.length > 1 && !dragActive && (
-					<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
-				)}
+				<div style={{ position: "relative", bottom: "15px", left: "1.5px", width: "60%" }}>
+					{transactionsPaginated && transactionsPaginated.length > 1 && !dragActive && (
+						<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
+					)}
+				</div>
 				{addTransactionBtnVisible && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />

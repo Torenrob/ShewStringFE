@@ -1,26 +1,18 @@
 import { Button, DateInput, Input, Radio, RadioGroup, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { Children, LegacyRef, MutableRefObject, Ref, RefObject, forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import { Children, LegacyRef, MutableRefObject, Ref, RefObject, forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
 import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import ArrowDownIcon from "./Icons/ArrowDownIcon";
 import { DateValue } from "@internationalized/date";
-import { Props } from "react-infinite-scroll-component";
 import SubmitTransactionIcon from "./Icons/SubmitTransactionIcon";
 import { postTransactionAPI } from "../../Services/API/TransactionAPI";
 import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
 import DebitIcon from "./Icons/DebitIcon";
 import CreditIcon from "./Icons/CreditIcon";
-import ReactDOM from "react-dom";
-import Transaction from "./BudgetComponents/Transaction";
-import TransactionPortal from "./BudgetComponents/TransactionPortal";
+import { CalendarContext } from "./CalendarContainer";
 
 export type TransactionInputDrawerRef = {
 	updateDate: (newDate: DateValue) => void;
-};
-
-export type TransactionPortalProps = {
-	transaction: TransactionAPIData;
-	containerID: string;
 };
 
 const countDecimals = function (value: number): number {
@@ -34,7 +26,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	const [amount, setAmount] = useState<string>("0.00");
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
-	const [transactionPortals, setTransactionPortals] = useState<TransactionPortalProps[]>([]);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
 	useImperativeHandle(ref, () => ({
@@ -42,6 +33,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			setDate(newDate);
 		},
 	}));
+
+	const { setDateTransactionsRef } = useContext(CalendarContext);
 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
@@ -103,14 +96,13 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 				const dateContainerID: string = `${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
 
-				const newPortal: TransactionPortalProps = {
-					transaction: TransactionData,
-					containerID: dateContainerID,
-				};
-
 				const saveDate = date as DateValue;
-
-				setTransactionPortals([...transactionPortals, newPortal]);
+				if (!setDateTransactionsRef.current) {
+					setErrorMessage(true);
+					setSubmittingTransaction(false);
+					return;
+				}
+				setDateTransactionsRef.current(TransactionData);
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
 				setDate(saveDate);
@@ -235,7 +227,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 					<ArrowDownIcon />
 				</Button>
 			</div>
-			{transactionPortals.length > 0 && transactionPortals.map((portal, i) => <TransactionPortal transaction={portal.transaction} containerID={portal.containerID} />)}
 		</div>
 	);
 });

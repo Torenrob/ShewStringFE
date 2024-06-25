@@ -1,4 +1,4 @@
-import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext } from "react";
+import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext, Fragment } from "react";
 import MonthBox from "./MonthBox";
 import { focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponentUtils";
 import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
@@ -120,7 +120,7 @@ export default function Calendar(): ReactNode {
 		endObserver.current = new IntersectionObserver(
 			(entry: IntersectionObserverEntry[]) => {
 				const bcr = entry[0].boundingClientRect;
-				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
+				if (bcr.top < 650) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
 			},
 			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
 		);
@@ -134,10 +134,11 @@ export default function Calendar(): ReactNode {
 			{monthComps.map((monthBoxObj, index) => {
 				if (monthComps.length === index + 1) {
 					return (
-						// <div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-						<>
-							<div ref={addLabelObserver} className="col-start-1 calLabelContainer">
-								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+						<Fragment key={`month${index}`}>
+							<div key={`leftLabel${index}`} ref={addLabelObserver} className="col-start-1 calLabelContainer">
+								<h1 key={`leftLabelTitle${index}`} className="calLabelText">
+									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+								</h1>
 							</div>
 							<MonthBox
 								transactions={transactions}
@@ -148,17 +149,23 @@ export default function Calendar(): ReactNode {
 								translateY={monthBoxObj.monthObj.styleYtransition}
 							/>
 							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
-								<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+								<h1 key={`rightLabelTitle${index}`} className="calLabelText">
+									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+								</h1>
 							</div>
-						</>
-						// </div>
+						</Fragment>
 					);
 				}
 				return (
-					// <div key={`leftLabel${index}`} className="grid grid-column-3 labelGridContainer" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-					<>
-						<div ref={addLabelObserver} className="col-start-1 calLabelContainer unfocusedLabel" style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+					<Fragment key={`month${index}`}>
+						<div
+							key={`leftLabel${index}`}
+							ref={addLabelObserver}
+							className="col-start-1 calLabelContainer unfocusedLabel"
+							style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+							<h1 key={`leftLabelTitle${index}`} className="calLabelText">
+								{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+							</h1>
 						</div>
 						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
 						<div
@@ -166,10 +173,11 @@ export default function Calendar(): ReactNode {
 							ref={addLabelObserver}
 							className="col-start-3 calLabelContainer unfocusedLabel"
 							style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-							<h1 className="calLabelText">{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}</h1>
+							<h1 key={`rightLabelTitle${index}`} className="calLabelText">
+								{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+							</h1>
 						</div>
-					</>
-					// </div>
+					</Fragment>
 				);
 			})}
 		</div>
