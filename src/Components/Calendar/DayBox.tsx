@@ -93,9 +93,11 @@ export default function DayBox({
 	function handleDragLeave() {}
 	function handleDragStart() {
 		setDragActive(true);
+		activeDrag.current = true;
 	}
 	function handleDragEnd() {
 		setDragActive(false);
+		activeDrag.current = false;
 	}
 
 	return (

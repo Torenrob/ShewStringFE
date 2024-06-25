@@ -42,16 +42,14 @@ export default function Transaction({
 
 	const btnRef = useRef<HTMLDivElement>(null);
 
-	const MotionBtn = motion(Button);
-
 	function getTransactionYpostion(): number {
-		console.log(btnRef);
 		let elementPosition = btnRef.current?.getBoundingClientRect().top;
 		elementPosition = elementPosition ? elementPosition / 2 : undefined;
 		return elementPosition as number;
 	}
 
 	function handleStartDrag() {
+		btnRef.current?.setAttribute("id", "draggedTransaction");
 		handleDragStart();
 		setDragActive(true);
 	}

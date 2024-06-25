@@ -30,9 +30,28 @@ export default function CalendarContainer() {
 		titleInput.focus();
 	}
 
+	function scrollUp(e: React.MouseEvent) {
+		if (!dragActive.current) {
+			return;
+		}
+		const draggedItem = document.getElementById("draggedTransaction");
+		if (!draggedItem) {
+			return;
+		}
+
+		draggedItem.style.top = "-50px";
+
+		const calendar = document.getElementById("calendar");
+		calendar?.scrollBy({
+			top: -5,
+			behavior: "smooth",
+		});
+		// CalendarDiv.current?.scrollBy(0, 5);
+	}
+
 	return (
 		<div className="relative flex flex-col calendarContainer overflow-clip">
-			<div id="topCalBound"></div>
+			<div id="topCalBound" onMouseOver={scrollUp}></div>
 			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
 				<div>Sunday</div>
 				<div>Monday</div>
