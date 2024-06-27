@@ -4,6 +4,7 @@ import { DateInput, DateValue } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { parseDate } from "@internationalized/date";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
+import { useMotionValue } from "framer-motion";
 
 export type CalendarContextType = {
 	toggle: (arg0: DateValue) => void;
@@ -19,6 +20,10 @@ export default function CalendarContainer() {
 	const dragActive = useRef<boolean>(false);
 
 	const setDateTransactionsRef = useRef(undefined);
+
+	const mouse = {
+		y: useMotionValue(0),
+	};
 
 	function toggleDrawer(newDate: DateValue) {
 		childref.current.updateDate(newDate);
@@ -39,7 +44,16 @@ export default function CalendarContainer() {
 			return;
 		}
 
-		draggedItem.style.top = "-50px";
+		mouse.y.set(e.pageY);
+
+		const rect1 = draggedItem.getBoundingClientRect();
+
+		setTimeout(() => (draggedItem.style.top = "25px"), 90);
+
+		const rect = draggedItem.getBoundingClientRect();
+
+		console.log(rect1.top);
+		console.log(rect.top);
 
 		const calendar = document.getElementById("calendar");
 		calendar?.scrollBy({

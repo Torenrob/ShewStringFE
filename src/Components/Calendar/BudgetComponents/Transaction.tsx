@@ -49,12 +49,16 @@ export default function Transaction({
 	}
 
 	function handleStartDrag() {
+		console.log(btnRef.current?.getBoundingClientRect().y);
 		btnRef.current?.setAttribute("id", "draggedTransaction");
 		handleDragStart();
 		setDragActive(true);
 	}
 
 	function handleEndDrag() {
+		if (!btnRef.current?.style) return;
+		btnRef.current.style.top = "";
+		btnRef.current?.removeAttribute("id");
 		handleDragEnd();
 		setDragActive(false);
 	}

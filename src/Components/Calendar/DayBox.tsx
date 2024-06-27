@@ -87,7 +87,7 @@ export default function DayBox({
 
 	function handleDrop() {}
 	function handleDragOver(e: DragEvent<HTMLElement>) {
-		if (!activeDrag) return;
+		if (!activeDrag.current) return;
 		console.log("ran");
 	}
 	function handleDragLeave() {}
@@ -120,7 +120,7 @@ export default function DayBox({
 						<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
 					)}
 				</div>
-				{addTransactionBtnVisible && (
+				{addTransactionBtnVisible && !activeDrag.current && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />
 					</Button>

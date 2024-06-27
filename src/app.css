@@ -177,7 +177,7 @@ div > .weekdayLabel {
 #topCalBound {
 	position: absolute;
 	width: 100%;
-	background-color: rgba(0, 0, 0, 0.363);
+	/* background-color: rgba(0, 0, 0, 0.363); */
 	height: 30px;
 	z-index: 100;
 }
