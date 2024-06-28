@@ -31,7 +31,7 @@ export default function DayBox({
 
 	const firstRender = useRef<boolean>(true);
 
-	const { toggle: openDrawer, activeDrag, setDateTransactionsRef } = useContext(CalendarContext);
+	const { toggle: openDrawer, dragObject, setDateTransactionsRef } = useContext(CalendarContext);
 
 	const updateDateTransactions = useCallback(
 		(transactions: TransactionAPIData) => {
@@ -78,7 +78,6 @@ export default function DayBox({
 	function clickAddTransaction() {
 		openDrawer(parseDate(`${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`));
 		setDateTransactionsRef.current = updateDateTransactions;
-		console.log(setDateTransactionsRef);
 	}
 
 	function pageChangeHandler(page: number) {
@@ -87,17 +86,18 @@ export default function DayBox({
 
 	function handleDrop() {}
 	function handleDragOver(e: DragEvent<HTMLElement>) {
-		if (!activeDrag.current) return;
+		if (!dragObject.current.dragOn) return;
 		console.log("ran");
 	}
 	function handleDragLeave() {}
-	function handleDragStart() {
+	function handleDragStart(dragItemY: number) {
 		setDragActive(true);
-		activeDrag.current = true;
+		dragObject.current.dragOn = true;
+		dragObject.current.dragItemY = dragItemY;
 	}
 	function handleDragEnd() {
 		setDragActive(false);
-		activeDrag.current = false;
+		dragObject.current.dragOn = false;
 	}
 
 	return (
@@ -120,7 +120,7 @@ export default function DayBox({
 						<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
 					)}
 				</div>
-				{addTransactionBtnVisible && !activeDrag.current && (
+				{addTransactionBtnVisible && !dragObject.current.dragOn && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />
 					</Button>

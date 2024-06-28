@@ -13,7 +13,7 @@ export default function Transaction({
 }: {
 	transaction: TransactionAPIData;
 	index: number;
-	handleDragStart: () => void;
+	handleDragStart: (dragItemY: number) => void;
 	handleDragEnd: () => void;
 }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
@@ -48,10 +48,9 @@ export default function Transaction({
 		return elementPosition as number;
 	}
 
-	function handleStartDrag() {
-		console.log(btnRef.current?.getBoundingClientRect().y);
+	function handleStartDrag(e: PointerEvent) {
 		btnRef.current?.setAttribute("id", "draggedTransaction");
-		handleDragStart();
+		handleDragStart(btnRef.current!.getBoundingClientRect().y);
 		setDragActive(true);
 	}
 
@@ -78,6 +77,7 @@ export default function Transaction({
 			onDragEnd={handleEndDrag}
 			drag
 			dragSnapToOrigin
+			className={`${transaction.date}`}
 			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 			id={`transaction${transaction.id}`}>
 			<Button
