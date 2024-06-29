@@ -46,14 +46,14 @@ export function getMonthName(num: number) {
 }
 
 export function getDragScrollYOffset(dragItemRectY: number): number {
-	if (dragItemRectY < 52) return -85;
+	if (dragItemRectY < 52) return -88;
 	if (dragItemRectY < 69) return -70;
 	if (dragItemRectY < 86) return -55;
-	if (dragItemRectY < 103) return -40;
+	if (dragItemRectY < 103) return -35;
 	if (dragItemRectY < 140) return -18;
 	if (dragItemRectY < 179) return 40;
-	if (dragItemRectY < 195) return 55;
-	if (dragItemRectY < 215) return 70;
+	if (dragItemRectY < 195) return 53;
+	if (dragItemRectY < 215) return 75;
 	if (dragItemRectY < 232) return 92;
 	if (dragItemRectY < 275) return 110;
 	if (dragItemRectY < 306) return 170;

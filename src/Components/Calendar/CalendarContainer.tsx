@@ -66,7 +66,7 @@ export default function CalendarContainer() {
 				behavior: "smooth",
 			});
 
-			setTimeout(() => (draggedItem.style.top = `${-monthBoxRectTop + getDragScrollYOffset(dragObject.current.dragItemY) + 260}px`), 70);
+			setTimeout(() => (draggedItem.style.top = `${-monthBoxRectTop + getDragScrollYOffset(dragObject.current.dragItemY) + 257}px`), 70);
 		} else if (direction === "up") {
 			calendar?.scrollBy({
 				top: -5,
