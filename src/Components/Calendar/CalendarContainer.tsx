@@ -8,7 +8,7 @@ import { useMotionValue } from "framer-motion";
 import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
 
 export type DragObject = {
-	dragOn: boolean;
+	globalDragOn: boolean;
 	dragItemY: number;
 };
 
@@ -25,7 +25,7 @@ export default function CalendarContainer() {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
 	const dragObject = useRef<DragObject>({
-		dragOn: false,
+		globalDragOn: false,
 		dragItemY: 0,
 	});
 
@@ -44,7 +44,7 @@ export default function CalendarContainer() {
 	}
 
 	function scrollDrag(direction: string) {
-		if (!dragObject.current?.dragOn) {
+		if (!dragObject.current?.globalDragOn) {
 			return;
 		}
 		const draggedItem = document.getElementById("draggedTransaction");

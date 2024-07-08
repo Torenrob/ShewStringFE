@@ -1,4 +1,4 @@
-import { Ref, ReactNode, useContext, useState, MouseEvent, DragEvent, useMemo, MutableRefObject, Dispatch, SetStateAction, useRef, useEffect, useCallback } from "react";
+import { Ref, ReactNode, useContext, useState, MouseEvent, DragEvent, useMemo, MutableRefObject, Dispatch, SetStateAction, useRef, useEffect, useCallback, LegacyRef } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
@@ -32,6 +32,12 @@ export default function DayBox({
 	const firstRender = useRef<boolean>(true);
 
 	const { toggle: openDrawer, dragObject, setDateTransactionsRef } = useContext(CalendarContext);
+
+	const customDropEvent = new Event("customDrop", { bubbles: true });
+
+	const transactionContainerRef = useCallback((div: unknown) => {
+		console.log(div);
+	}, []);
 
 	const updateDateTransactions = useCallback(
 		(transactions: TransactionAPIData) => {
@@ -84,20 +90,25 @@ export default function DayBox({
 		setTransactionPage(page - 1);
 	}
 
-	function handleDrop() {}
-	function handleDragOver(e: DragEvent<HTMLElement>) {
-		if (!dragObject.current.dragOn) return;
+	function handleDragOver(e: MouseEvent) {
+		if (!dragObject.current.globalDragOn) return;
+		e.currentTarget.classList.add("dragOver");
+	}
+	function handleDragLeave(e: MouseEvent) {
+		e.currentTarget.classList.remove("dragOver");
+	}
+	function handleDrop() {
 		console.log("ran");
 	}
-	function handleDragLeave() {}
 	function handleDragStart(dragItemY: number) {
 		setDragActive(true);
-		dragObject.current.dragOn = true;
+		dragObject.current.globalDragOn = true;
 		dragObject.current.dragItemY = dragItemY;
 	}
 	function handleDragEnd() {
+		document.getElementsByClassName("dragOver");
 		setDragActive(false);
-		dragObject.current.dragOn = false;
+		dragObject.current.globalDragOn = false;
 	}
 
 	return (
@@ -109,7 +120,7 @@ export default function DayBox({
 				style={{ position: `${dragActive ? "static" : "relative"}` }}>
 				<span className="text-right text-sm">{date}</span>
 				<Divider />
-				<div onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
+				<div ref={transactionContainerRef} onMouseEnter={handleDragOver} onMouseLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
 					{transactionsPaginated &&
 						transactionsPaginated[transactionPage].map((trans: TransactionAPIData, i: number) => (
 							<Transaction index={i} transaction={trans} key={`${dateObj.date}/${dateObj.month}/${dateObj.year}-Trans${i}`} handleDragStart={handleDragStart} handleDragEnd={handleDragEnd} />
@@ -120,7 +131,7 @@ export default function DayBox({
 						<CustomPaginator total={transactionsPaginated.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
 					)}
 				</div>
-				{addTransactionBtnVisible && !dragObject.current.dragOn && (
+				{addTransactionBtnVisible && !dragObject.current.globalDragOn && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
 						<AddTransactionIcon />
 					</Button>

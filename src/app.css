@@ -204,3 +204,7 @@ div > .weekdayLabel {
 	border-left: 0;
 	border-right: 0.5rem solid lightgray;
 }
+
+.dragOver {
+	border: solid red 2px;
+}

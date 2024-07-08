@@ -54,7 +54,8 @@ export default function Transaction({
 		setDragActive(true);
 	}
 
-	function handleEndDrag() {
+	function handleEndDrag(e: MouseEvent) {
+		console.log(e.target);
 		if (!btnRef.current?.style) return;
 		btnRef.current.style.top = "";
 		btnRef.current?.removeAttribute("id");
