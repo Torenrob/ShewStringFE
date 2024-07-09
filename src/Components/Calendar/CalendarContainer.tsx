@@ -1,14 +1,19 @@
 import { createContext, useState, SetStateAction, Dispatch, useRef, MutableRefObject, Ref, RefObject, useCallback, useEffect } from "react";
 import Calendar from "./Calendar";
-import { DateInput, DateValue } from "@nextui-org/react";
+import { Button, DateInput, DateValue } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { parseDate } from "@internationalized/date";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { useMotionValue } from "framer-motion";
 import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
+import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
 
 export type DragObject = {
 	globalDragOn: boolean;
+	dropping: boolean | null;
+	paginationDragState: { (dragOn: boolean): void }[];
+	containerDropped: () => void;
+	dragItemTransactions: (transaction: TransactionAPIData) => void;
 	dragItemY: number;
 };
 
@@ -26,6 +31,10 @@ export default function CalendarContainer() {
 
 	const dragObject = useRef<DragObject>({
 		globalDragOn: false,
+		dropping: null,
+		paginationDragState: [],
+		containerDropped: () => {},
+		dragItemTransactions: (transaction: TransactionAPIData) => {},
 		dragItemY: 0,
 	});
 

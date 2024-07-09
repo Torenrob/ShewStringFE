@@ -14,7 +14,7 @@ export default function Transaction({
 	transaction: TransactionAPIData;
 	index: number;
 	handleDragStart: (dragItemY: number) => void;
-	handleDragEnd: () => void;
+	handleDragEnd: (trans: TransactionAPIData) => void;
 }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
@@ -48,18 +48,17 @@ export default function Transaction({
 		return elementPosition as number;
 	}
 
-	function handleStartDrag(e: PointerEvent) {
+	function handleStartDrag(e: PointerEvent | MouseEvent | TouchEvent) {
 		btnRef.current?.setAttribute("id", "draggedTransaction");
 		handleDragStart(btnRef.current!.getBoundingClientRect().y);
 		setDragActive(true);
 	}
 
-	function handleEndDrag(e: MouseEvent) {
-		console.log(e.target);
+	function handleEndDrag(e: PointerEvent | MouseEvent | TouchEvent) {
 		if (!btnRef.current?.style) return;
 		btnRef.current.style.top = "";
 		btnRef.current?.removeAttribute("id");
-		handleDragEnd();
+		handleDragEnd(transaction);
 		setDragActive(false);
 	}
 
@@ -74,7 +73,7 @@ export default function Transaction({
 		// </motion.div>
 		<motion.div
 			ref={btnRef}
-			onDragStart={handleStartDrag}
+			onDragStart={(e) => handleStartDrag(e)}
 			onDragEnd={handleEndDrag}
 			drag
 			dragSnapToOrigin
