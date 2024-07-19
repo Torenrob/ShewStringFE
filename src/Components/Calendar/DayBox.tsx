@@ -56,10 +56,11 @@ export default function DayBox({
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
 
 	const transactionsPaginated = useMemo((): TransactionAPIData[][] | null => {
-		if (!todaysTransactions) return null;
+		if (todaysTransactions.length == 0) return null;
 		else if (todaysTransactions.length <= 5) {
 			return [todaysTransactions];
 		} else {
+			console.log("ran");
 			dragObject.current.paginationDragState.push(updatePaginationDragState);
 			const transactionsPaginated: TransactionAPIData[][] = [];
 			const transactionCopy = [...todaysTransactions];
@@ -100,19 +101,20 @@ export default function DayBox({
 		};
 		e.currentTarget.classList.add("dragOver");
 	}
+
 	function handleDragLeave(e: MouseEvent) {
 		e.currentTarget.classList.remove("dragOver");
 	}
+
 	function handleDrop() {
 		console.log("ran");
 	}
+
 	function handleDragStart(dragItemY: number) {
 		setDragActive(true);
 		dragObject.current.dragItemTransactions = (transaction: TransactionAPIData) => {
 			setTodaysTransactions((p) => {
-				console.log(p);
 				p.splice(p.indexOf(transaction), 1);
-				console.log(p);
 				return p;
 			});
 		};
@@ -122,12 +124,13 @@ export default function DayBox({
 			x(true);
 		});
 	}
+
 	function handleDragEnd(transaction: TransactionAPIData) {
+		const dateO = date;
 		const dragOver = document.getElementsByClassName("dragOver");
 		if (dragOver.length > 0) {
 			const dropContainerDate = dragOver[0].id.substring(0, 10);
 			if (!(dropContainerDate === transaction.date)) {
-				dragObject.current.dragItemTransactions(transaction);
 				setDateTransactionsRef.current!(transaction);
 				dragObject.current.containerDropped();
 			}
@@ -139,6 +142,7 @@ export default function DayBox({
 		dragObject.current.paginationDragState.forEach((x) => {
 			x(false);
 		});
+		dragObject.current.dragItemTransactions(transaction);
 	}
 
 	return (
