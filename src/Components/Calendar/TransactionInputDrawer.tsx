@@ -15,10 +15,8 @@ export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
 };
 
-const countDecimals = function (value: number): number {
-	console.log(value);
-	if (Math.floor(value) === value) return 0;
-	return value.toString().split(".")[1].length || 0;
+const countDecimals = function (value: string): number {
+	return value.split(".")[1].length || 0;
 };
 
 export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, ref) => {
@@ -28,12 +26,12 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
-	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo | null>({ amount: "0.00" });
+	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00" });
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
 			const { date: newDate, ...transactionContainerInfo } = arg;
-			console.log(JSON.stringify(transactionContainerInfo) === "{}");
+
 			if (JSON.stringify(transactionContainerInfo) === "{}") {
 				setContainerInfo({ date: arg.date, amount: "0.00" });
 				return;
@@ -90,8 +88,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			description: event.currentTarget.description.value,
 		};
 
-		console.log(transactionData);
-
 		const postResponse = await postTransactionAPI(transactionData);
 
 		if (!postResponse) {
@@ -113,7 +109,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				setDateTransactionsRef.current(TransactionData);
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
-				setContainerInfo({ date: saveDate });
+				setContainerInfo({ date: saveDate, ...containerInfo });
 				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
 				form.title.focus();
 				setSubmittingTransaction(false);
@@ -122,9 +118,10 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	}
 
 	const validateAmount: boolean = useMemo(() => {
-		console.log(containerInfo?.amount);
-		if (countDecimals(Number(containerInfo?.amount)) > 2) return true;
-		if (containerInfo?.amount?.startsWith("0") && containerInfo.amount.includes(".") && containerInfo.amount.length > 2) {
+		if (containerInfo.amount?.includes(".")) {
+			if (countDecimals(containerInfo?.amount) > 2) return true;
+		}
+		if (containerInfo?.amount?.startsWith("0") && !containerInfo.amount.includes(".") && containerInfo.amount.length > 2) {
 			if (!containerInfo?.amount?.match(/0\d?\./)) return true;
 		}
 		if (Number(containerInfo?.amount) < 0) return true;
@@ -140,13 +137,12 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		}
 	}
 
-	function clearErrorMessage() {
-		setErrorMessage(false);
+	function updateAmount(e: string) {
+		setContainerInfo({ ...containerInfo, amount: e });
 	}
 
-	function updateDate(e: CalendarDate | CalendarDateTime | ZonedDateTime) {
-		const check: UpdateTransactionContainerInfo = { date: e, ...containerInfo };
-		setContainerInfo(check);
+	function clearErrorMessage() {
+		setErrorMessage(false);
 	}
 
 	return (
@@ -179,7 +175,15 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 							id="TransactionDrawerTitle"
 							value={containerInfo?.title ? containerInfo.title : undefined}
 						/>
-						<DateInput className="col-start-2 row-start-1 basis-1/6" radius="none" label="Date" name="date" size="sm" value={date} onChange={setDate} />
+						<DateInput
+							className="col-start-2 row-start-1 basis-1/6"
+							radius="none"
+							label="Date"
+							name="date"
+							size="sm"
+							value={containerInfo?.date}
+							onChange={(e) => setContainerInfo({ ...containerInfo, date: e })}
+						/>
 						<Select
 							required
 							selectedKeys={containerInfo?.bankAccount ? containerInfo.bankAccount.id.toString() : bankAccounts[0]?.id.toString()}
@@ -209,8 +213,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 						</Button>
 						<Input
 							required
-							value={amount}
-							onValueChange={setAmount}
+							value={containerInfo.amount}
+							onValueChange={(e) => updateAmount(e)}
 							radius="none"
 							size="sm"
 							isInvalid={validateAmount}

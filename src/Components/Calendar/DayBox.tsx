@@ -67,7 +67,6 @@ export default function DayBox({
 
 	//Functions
 	function transactionsPaginated(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] | null {
-		const date = dateObj;
 		const transArr = todayTransArr ? todayTransArr : transactions.get(dateString) ? transactions.get(dateString)! : [];
 		if (transArr.length == 0) return null;
 		else if (transArr.length <= 5) {
@@ -132,7 +131,6 @@ export default function DayBox({
 			if (!(dropContainerDate === transaction.date)) {
 				dragObject.current.dragItemTransactions(transaction);
 				const updatedTransaction = await dragNDropUpdateTransactionAPI(transaction, dropContainerDate);
-				console.log(updatedTransaction?.data);
 				setDateTransactionsRef.current!(updatedTransaction?.data);
 				dragObject.current.containerDropped();
 			}
