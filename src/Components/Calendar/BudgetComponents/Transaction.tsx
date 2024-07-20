@@ -1,12 +1,25 @@
-import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler } from "react";
+import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler, useMemo, SetStateAction, MouseEventHandler } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
-import { motion } from "framer-motion";
+import { MotionStyle, motion } from "framer-motion";
 
-export default function Transaction({ transaction, index }: { transaction: TransactionAPIData; index: number }) {
+export default function Transaction({
+	transaction,
+	onClick,
+	index,
+	handleDragStart,
+	handleDragEnd,
+}: {
+	transaction: TransactionAPIData;
+	onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, transaction: TransactionAPIData) => void;
+	index: number;
+	handleDragStart: (dragItemY: number) => void;
+	handleDragEnd: (trans: TransactionAPIData) => void;
+}) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
+	const [dragActive, setDragActive] = useState(false);
 
 	function shouldMarqueePlay(): boolean {
 		const transactionTitle = transaction?.title as string;
@@ -26,35 +39,65 @@ export default function Transaction({ transaction, index }: { transaction: Trans
 	const marqueeStyle: CSSProperties = {
 		marginRight: "3px",
 		position: "relative",
+		fontWeight: "bold",
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
 
-	const MotionBtn = motion(Button);
+	function getTransactionYpostion(): number {
+		let elementPosition = btnRef.current?.getBoundingClientRect().top;
+		elementPosition = elementPosition ? elementPosition / 2 : undefined;
+		return elementPosition as number;
+	}
+
+	function handleStartDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+		btnRef.current?.setAttribute("id", "draggedTransaction");
+		handleDragStart(btnRef.current!.getBoundingClientRect().y);
+		setDragActive(true);
+	}
+
+	function handleEndDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+		if (!btnRef.current?.style) return;
+		btnRef.current.style.top = "";
+		btnRef.current?.removeAttribute("id");
+		handleDragEnd(transaction);
+		setDragActive(false);
+	}
+
+	const dragStyle: MotionStyle = {
+		position: "absolute",
+		zIndex: 100,
+	};
 
 	return (
 		// <motion.div ref={conref} drag>
 		// 	<motion.span>Hello</motion.span>
 		// </motion.div>
-		<motion.div ref={btnRef} dragSnapToOrigin drag whileDrag={{ position: "absolute", zIndex: 10 }}>
+		<motion.div
+			ref={btnRef}
+			onDragStart={(e) => handleStartDrag(e)}
+			onDragEnd={handleEndDrag}
+			drag
+			dragSnapToOrigin
+			className={`${transaction.date}`}
+			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
+			id={`transaction${transaction.id}`}>
 			<Button
+				onClick={(e) => onClick(e, transaction)}
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
-				variant="ghost"
+				variant={dragActive ? "solid" : "ghost"}
 				color={transaction?.transactionType === "Credit" ? "success" : "danger"}
 				radius="none"
 				size="sm"
-				className="transaction flex content-between border-0 mb-1 h-4 w-auto">
-				<span>
+				className="transaction flex content-between border-0 mb-0.5 h-4 w-auto">
+				<span style={{ fontWeight: "bold" }}>
 					${transaction?.transactionType === "Credit" ? "" : "("}
 					{Number.parseFloat(transaction?.amount.toString() as string).toFixed(2)}
 					{transaction?.transactionType === "Debit" && ")"}
 				</span>
-				{marqueePlay ? (
-					<Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>
-				) : (
-					<Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>
-				)}
+				{marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
+				{!marqueePlay && <Marquee children={transaction?.title} style={marqueeStyle} play={false}></Marquee>}
 			</Button>
 		</motion.div>
 	);

@@ -50,11 +50,11 @@ export default function MonthBox({
 	};
 
 	return (
-		<div id={id} className="monthBox" style={{ top: -translateY }}>
+		<div id={`${monthObj.year}-${monthObj.month.toString().padStart(2, "0")}`} className="monthBox" style={{ top: -translateY }}>
 			<div className="grid grid-cols-7" style={{ position: "static" }}>
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
-						return <DayBox transactions={transactions} endRef={endRef} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					} else {
 						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
 					}

@@ -5,8 +5,14 @@ export interface BankAccountAPIData {
 	repeatGroups: RepeatGroupInBankAccountAPIData[];
 	transactions: TransactionAPIData[];
 }
+
+export interface TransactionBankAccountData {
+	id: number;
+	title: string;
+}
+
 export interface TransactionAPIData {
-	id: string;
+	id: number;
 	title: string | null;
 	transactionType: "Debit" | "Credit";
 	amount: number;
@@ -15,7 +21,7 @@ export interface TransactionAPIData {
 	category: string;
 	description: string | null;
 	createdOn: string;
-	bankAccountId: number;
+	bankAccount: TransactionBankAccountData;
 	repeatGroupId: number | null;
 }
 
