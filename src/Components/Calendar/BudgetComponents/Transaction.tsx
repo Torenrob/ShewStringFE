@@ -1,4 +1,4 @@
-import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler, useMemo, SetStateAction } from "react";
+import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler, useMemo, SetStateAction, MouseEventHandler } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
@@ -7,11 +7,13 @@ import { MotionStyle, motion } from "framer-motion";
 
 export default function Transaction({
 	transaction,
+	onClick,
 	index,
 	handleDragStart,
 	handleDragEnd,
 }: {
 	transaction: TransactionAPIData;
+	onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, transaction: TransactionAPIData) => void;
 	index: number;
 	handleDragStart: (dragItemY: number) => void;
 	handleDragEnd: (trans: TransactionAPIData) => void;
@@ -81,6 +83,7 @@ export default function Transaction({
 			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 			id={`transaction${transaction.id}`}>
 			<Button
+				onClick={(e) => onClick(e, transaction)}
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
 				variant={dragActive ? "solid" : "ghost"}

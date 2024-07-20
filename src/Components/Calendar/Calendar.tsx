@@ -121,7 +121,7 @@ export default function Calendar(): ReactNode {
 		endObserver.current = new IntersectionObserver(
 			(entry: IntersectionObserverEntry[]) => {
 				const bcr = entry[0].boundingClientRect;
-				if (bcr.top < 650) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
+				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
 			},
 			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
 		);

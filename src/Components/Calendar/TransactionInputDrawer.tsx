@@ -3,19 +3,20 @@ import { Children, LegacyRef, MutableRefObject, Ref, RefObject, forwardRef, useC
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
 import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import ArrowDownIcon from "./Icons/ArrowDownIcon";
-import { DateValue } from "@internationalized/date";
+import { CalendarDate, CalendarDateTime, DateValue, parseDate, ZonedDateTime } from "@internationalized/date";
 import SubmitTransactionIcon from "./Icons/SubmitTransactionIcon";
 import { postTransactionAPI } from "../../Services/API/TransactionAPI";
 import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
 import DebitIcon from "./Icons/DebitIcon";
 import CreditIcon from "./Icons/CreditIcon";
-import { CalendarContext } from "./CalendarContainer";
+import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 
 export type TransactionInputDrawerRef = {
-	updateDate: (newDate: DateValue) => void;
+	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
 };
 
 const countDecimals = function (value: number): number {
+	console.log(value);
 	if (Math.floor(value) === value) return 0;
 	return value.toString().split(".")[1].length || 0;
 };
@@ -27,10 +28,18 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
+	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo | null>({ amount: "0.00" });
 
 	useImperativeHandle(ref, () => ({
-		updateDate(newDate: DateValue) {
-			setDate(newDate);
+		updateContainer(arg: UpdateTransactionContainerInfo) {
+			const { date: newDate, ...transactionContainerInfo } = arg;
+			console.log(JSON.stringify(transactionContainerInfo) === "{}");
+			if (JSON.stringify(transactionContainerInfo) === "{}") {
+				setContainerInfo({ date: arg.date, amount: "0.00" });
+				return;
+			} else {
+				setContainerInfo(arg);
+			}
 		},
 	}));
 
@@ -39,7 +48,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
 		if (bankAccounts) {
-			setBankAccounts(bankAccounts);
+			setBankAccounts((p) => bankAccounts);
 		}
 	}, []);
 
@@ -48,7 +57,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	function closeDrawer() {
 		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
 		const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
-		form.reset();
 		if (!drawer.classList.contains("drawerClosed")) {
 			drawer.classList.add("drawerClosed");
 		}
@@ -82,6 +90,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			description: event.currentTarget.description.value,
 		};
 
+		console.log(transactionData);
+
 		const postResponse = await postTransactionAPI(transactionData);
 
 		if (!postResponse) {
@@ -94,9 +104,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			setTimeout(() => {
 				const TransactionData: TransactionAPIData = postResponse?.data;
 
-				const dateContainerID: string = `${date?.year}-${date?.month.toString().padStart(2, "0")}-${date?.day.toString().padStart(2, "0")}Transactions`;
-
-				const saveDate = date as DateValue;
+				const saveDate = containerInfo?.date;
 				if (!setDateTransactionsRef.current) {
 					setErrorMessage(true);
 					setSubmittingTransaction(false);
@@ -105,7 +113,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				setDateTransactionsRef.current(TransactionData);
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
-				setDate(saveDate);
+				setContainerInfo({ date: saveDate });
 				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
 				form.title.focus();
 				setSubmittingTransaction(false);
@@ -114,10 +122,14 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	}
 
 	const validateAmount: boolean = useMemo(() => {
-		if (countDecimals(Number(amount)) > 2) return true;
-		if (Number(amount) < 0) return true;
+		console.log(containerInfo?.amount);
+		if (countDecimals(Number(containerInfo?.amount)) > 2) return true;
+		if (containerInfo?.amount?.startsWith("0") && containerInfo.amount.includes(".") && containerInfo.amount.length > 2) {
+			if (!containerInfo?.amount?.match(/0\d?\./)) return true;
+		}
+		if (Number(containerInfo?.amount) < 0) return true;
 		return false;
-	}, [amount]);
+	}, [containerInfo?.amount]);
 
 	function transactionTypeClick(event: React.MouseEvent<HTMLButtonElement>) {
 		const target = event.currentTarget;
@@ -130,6 +142,11 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 	function clearErrorMessage() {
 		setErrorMessage(false);
+	}
+
+	function updateDate(e: CalendarDate | CalendarDateTime | ZonedDateTime) {
+		const check: UpdateTransactionContainerInfo = { date: e, ...containerInfo };
+		setContainerInfo(check);
 	}
 
 	return (
@@ -150,9 +167,27 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 						)}
 					</div>
 					<div className=" col-start-1 row-start-1 col-span-3 flex gap-3">
-						<Input required radius="none" size="sm" className="w-3/5 text-slate-500 basis-3/6" type="text" label="Title" name="title" isClearable id="TransactionDrawerTitle" />
+						<Input
+							required
+							radius="none"
+							size="sm"
+							className="w-3/5 text-slate-500 basis-3/6"
+							type="text"
+							label="Title"
+							name="title"
+							isClearable
+							id="TransactionDrawerTitle"
+							value={containerInfo?.title ? containerInfo.title : undefined}
+						/>
 						<DateInput className="col-start-2 row-start-1 basis-1/6" radius="none" label="Date" name="date" size="sm" value={date} onChange={setDate} />
-						<Select required selectedKeys={["1"]} radius="none" size="sm" label="Account" name="account" className="h-4 text-slate-500 basis-2/6 row-start-1 ">
+						<Select
+							required
+							selectedKeys={containerInfo?.bankAccount ? containerInfo.bankAccount.id.toString() : bankAccounts[0]?.id.toString()}
+							radius="none"
+							size="sm"
+							label="Account"
+							name="account"
+							className="h-4 text-slate-500 basis-2/6 row-start-1 ">
 							{bankAccounts.map((account, i) => (
 								<SelectItem key={`${account.id}`} value={account.id}>
 									{account.title}
@@ -215,13 +250,25 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 							</div>
 						</div>
 					</div>
-					<Select defaultSelectedKeys={["None"]} radius="none" size="sm" label="Category" name="category" className="h-4 text-slate-500 col-start-3 row-start-2 ">
+					<Select
+						defaultSelectedKeys={containerInfo?.category ? containerInfo.category : "None"}
+						radius="none"
+						size="sm"
+						label="Category"
+						name="category"
+						className="h-4 text-slate-500 col-start-3 row-start-2 ">
 						<SelectItem key="None">None</SelectItem>
 						<SelectItem key="income">Income</SelectItem>
 						<SelectItem key="groceries">Groceries</SelectItem>
 						<SelectItem key="bills">Bills</SelectItem>
 					</Select>
-					<Textarea radius="none" className="col-start-4 row-start-1 row-span-2 mt-1" label="Description" name="description" />
+					<Textarea
+						radius="none"
+						className="col-start-4 row-start-1 row-span-2 mt-1"
+						label="Description"
+						name="description"
+						value={containerInfo?.description ? containerInfo.description : undefined}
+					/>
 				</form>
 				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute justify-self-end">
 					<ArrowDownIcon />

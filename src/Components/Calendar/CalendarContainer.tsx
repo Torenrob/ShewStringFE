@@ -3,7 +3,7 @@ import Calendar from "./Calendar";
 import { Button, DateInput, DateValue } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { parseDate } from "@internationalized/date";
-import { TransactionAPIData } from "../../Types/APIDataTypes";
+import { TransactionAPIData, TransactionBankAccountData } from "../../Types/APIDataTypes";
 import { useMotionValue } from "framer-motion";
 import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
 import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
@@ -17,8 +17,18 @@ export type DragObject = {
 	dragItemY: number;
 };
 
+export type UpdateTransactionContainerInfo = {
+	date?: DateValue;
+	title?: string | null;
+	amount?: string;
+	transactionType?: "Debit" | "Credit";
+	category?: string;
+	description?: string | null;
+	bankAccount?: TransactionBankAccountData;
+};
+
 export type CalendarContextType = {
-	toggle: (arg0: DateValue) => void;
+	toggle: (arg: UpdateTransactionContainerInfo) => void;
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
 	setDateTransactionsRef: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
@@ -42,8 +52,8 @@ export default function CalendarContainer() {
 
 	const firstDragScrollTrigger = useRef(true);
 
-	function toggleDrawer(newDate: DateValue) {
-		childref.current.updateDate(newDate);
+	function toggleDrawer(arg: UpdateTransactionContainerInfo) {
+		childref.current.updateContainer(arg);
 		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
 		if (drawer.classList.contains("drawerClosed")) {
 			drawer.classList.remove("drawerClosed");
