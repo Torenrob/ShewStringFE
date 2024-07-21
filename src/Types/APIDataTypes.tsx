@@ -6,11 +6,6 @@ export interface BankAccountAPIData {
 	transactions: TransactionAPIData[];
 }
 
-export interface TransactionBankAccountData {
-	id: number;
-	title: string;
-}
-
 export interface TransactionAPIData {
 	id: number;
 	title: string | null;
@@ -21,7 +16,7 @@ export interface TransactionAPIData {
 	category: string;
 	description: string | null;
 	createdOn: string;
-	bankAccount: TransactionBankAccountData;
+	bankAccountId: number;
 	repeatGroupId: number | null;
 }
 

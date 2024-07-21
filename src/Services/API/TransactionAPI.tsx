@@ -26,11 +26,8 @@ export const postTransactionAPI = async (transaction: PostTransactionAPIData): P
 };
 
 export const dragNDropUpdateTransactionAPI = async (transaction: TransactionAPIData, newDate: string): Promise<AxiosResponse | null> => {
-	console.log("ran");
-	const { id, createdOn, time, bankAccount, date, ...TransactionAPIData } = transaction;
-	console.log("ran");
-	const UpdateTransactionAPIData = { Date: newDate, BankAccountId: bankAccount.id, ...TransactionAPIData };
-	console.log("ran");
+	const { id, createdOn, time, date, ...TransactionData } = transaction;
+	const UpdateTransactionAPIData = { Date: newDate, ...TransactionData };
 	try {
 		console.log("ran");
 		const data = await axios.put(api + `/${transaction.id}`, UpdateTransactionAPIData);

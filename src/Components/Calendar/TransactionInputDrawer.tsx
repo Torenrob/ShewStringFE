@@ -186,7 +186,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 						/>
 						<Select
 							required
-							selectedKeys={containerInfo?.bankAccount ? containerInfo.bankAccount.id.toString() : bankAccounts[0]?.id.toString()}
+							selectedKeys={containerInfo?.bankAccountId ? containerInfo.bankAccountId.toString() : bankAccounts[0]?.id.toString()}
 							radius="none"
 							size="sm"
 							label="Account"

@@ -96,7 +96,7 @@ export default function DayBox({
 	}
 
 	function handleClickOnTransaction(e: MouseEvent, trans: TransactionAPIData) {
-		openDrawer({ date: parseDate(dateString), amount: trans.amount.toString(), bankAccount: trans.bankAccount, category: trans.category, description: trans.description, title: trans.title });
+		openDrawer({ date: parseDate(dateString), amount: trans.amount.toString(), bankAccountId: trans.bankAccountId, category: trans.category, description: trans.description, title: trans.title });
 	}
 
 	function pageChangeHandler(page: number) {
@@ -128,10 +128,17 @@ export default function DayBox({
 		const dragOver = document.getElementsByClassName("dragOver");
 		if (dragOver.length > 0) {
 			const dropContainerDate = dragOver[0].id.substring(0, 10);
+			console.log(dropContainerDate);
 			if (!(dropContainerDate === transaction.date)) {
 				dragObject.current.dragItemTransactions(transaction);
-				const updatedTransaction = await dragNDropUpdateTransactionAPI(transaction, dropContainerDate);
-				setDateTransactionsRef.current!(updatedTransaction?.data);
+				try {
+					console.log("ran");
+					const updatedTransaction = await dragNDropUpdateTransactionAPI(transaction, dropContainerDate);
+					console.log("ran");
+					setDateTransactionsRef.current!(updatedTransaction?.data);
+				} catch (error) {
+					console.log(error);
+				}
 				dragObject.current.containerDropped();
 			}
 		}
