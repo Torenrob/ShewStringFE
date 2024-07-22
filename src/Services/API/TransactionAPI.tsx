@@ -25,16 +25,27 @@ export const postTransactionAPI = async (transaction: PostTransactionAPIData): P
 	}
 };
 
-export const dragNDropUpdateTransactionAPI = async (transaction: TransactionAPIData, newDate: string): Promise<AxiosResponse | null> => {
-	const { id, createdOn, time, date, ...TransactionData } = transaction;
-	const UpdateTransactionAPIData = { Date: newDate, ...TransactionData };
+export const deleteTransactionAPI = async (transId: number): Promise<AxiosResponse | null> => {
 	try {
-		console.log("ran");
-		const data = await axios.put(api + `/${transaction.id}`, UpdateTransactionAPIData);
-		console.log(data);
+		return await axios.delete(api + `/${transId}`);
+	} catch (error) {
+		ErrorHandler(error);
+		return null;
+	}
+};
+
+export const updateTransactionAPI = async (transaction: TransactionAPIData, newDate?: string): Promise<AxiosResponse | null> => {
+	let updateTransactionAPIData;
+	const { id, createdOn, time, ...TransactionData } = transaction;
+	if (newDate) {
+		updateTransactionAPIData = { ...TransactionData, date: newDate };
+	} else {
+		updateTransactionAPIData = TransactionData;
+	}
+	try {
+		const data = await axios.put(api + `/${transaction.id}`, updateTransactionAPIData);
 		return data;
 	} catch (error) {
-		console.log("ran");
 		ErrorHandler(error);
 		return null;
 	}

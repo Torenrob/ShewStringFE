@@ -100,3 +100,14 @@ export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMont
 		return prevYtrans + 128;
 	}
 }
+
+export function highlightEditedTransactionSwitch(transBtn?: HTMLDivElement) {
+	const selectedTransaction = document.getElementById("selectedTransaction");
+	if (transBtn) {
+		if (selectedTransaction) selectedTransaction.removeAttribute("id");
+		transBtn.setAttribute("id", "selectedTransaction");
+		return;
+	} else {
+		selectedTransaction?.removeAttribute("id");
+	}
+}

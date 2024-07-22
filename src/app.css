@@ -208,3 +208,8 @@ div > .weekdayLabel {
 .dragOver {
 	border: solid red 2px;
 }
+
+#selectedTransaction {
+	border: solid 2px black;
+	padding-top: 2px;
+}

@@ -18,13 +18,22 @@ export type DragObject = {
 };
 
 export type UpdateTransactionContainerInfo = {
+	id?: number;
 	date?: DateValue;
 	title?: string | null;
 	amount?: string;
-	transactionType?: "Debit" | "Credit";
 	category?: string;
 	description?: string | null;
 	bankAccountId?: number;
+	editingExisting: boolean;
+	transactionObj?: TransactionAPIData;
+	deleteTransactionFunc?: (trans: TransactionAPIData) => void;
+	editTransactionFunc?: (t: TransactionAPIData) => void;
+};
+
+export type editTransDatesFuncsObj = {
+	addTransToDate: (t: TransactionAPIData) => void;
+	removeTransFromDate: (t: TransactionAPIData) => void;
 };
 
 export type CalendarContextType = {
@@ -32,6 +41,7 @@ export type CalendarContextType = {
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
 	setDateTransactionsRef: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
+	updateEditTransDatesFuncMap: MutableRefObject<Map<string, editTransDatesFuncsObj>>;
 };
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
@@ -47,6 +57,8 @@ export default function CalendarContainer() {
 		dragItemTransactions: (transaction: TransactionAPIData) => {},
 		dragItemY: 0,
 	});
+
+	const updateEditTransDatesFuncArr = useRef(new Map());
 
 	const setDateTransactionsRef = useRef(undefined);
 
@@ -74,8 +86,6 @@ export default function CalendarContainer() {
 		const draggedDate = draggedItem.classList;
 		const draggedMonthBox = document.getElementById(`${draggedDate.value.substring(0, 7)}`);
 		const monthBoxRectTop = draggedMonthBox!.getBoundingClientRect().top;
-
-		// const draggedOffSet = firstDragScrollTrigger ? monthBoxRectTop + dragItemTop : monthBoxRectTop;
 
 		const calendar = document.getElementById("calendar");
 
@@ -108,7 +118,14 @@ export default function CalendarContainer() {
 				<div>Friday</div>
 				<div>Saturday</div>
 			</div>
-			<CalendarContext.Provider value={{ toggle: toggleDrawer, dragObject: dragObject, dragScrollTrigger: firstDragScrollTrigger, setDateTransactionsRef: setDateTransactionsRef }}>
+			<CalendarContext.Provider
+				value={{
+					toggle: toggleDrawer,
+					dragObject: dragObject,
+					dragScrollTrigger: firstDragScrollTrigger,
+					setDateTransactionsRef: setDateTransactionsRef,
+					updateEditTransDatesFuncMap: updateEditTransDatesFuncArr,
+				}}>
 				<TransactionInputDrawer ref={childref} />
 				<Calendar />
 			</CalendarContext.Provider>
