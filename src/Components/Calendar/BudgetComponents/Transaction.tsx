@@ -22,6 +22,10 @@ export default function Transaction({
 	const [dragActive, setDragActive] = useState(false);
 	const [transactionInfo, setTransactionInfo] = useState<TransactionAPIData>(transaction);
 
+	useEffect(() => {
+		setTransactionInfo(transaction);
+	}, [transaction]);
+
 	function shouldMarqueePlay(): boolean {
 		const transactionTitle = transactionInfo?.title ? transactionInfo.title : "";
 		if (transactionTitle.length > 32) {
@@ -78,7 +82,7 @@ export default function Transaction({
 			dragSnapToOrigin
 			className={`${transactionInfo.date}`}
 			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
-			id={`transaction${transaction.id}`}>
+			id={`transaction${transactionInfo.id}`}>
 			<Button
 				onClick={(e) => onClick(e, transactionInfo, updateTransactionBanner)}
 				onMouseEnter={marqueeSwitch}

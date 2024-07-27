@@ -7,6 +7,7 @@ import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { useMotionValue } from "framer-motion";
 import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
 import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
+import { EditTransContFunc } from "./DayBox";
 
 export type DragObject = {
 	globalDragOn: boolean;
@@ -31,17 +32,12 @@ export type UpdateTransactionContainerInfo = {
 	editTransactionFunc?: (t: TransactionAPIData) => void;
 };
 
-export type editTransDatesFuncsObj = {
-	addTransToDate: (t: TransactionAPIData) => void;
-	removeTransFromDate: (t: TransactionAPIData) => void;
-};
-
 export type CalendarContextType = {
 	toggle: (arg: UpdateTransactionContainerInfo) => void;
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
 	setDateTransactionsRef: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
-	updateEditTransDatesFuncMap: MutableRefObject<Map<string, editTransDatesFuncsObj>>;
+	editDateTransFuncsMap: MutableRefObject<Map<string, EditTransContFunc>>;
 };
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
@@ -58,11 +54,11 @@ export default function CalendarContainer() {
 		dragItemY: 0,
 	});
 
-	const updateEditTransDatesFuncArr = useRef(new Map());
-
 	const setDateTransactionsRef = useRef(undefined);
 
 	const firstDragScrollTrigger = useRef(true);
+
+	const editDateTransFuncSet = useRef(new Map<string, EditTransContFunc>());
 
 	function toggleDrawer(arg: UpdateTransactionContainerInfo) {
 		childref.current.updateContainer(arg);
@@ -124,7 +120,7 @@ export default function CalendarContainer() {
 					dragObject: dragObject,
 					dragScrollTrigger: firstDragScrollTrigger,
 					setDateTransactionsRef: setDateTransactionsRef,
-					updateEditTransDatesFuncMap: updateEditTransDatesFuncArr,
+					editDateTransFuncsMap: editDateTransFuncSet,
 				}}>
 				<TransactionInputDrawer ref={childref} />
 				<Calendar />

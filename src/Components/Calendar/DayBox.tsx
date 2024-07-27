@@ -17,15 +17,17 @@ import {
 	RefObject,
 } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes";
-import { Button, Card, CardBody, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Button, Card, CardBody, dateInput, Divider, Input, Pagination, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 import Transaction from "./BudgetComponents/Transaction";
-import { CalendarContext, editTransDatesFuncsObj } from "./CalendarContainer";
+import { CalendarContext } from "./CalendarContainer";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import AddTransactionIcon from "./Icons/AddTransactionIcon";
-import { parseDate } from "@internationalized/date";
+import { parseDate, today } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI, postTransactionAPI } from "../../Services/API/TransactionAPI";
 import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
+
+export type EditTransContFunc = (type: string) => (t: TransactionAPIData) => void;
 
 export default function DayBox({
 	date,
@@ -47,10 +49,9 @@ export default function DayBox({
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
-	const { toggle: openDrawer, dragObject, setDateTransactionsRef, updateEditTransDatesFuncMap: updateEditTransDatesFuncArr } = useContext(CalendarContext);
+	const { toggle: openDrawer, dragObject, setDateTransactionsRef, editDateTransFuncsMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
-	//CallBack Hooks
 	const transactionsPaginated = useCallback(
 		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] | null => {
 			const transArr = todayTransArr ? todayTransArr : transactions.get(dateString) ? transactions.get(dateString)! : [];
@@ -73,7 +74,15 @@ export default function DayBox({
 		[dateString, dragObject, transactions, updatePaginationDragState]
 	);
 
-	const updateDateTransactions = useCallback((transactions: TransactionAPIData) => {
+	//State Hooks
+	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
+	const [dragActive, setDragActive] = useState<boolean>(false);
+	const [transactionPage, setTransactionPage] = useState<number>(0);
+	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
+	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][] | null>(transactionsPaginated());
+
+	//CallBack Hooks
+	const addDateTransaction = (transactions: TransactionAPIData) => {
 		setTodaysTransactions((p) => {
 			if (!p) {
 				return [[transactions]];
@@ -85,36 +94,37 @@ export default function DayBox({
 				return p;
 			}
 		});
-	}, []);
+		editDateTransFuncsMap.current.delete(dateString);
+		editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
+	};
 
-	const removeTransactionFromList = useCallback(
-		(transaction: TransactionAPIData) => {
-			setTodaysTransactions((p) => {
-				if (!p) return [[]];
-				const flatTransArr = p.flat();
-				flatTransArr.splice(flatTransArr.indexOf(transaction), 1);
-				return transactionsPaginated(flatTransArr);
-			});
-		},
-		[transactionsPaginated]
-	);
+	const removeTransactionFromList = (transaction: TransactionAPIData) => {
+		setTodaysTransactions((p) => {
+			if (!p) return [[]];
+			const flatTransArr = p.flat();
+			flatTransArr.splice(flatTransArr.indexOf(transaction), 1);
+			return transactionsPaginated(flatTransArr);
+		});
+		editDateTransFuncsMap.current.delete(dateString);
+		editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
+	};
 
-	//State Hooks
-	const [addTransactionBtnVisible, setAddTransactionBtnVisible] = useState<boolean>(false);
-	const [dragActive, setDragActive] = useState<boolean>(false);
-	const [transactionPage, setTransactionPage] = useState<number>(0);
-	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
-	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][] | null>(transactionsPaginated());
+	const updateEditTransFuncs = (type: string): ((t: TransactionAPIData) => void) => {
+		if (type === "remove") {
+			return removeTransactionFromList;
+		} else {
+			return addDateTransaction;
+		}
+	};
 
-	useEffect(() => {
+	(() => {
 		if (firstRender.current) {
 			firstRender.current = false;
-			const editDayTransArr: editTransDatesFuncsObj = { addTransToDate: updateDateTransactions, removeTransFromDate: removeTransactionFromList };
-			updateEditTransDatesFuncArr.current.set(dateString, editDayTransArr);
+			editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
 			return;
 		}
-		setDateTransactionsRef.current = updateDateTransactions;
-	}, [setDateTransactionsRef, updateDateTransactions, updateEditTransDatesFuncArr, removeTransactionFromList, dateString]);
+		setDateTransactionsRef.current = updateEditTransFuncs("");
+	})();
 
 	//Functions
 	function toggleAddTransactionBtn(event: MouseEvent) {
@@ -124,7 +134,7 @@ export default function DayBox({
 
 	function clickAddTransaction() {
 		openDrawer({ date: parseDate(dateString), editingExisting: false });
-		setDateTransactionsRef.current = updateDateTransactions;
+		setDateTransactionsRef.current = addDateTransaction;
 	}
 
 	function handleClickOnTransaction(e: MouseEvent, trans: TransactionAPIData, updateTransBanner: (t: TransactionAPIData) => void) {
@@ -161,7 +171,7 @@ export default function DayBox({
 
 	function handleDragOver(e: MouseEvent) {
 		if (!dragObject.current.globalDragOn) return;
-		setDateTransactionsRef.current = updateDateTransactions;
+		setDateTransactionsRef.current = addDateTransaction;
 		dragObject.current.containerDropped = setDroppedPage;
 		e.currentTarget.classList.add("dragOver");
 	}
@@ -171,21 +181,20 @@ export default function DayBox({
 	}
 
 	async function handleDragEnd(transaction: TransactionAPIData) {
-		const dragOver = document.getElementsByClassName("dragOver");
-		if (dragOver.length > 0) {
-			const dropContainerDate = dragOver[0].id.substring(0, 10);
-			if (!(dropContainerDate === transaction.date)) {
-				dragObject.current.dragItemTransactions(transaction);
-				try {
-					const updatedTransaction = await updateTransactionAPI(transaction, dropContainerDate);
-					setDateTransactionsRef.current!(updatedTransaction?.data);
-				} catch (error) {
-					console.log(error);
-				}
-				dragObject.current.containerDropped();
-			}
-		}
 		setDragActive(false);
+		const dragOver = document.getElementsByClassName("dragOver")[0];
+		dragOver.classList.remove("dragOver");
+		const dropContainerDate = dragOver.id.substring(0, 10);
+		if (!(dropContainerDate === transaction.date)) {
+			dragObject.current.dragItemTransactions(transaction);
+			try {
+				const updatedTransaction = await updateTransactionAPI(transaction, dropContainerDate);
+				setDateTransactionsRef.current!(updatedTransaction?.data);
+			} catch (error) {
+				console.log(error);
+			}
+			dragObject.current.containerDropped();
+		}
 		dragObject.current.globalDragOn = false;
 		setDateTransactionsRef.current = undefined;
 		dragObject.current.paginationDragState.forEach((x) => {

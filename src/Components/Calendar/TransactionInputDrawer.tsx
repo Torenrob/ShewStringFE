@@ -11,6 +11,7 @@ import CreditIcon from "./Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
+import { EditTransContFunc } from "./DayBox";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -41,7 +42,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		},
 	}));
 
-	const { setDateTransactionsRef, updateEditTransDatesFuncMap } = useContext(CalendarContext);
+	const { setDateTransactionsRef, editDateTransFuncsMap } = useContext(CalendarContext);
 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
@@ -110,6 +111,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 		if (!postResponse) {
 			setTimeout(() => {
+				console.log("ran");
 				setErrorMessage(true);
 				setSubmittingTransaction(false);
 				return;
@@ -119,20 +121,24 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				const TransactionData: TransactionAPIData = postResponse?.data;
 
 				const saveDate = containerInfo?.date;
-				if (!setDateTransactionsRef.current) {
+				if (!setDateTransactionsRef.current && !editingExisting) {
+					console.log("ran");
 					setErrorMessage(true);
 					setSubmittingTransaction(false);
 					return;
 				}
 				if (containerInfo.editingExisting) {
 					if (!editTransactionIsSameDate) {
-						updateEditTransDatesFuncMap.current.get(containerInfo.transactionObj!.date)?.removeTransFromDate(containerInfo.transactionObj!);
-						updateEditTransDatesFuncMap.current.get(TransactionData.date)?.addTransToDate(TransactionData);
+						const removeTransFunc = editDateTransFuncsMap.current.get(containerInfo.transactionObj!.date)!("remove");
+						const addTransFunc = editDateTransFuncsMap.current.get(TransactionData.date)!("");
+
+						removeTransFunc(containerInfo.transactionObj!);
+						addTransFunc(TransactionData);
 					} else {
 						containerInfo.editTransactionFunc!(TransactionData);
 					}
 				} else {
-					setDateTransactionsRef.current(TransactionData);
+					setDateTransactionsRef.current!(TransactionData);
 				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
