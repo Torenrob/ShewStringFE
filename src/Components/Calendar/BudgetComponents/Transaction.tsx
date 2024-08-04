@@ -1,9 +1,10 @@
-import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useCallback, Ref, DragEventHandler, useMemo, SetStateAction, MouseEventHandler, RefObject } from "react";
+import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useContext } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
 import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
 import { MotionStyle, motion } from "framer-motion";
+import { CalendarContext } from "../CalendarContainer";
 
 export default function Transaction({
 	transaction,
@@ -21,6 +22,8 @@ export default function Transaction({
 	const [marqueePlay, setMarqueePlay] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
 	const [transactionInfo, setTransactionInfo] = useState<TransactionAPIData>(transaction);
+
+	const { dragObject } = useContext(CalendarContext);
 
 	useEffect(() => {
 		setTransactionInfo(transaction);
@@ -57,11 +60,13 @@ export default function Transaction({
 
 	function handleStartDrag(e: PointerEvent | MouseEvent | TouchEvent) {
 		btnRef.current?.setAttribute("id", "draggedTransaction");
+		dragObject.current.globalDragOn = true;
 		handleDragStart(btnRef.current!.getBoundingClientRect().y);
 		setDragActive(true);
 	}
 
 	function handleEndDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+		dragObject.current.globalDragOn = false;
 		if (!btnRef.current?.style) return;
 		btnRef.current.style.top = "";
 		btnRef.current?.removeAttribute("id");

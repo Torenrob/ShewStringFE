@@ -11,7 +11,6 @@ import CreditIcon from "./Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
-import { EditTransContFunc } from "./DayBox";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -42,7 +41,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		},
 	}));
 
-	const { setDateTransactionsRef, editDateTransFuncsMap } = useContext(CalendarContext);
+	const { addTransToDate: setDateTransactionsRef, editTransOnDatesFuncsMap } = useContext(CalendarContext);
 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
@@ -77,39 +76,18 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
 		event.preventDefault();
-
-		const transactionData: PostTransactionAPIData = {
-			// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
-			title: event.currentTarget.title.value,
-			transactionType: transactionType ? 0 : 1,
-			bankAccountId: event.currentTarget.account.value,
-			date: event.currentTarget.date.value,
-			amount: event.currentTarget.amount.value,
-			category: event.currentTarget.category.value,
-			description: event.currentTarget.description.value,
-		};
-
-		let postResponse;
-		let editTransactionIsSameDate: boolean; /*  */
-
+		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType);
+		let response;
+		let editTransactionIsSameDate: boolean;
 		if (containerInfo.editingExisting) {
-			//@ts-expect-error - TS wants to be sure every prop in containerInfo.transactionObj is present. According to logic they will all be present.
-			const updatedTrans: TransactionAPIData = {
-				...transactionData,
-				time: containerInfo.transactionObj!.time,
-				id: containerInfo.transactionObj!.id,
-				createdOn: containerInfo.transactionObj!.createdOn,
-				repeatGroupId: containerInfo.transactionObj!.repeatGroupId,
-			};
-
+			const updatedTrans = mkUpdTransAPIData(containerInfo.transactionObj!, postTransactionData);
 			editTransactionIsSameDate = updatedTrans.date === containerInfo.transactionObj!.date;
-
-			postResponse = await updateTransactionAPI(updatedTrans);
+			response = await updateTransactionAPI(updatedTrans);
 		} else {
-			postResponse = await postTransactionAPI(transactionData);
+			response = await postTransactionAPI(postTransactionData);
 		}
 
-		if (!postResponse) {
+		if (!response) {
 			setTimeout(() => {
 				console.log("ran");
 				setErrorMessage(true);
@@ -118,27 +96,27 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 			}, 500);
 		} else {
 			setTimeout(() => {
-				const TransactionData: TransactionAPIData = postResponse?.data;
+				const responseData: TransactionAPIData = response?.data;
 
 				const saveDate = containerInfo?.date;
 				if (!setDateTransactionsRef.current && !editingExisting) {
-					console.log("ran");
 					setErrorMessage(true);
 					setSubmittingTransaction(false);
 					return;
 				}
 				if (containerInfo.editingExisting) {
 					if (!editTransactionIsSameDate) {
-						const removeTransFunc = editDateTransFuncsMap.current.get(containerInfo.transactionObj!.date)!("remove");
-						const addTransFunc = editDateTransFuncsMap.current.get(TransactionData.date)!("");
-
-						removeTransFunc(containerInfo.transactionObj!);
-						addTransFunc(TransactionData);
+						containerInfo.deleteTransactionFromDate!(containerInfo.transactionObj!);
+						const editTransOnDateFuncs = editTransOnDatesFuncsMap.current.get(responseData.date);
+						editTransOnDateFuncs![0](responseData);
+						//Next two lines update the container info, in case user tries to edit from container again without selecting a diff transaction
+						containerInfo.transactionObj!.date = responseData.date;
+						containerInfo.deleteTransactionFromDate = editTransOnDateFuncs![1];
 					} else {
-						containerInfo.editTransactionFunc!(TransactionData);
+						containerInfo.editTransactionFunc!(responseData);
 					}
 				} else {
-					setDateTransactionsRef.current!(TransactionData);
+					setDateTransactionsRef.current!(responseData);
 				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
@@ -173,7 +151,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	async function deleteTransaction() {
 		const resp = await deleteTransactionAPI(containerInfo.id!);
 		if (resp?.statusText === "OK") {
-			containerInfo.deleteTransactionFunc!(containerInfo.transactionObj!);
+			containerInfo.deleteTransactionFromDate!(containerInfo.transactionObj!);
 			closeDrawer();
 		} else {
 			ErrorHandler("Transaction Delete API Failed");
@@ -354,3 +332,31 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 });
 
 export default TransactionInputDrawer;
+
+function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean): PostTransactionAPIData {
+	const transactionData: PostTransactionAPIData = {
+		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
+		title: targetData.title.value,
+		transactionType: transactionType ? 0 : 1,
+		bankAccountId: targetData.account.value,
+		date: targetData.date.value,
+		amount: targetData.amount.value,
+		category: targetData.category.value,
+		description: targetData.description.value,
+	};
+
+	return transactionData;
+}
+
+function mkUpdTransAPIData(curTransInfo: TransactionAPIData, newTransInfo: PostTransactionAPIData): TransactionAPIData {
+	const updatedTrans: TransactionAPIData = {
+		...newTransInfo,
+		transactionType: newTransInfo.transactionType === 0 ? "Debit" : "Credit",
+		time: curTransInfo.time,
+		id: curTransInfo.id,
+		createdOn: curTransInfo.createdOn,
+		repeatGroupId: curTransInfo.repeatGroupId,
+	};
+
+	return updatedTrans;
+}

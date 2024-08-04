@@ -4,12 +4,12 @@ import { BankAccountAPIData } from "../../Types/APIDataTypes";
 
 const api = import.meta.env.VITE_API_URL + "/bankaccounts";
 
-export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[] | null> => {
+export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => {
 	try {
 		const data = await axios.get(api);
 		return data.data;
 	} catch (error) {
 		ErrorHandler(error);
-		return null;
+		return [];
 	}
 };

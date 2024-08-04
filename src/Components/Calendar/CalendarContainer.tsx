@@ -7,14 +7,14 @@ import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { useMotionValue } from "framer-motion";
 import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
 import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
-import { EditTransContFunc } from "./DayBox";
+import { editTransOnDateFuncs } from "./DayBox";
 
 export type DragObject = {
 	globalDragOn: boolean;
 	dropping: boolean | null;
 	paginationDragState: { (dragOn: boolean): void }[];
 	containerDropped: () => void;
-	dragItemTransactions: (transaction: TransactionAPIData) => void;
+	removeTransactionFromDate: (transaction: TransactionAPIData) => void;
 	dragItemY: number;
 };
 
@@ -23,12 +23,13 @@ export type UpdateTransactionContainerInfo = {
 	date?: DateValue;
 	title?: string | null;
 	amount?: string;
+	transactionType?: "Debit" | "Credit";
 	category?: string;
 	description?: string | null;
 	bankAccountId?: number;
 	editingExisting: boolean;
 	transactionObj?: TransactionAPIData;
-	deleteTransactionFunc?: (trans: TransactionAPIData) => void;
+	deleteTransactionFromDate?: (trans: TransactionAPIData) => void;
 	editTransactionFunc?: (t: TransactionAPIData) => void;
 };
 
@@ -36,8 +37,8 @@ export type CalendarContextType = {
 	toggle: (arg: UpdateTransactionContainerInfo) => void;
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
-	setDateTransactionsRef: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
-	editDateTransFuncsMap: MutableRefObject<Map<string, EditTransContFunc>>;
+	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
+	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
 };
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
@@ -50,15 +51,15 @@ export default function CalendarContainer() {
 		dropping: null,
 		paginationDragState: [],
 		containerDropped: () => {},
-		dragItemTransactions: (transaction: TransactionAPIData) => {},
+		removeTransactionFromDate: (transaction: TransactionAPIData) => {},
 		dragItemY: 0,
 	});
 
-	const setDateTransactionsRef = useRef(undefined);
+	const addTransToDate = useRef(undefined);
 
 	const firstDragScrollTrigger = useRef(true);
 
-	const editDateTransFuncSet = useRef(new Map<string, EditTransContFunc>());
+	const editTransOnDatesFuncMap = useRef(new Map<string, editTransOnDateFuncs>());
 
 	function toggleDrawer(arg: UpdateTransactionContainerInfo) {
 		childref.current.updateContainer(arg);
@@ -82,6 +83,8 @@ export default function CalendarContainer() {
 		const draggedDate = draggedItem.classList;
 		const draggedMonthBox = document.getElementById(`${draggedDate.value.substring(0, 7)}`);
 		const monthBoxRectTop = draggedMonthBox!.getBoundingClientRect().top;
+
+		// const draggedOffSet = firstDragScrollTrigger ? monthBoxRectTop + dragItemTop : monthBoxRectTop;
 
 		const calendar = document.getElementById("calendar");
 
@@ -119,8 +122,8 @@ export default function CalendarContainer() {
 					toggle: toggleDrawer,
 					dragObject: dragObject,
 					dragScrollTrigger: firstDragScrollTrigger,
-					setDateTransactionsRef: setDateTransactionsRef,
-					editDateTransFuncsMap: editDateTransFuncSet,
+					addTransToDate: addTransToDate,
+					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
 				<TransactionInputDrawer ref={childref} />
 				<Calendar />

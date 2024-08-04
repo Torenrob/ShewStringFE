@@ -26,8 +26,9 @@ import { parseDate, today } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI, postTransactionAPI } from "../../Services/API/TransactionAPI";
 import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
 
-export type EditTransContFunc = (type: string) => (t: TransactionAPIData) => void;
+export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 
 export default function DayBox({
 	date,
@@ -49,13 +50,13 @@ export default function DayBox({
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
-	const { toggle: openDrawer, dragObject, setDateTransactionsRef, editDateTransFuncsMap } = useContext(CalendarContext);
+	const { toggle: openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap: addTransToDatesMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
-		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] | null => {
+		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] => {
 			const transArr = todayTransArr ? todayTransArr : transactions.get(dateString) ? transactions.get(dateString)! : [];
-			if (transArr.length == 0) return null;
+			if (transArr.length == 0) return [[]];
 			else if (transArr.length <= 5) {
 				return [transArr];
 			} else {
@@ -79,52 +80,50 @@ export default function DayBox({
 	const [dragActive, setDragActive] = useState<boolean>(false);
 	const [transactionPage, setTransactionPage] = useState<number>(0);
 	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
-	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][] | null>(transactionsPaginated());
+	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][]>(transactionsPaginated());
+	const [forceState, setForceState] = useState<number>(getRandomNum());
 
 	//CallBack Hooks
-	const addDateTransaction = (transactions: TransactionAPIData) => {
+	const addTransactionToList = useCallback((transaction: TransactionAPIData) => {
 		setTodaysTransactions((p) => {
 			if (!p) {
-				return [[transactions]];
+				p = [[transaction]];
 			} else if (p[p.length - 1].length < 5) {
-				p[p.length - 1].push(transactions);
-				return p;
+				p[p.length - 1].push(transaction);
 			} else {
-				p.push([transactions]);
-				return p;
+				p.push([transaction]);
 			}
+			return p;
 		});
-		editDateTransFuncsMap.current.delete(dateString);
-		editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
-	};
+		setForceState(getRandomNum());
+	}, []);
 
 	const removeTransactionFromList = (transaction: TransactionAPIData) => {
+		if (todaysTransactions!.length > 1 && todaysTransactions![todaysTransactions!.length - 1].length === 1) {
+			setTransactionPage(todaysTransactions!.length - 2);
+		}
+
 		setTodaysTransactions((p) => {
 			if (!p) return [[]];
-			const flatTransArr = p.flat();
-			flatTransArr.splice(flatTransArr.indexOf(transaction), 1);
-			return transactionsPaginated(flatTransArr);
+			const res = p.flat().filter((e) => e.id !== transaction.id);
+			return transactionsPaginated(res);
 		});
-		editDateTransFuncsMap.current.delete(dateString);
-		editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
 	};
 
-	const updateEditTransFuncs = (type: string): ((t: TransactionAPIData) => void) => {
-		if (type === "remove") {
-			return removeTransactionFromList;
-		} else {
-			return addDateTransaction;
-		}
-	};
-
-	(() => {
+	useEffect(() => {
 		if (firstRender.current) {
 			firstRender.current = false;
-			editDateTransFuncsMap.current.set(dateString, updateEditTransFuncs);
 			return;
 		}
-		setDateTransactionsRef.current = updateEditTransFuncs("");
-	})();
+		addTransToDate.current = addTransactionToList;
+	}, [addTransToDate, addTransactionToList]);
+
+	if (addTransToDatesMap.current.get(dateString)) {
+		addTransToDatesMap.current.delete(dateString);
+		addTransToDatesMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
+	} else {
+		addTransToDatesMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
+	}
 
 	//Functions
 	function toggleAddTransactionBtn(event: MouseEvent) {
@@ -134,7 +133,7 @@ export default function DayBox({
 
 	function clickAddTransaction() {
 		openDrawer({ date: parseDate(dateString), editingExisting: false });
-		setDateTransactionsRef.current = addDateTransaction;
+		addTransToDate.current = addTransactionToList;
 	}
 
 	function handleClickOnTransaction(e: MouseEvent, trans: TransactionAPIData, updateTransBanner: (t: TransactionAPIData) => void) {
@@ -150,7 +149,7 @@ export default function DayBox({
 			title: trans.title,
 			editingExisting: true,
 			transactionObj: trans,
-			deleteTransactionFunc: removeTransactionFromList,
+			deleteTransactionFromDate: removeTransactionFromList,
 			editTransactionFunc: updateTransBanner,
 		});
 	}
@@ -161,8 +160,7 @@ export default function DayBox({
 
 	function handleDragStart(dragItemY: number) {
 		setDragActive(true);
-		dragObject.current.dragItemTransactions = removeTransactionFromList;
-		dragObject.current.globalDragOn = true;
+		dragObject.current.removeTransactionFromDate = removeTransactionFromList;
 		dragObject.current.dragItemY = dragItemY;
 		dragObject.current.paginationDragState.forEach((x) => {
 			x(true);
@@ -171,7 +169,7 @@ export default function DayBox({
 
 	function handleDragOver(e: MouseEvent) {
 		if (!dragObject.current.globalDragOn) return;
-		setDateTransactionsRef.current = addDateTransaction;
+		addTransToDate.current = addTransactionToList;
 		dragObject.current.containerDropped = setDroppedPage;
 		e.currentTarget.classList.add("dragOver");
 	}
@@ -181,22 +179,21 @@ export default function DayBox({
 	}
 
 	async function handleDragEnd(transaction: TransactionAPIData) {
-		setDragActive(false);
 		const dragOver = document.getElementsByClassName("dragOver")[0];
 		dragOver.classList.remove("dragOver");
 		const dropContainerDate = dragOver.id.substring(0, 10);
-		if (!(dropContainerDate === transaction.date)) {
-			dragObject.current.dragItemTransactions(transaction);
+		if (dropContainerDate !== transaction.date) {
+			dragObject.current.removeTransactionFromDate(transaction);
 			try {
 				const updatedTransaction = await updateTransactionAPI(transaction, dropContainerDate);
-				setDateTransactionsRef.current!(updatedTransaction?.data);
+				addTransToDate.current!(updatedTransaction?.data);
 			} catch (error) {
-				console.log(error);
+				ErrorHandler(error);
 			}
-			dragObject.current.containerDropped();
 		}
-		dragObject.current.globalDragOn = false;
-		setDateTransactionsRef.current = undefined;
+		addTransToDate.current = undefined;
+		dragObject.current.containerDropped();
+		setDragActive(false);
 		dragObject.current.paginationDragState.forEach((x) => {
 			x(false);
 		});
@@ -243,4 +240,8 @@ export default function DayBox({
 			</CardBody>
 		</Card>
 	);
+}
+
+function getRandomNum(): number {
+	return Math.floor(Math.random() * 10000000);
 }
