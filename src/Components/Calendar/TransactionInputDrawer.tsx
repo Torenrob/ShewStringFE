@@ -10,7 +10,7 @@ import DebitIcon from "./Icons/DebitIcon";
 import CreditIcon from "./Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
+import { closeDrawer } from "../../Utilities/CalendarComponentUtils";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -36,7 +36,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				return;
 			} else {
 				setContainerInfo(arg);
-				setTransactionType(arg.transactionObj?.transactionType === "Debit");
+				setTransactionType(arg.transactionObj ? arg.transactionObj?.transactionType === "Debit" : true);
 			}
 		},
 	}));
@@ -51,14 +51,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 	}, []);
 
 	function cancelHover(event: MouseEvent) {}
-
-	function closeDrawer() {
-		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
-		highlightEditedTransactionSwitch();
-		if (!drawer.classList.contains("drawerClosed")) {
-			drawer.classList.add("drawerClosed");
-		}
-	}
 
 	useEffect(() => {
 		accountOptions();

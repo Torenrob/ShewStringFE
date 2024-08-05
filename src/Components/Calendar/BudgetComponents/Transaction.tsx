@@ -5,6 +5,7 @@ import { TransactionAPIData } from "../../../Types/APIDataTypes";
 import "./Transaction.css";
 import { MotionStyle, motion } from "framer-motion";
 import { CalendarContext } from "../CalendarContainer";
+import { closeDrawer } from "../../../Utilities/CalendarComponentUtils";
 
 export default function Transaction({
 	transaction,
@@ -14,13 +15,14 @@ export default function Transaction({
 	handleDragEnd,
 }: {
 	transaction: TransactionAPIData;
-	onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, transaction: TransactionAPIData, f: (t: TransactionAPIData) => void) => void;
+	onClick: (transaction: TransactionAPIData, f: (t: TransactionAPIData) => void) => void;
 	index: number;
 	handleDragStart: (dragItemY: number) => void;
 	handleDragEnd: (trans: TransactionAPIData) => void;
 }) {
 	const [marqueePlay, setMarqueePlay] = useState(false);
 	const [dragActive, setDragActive] = useState(false);
+	const [mouseOver, setMouseOver] = useState(false);
 	const [transactionInfo, setTransactionInfo] = useState<TransactionAPIData>(transaction);
 
 	const { dragObject } = useContext(CalendarContext);
@@ -52,13 +54,8 @@ export default function Transaction({
 
 	const btnRef = useRef<HTMLDivElement>(null);
 
-	function getTransactionYpostion(): number {
-		let elementPosition = btnRef.current?.getBoundingClientRect().top;
-		elementPosition = elementPosition ? elementPosition / 2 : undefined;
-		return elementPosition as number;
-	}
-
 	function handleStartDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+		closeDrawer();
 		btnRef.current?.setAttribute("id", "draggedTransaction");
 		dragObject.current.globalDragOn = true;
 		handleDragStart(btnRef.current!.getBoundingClientRect().y);
@@ -66,6 +63,7 @@ export default function Transaction({
 	}
 
 	function handleEndDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+		setMouseOver(false);
 		dragObject.current.globalDragOn = false;
 		if (!btnRef.current?.style) return;
 		btnRef.current.style.top = "";
@@ -78,25 +76,54 @@ export default function Transaction({
 		setTransactionInfo(trans);
 	}
 
+	function onMouseEnter() {
+		setMouseOver(true);
+	}
+
+	function onMouseLeave() {
+		if (!dragActive) setMouseOver(false);
+	}
+
 	return (
-		<motion.div
-			ref={btnRef}
-			onDragStart={(e) => handleStartDrag(e)}
-			onDragEnd={handleEndDrag}
-			drag
-			dragSnapToOrigin
-			className={`${transactionInfo.date}`}
-			whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
-			id={`transaction${transactionInfo.id}`}>
+		<div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+			<motion.div
+				ref={btnRef}
+				onDragStart={(e) => handleStartDrag(e)}
+				onDragEnd={handleEndDrag}
+				drag
+				dragSnapToOrigin
+				style={{ display: mouseOver ? "block" : "none" }}
+				className={`${transactionInfo.date}`}
+				whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
+				id={`transaction${transactionInfo.id}`}>
+				<Button
+					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
+					onMouseEnter={marqueeSwitch}
+					onMouseLeave={marqueeSwitch}
+					variant={dragActive ? "solid" : "ghost"}
+					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
+					radius="none"
+					size="sm"
+					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
+					<span style={{ fontWeight: "bold" }}>
+						${transactionInfo?.transactionType === "Credit" ? "" : "("}
+						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
+						{transactionInfo?.transactionType === "Debit" && ")"}
+					</span>
+					{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
+					{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
+				</Button>
+			</motion.div>
 			<Button
-				onClick={(e) => onClick(e, transactionInfo, updateTransactionBanner)}
+				onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
 				onMouseEnter={marqueeSwitch}
 				onMouseLeave={marqueeSwitch}
+				style={{ display: !mouseOver ? "flex" : "none" }}
 				variant={dragActive ? "solid" : "ghost"}
 				color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
 				radius="none"
 				size="sm"
-				className="transaction flex content-between border-0 mb-0.5 h-4 w-auto">
+				className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
 				<span style={{ fontWeight: "bold" }}>
 					${transactionInfo?.transactionType === "Credit" ? "" : "("}
 					{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
@@ -105,6 +132,6 @@ export default function Transaction({
 				{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
 				{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
 			</Button>
-		</motion.div>
+		</div>
 	);
 }

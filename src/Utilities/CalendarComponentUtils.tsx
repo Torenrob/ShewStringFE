@@ -101,13 +101,28 @@ export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMont
 	}
 }
 
-export function highlightEditedTransactionSwitch(transBtn?: HTMLDivElement) {
-	const selectedTransaction = document.getElementById("selectedTransaction");
-	if (transBtn) {
-		if (selectedTransaction) selectedTransaction.removeAttribute("id");
-		transBtn.setAttribute("id", "selectedTransaction");
+export function closeDrawer() {
+	const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
+	highlightEditedTransactionSwitch();
+	if (!drawer.classList.contains("drawerClosed")) {
+		drawer.classList.add("drawerClosed");
+	}
+}
+
+export function highlightEditedTransactionSwitch(transID?: string) {
+	const selectedTransaction = document.getElementsByClassName("selectedTransaction");
+	if (transID) {
+		if (selectedTransaction.length > 0) {
+			Array.from(selectedTransaction).forEach((element) => {
+				element.classList.remove("selectedTransaction");
+			});
+		}
+		const transIdDivs = document.getElementsByClassName(`transClass${transID}`);
+		Array.from(transIdDivs).forEach((el) => el.classList.add("selectedTransaction"));
 		return;
 	} else {
-		selectedTransaction?.removeAttribute("id");
+		Array.from(selectedTransaction).forEach((element) => {
+			element.classList.remove("selectedTransaction");
+		});
 	}
 }

@@ -136,8 +136,8 @@ export default function DayBox({
 		addTransToDate.current = addTransactionToList;
 	}
 
-	function handleClickOnTransaction(e: MouseEvent, trans: TransactionAPIData, updateTransBanner: (t: TransactionAPIData) => void) {
-		highlightEditedTransactionSwitch(e.currentTarget as HTMLDivElement);
+	function handleClickOnTransaction(trans: TransactionAPIData, updateTransBanner: (t: TransactionAPIData) => void) {
+		highlightEditedTransactionSwitch(trans.id.toString());
 
 		openDrawer({
 			id: trans.id,
@@ -205,6 +205,29 @@ export default function DayBox({
 		}
 	}
 
+	//Check to make sure no transaction is added twice to container.
+	//A certain bug during DND was adding transactions twice.
+	const lastTransIndex = todaysTransactions[todaysTransactions.length - 1];
+	if (lastTransIndex.length > 1) {
+		lastTransIndex.forEach((x) => {
+			const indexes = [];
+			let i = -1;
+			while ((i = lastTransIndex.indexOf(x, i + 1)) !== -1) {
+				indexes.push(i);
+			}
+			indexes.length > 1 ? removeDups(indexes.reverse()) : null;
+		});
+	}
+
+	function removeDups(indexList: number[]) {
+		setTodaysTransactions((p) => {
+			indexList.forEach((y) => {
+				p[p.length - 1].slice(y, 1);
+			});
+			return p;
+		});
+	}
+
 	return (
 		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 outline-black`}>
 			<CardBody
@@ -212,7 +235,13 @@ export default function DayBox({
 				onMouseLeave={toggleAddTransactionBtn}
 				className="px-1 py-0 overflow-x-hidden overflow-y-hidden"
 				style={{ position: `${dragActive ? "static" : "relative"}` }}>
-				<span className="text-right text-sm">{date}</span>
+				<div className="flex justify-between">
+					<div className="flex">
+						{date === 1 && <span className="text-right text-sm">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
+						<span className="text-right text-sm">{date}</span>
+					</div>
+					<span></span>
+				</div>
 				<Divider />
 				<div onMouseEnter={handleDragOver} onMouseLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
 					{todaysTransactions &&
