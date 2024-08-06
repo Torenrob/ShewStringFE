@@ -146,22 +146,23 @@ export function updateDailyBalances(
 	dateBalMap: Map<string, number>,
 	newTransInfo: TransactionAPIData,
 	oldTransInfo?: TransactionAPIData
-): Map<string, number> {
+): [Map<string, number>, boolean] {
 	if (!oldTransInfo) {
 		const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
 		transMap.set(newTransInfo.date, newTrsDateTrsArr);
-		return calcDailyBalances(transMap);
+		return [calcDailyBalances(transMap), true];
 	}
 
-	if (newTransInfo.date === oldTransInfo.date && newTransInfo.amount === oldTransInfo.amount) {
-		return dateBalMap;
+	if (newTransInfo.date === oldTransInfo.date && newTransInfo.amount === oldTransInfo.amount && newTransInfo.transactionType === oldTransInfo.transactionType) {
+		return [dateBalMap, false];
 	}
 
 	if (newTransInfo.date === oldTransInfo.date) {
 		const updatedDateTransArr = transMap.get(newTransInfo.date)!;
 		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].amount = newTransInfo.amount;
+		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].transactionType = newTransInfo.transactionType;
 		transMap.set(newTransInfo.date, updatedDateTransArr);
-		return calcDailyBalances(transMap);
+		return [calcDailyBalances(transMap), true];
 	}
 
 	const oldTrsDateTrsArr = transMap.get(oldTransInfo.date)!;
@@ -175,5 +176,41 @@ export function updateDailyBalances(
 		transMap.set(oldTransInfo.date, oldTrsDateTrsArr);
 	}
 
-	return calcDailyBalances(transMap);
+	return [calcDailyBalances(transMap), true];
+}
+
+export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: number) => void>, dailyBalMap: Map<string, number>): void {
+	let balanceKeeper: number = 0;
+	const dailyBalArr = Array.from(dailyBalMap.entries());
+
+	const unsortedBalStateMap = Array.from(setBalStateMap);
+	const sortedBalStateMap = unsortedBalStateMap.sort((a, b) => {
+		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
+	});
+
+	sortedBalStateMap.forEach((entry, i) => {
+		if (i == 0) {
+			if (new Date(dailyBalArr[0][0]).toDateString() === new Date(entry[0]).toDateString() || new Date(dailyBalArr[0][0]) < new Date(entry[0])) {
+				balanceKeeper = dailyBalArr[0][1];
+				entry[1](balanceKeeper);
+				return;
+			} else {
+				entry[1](balanceKeeper);
+				return;
+			}
+		}
+
+		// if (entry[0] === "2024-08-16") {
+		// 	console.log("ran");
+		// 	console.log("ran");
+		// }
+
+		if (!dailyBalMap.get(entry[0])) {
+			entry[1](balanceKeeper);
+			return;
+		}
+
+		balanceKeeper = dailyBalMap.get(entry[0])!;
+		entry[1](balanceKeeper);
+	});
 }

@@ -10,7 +10,7 @@ import DebitIcon from "./Icons/DebitIcon";
 import CreditIcon from "./Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { calcDailyBalances, closeDrawer, updateDailyBalances } from "../../Utilities/CalendarComponentUtils";
+import { calcDailyBalances, closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/CalendarComponentUtils";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -41,7 +41,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		},
 	}));
 
-	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
+	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap, setStateDailyBalanceMap } = useContext(CalendarContext);
 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
@@ -110,7 +110,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				} else {
 					addTransToDate.current!(responseData);
 				}
-				dailyBalancesMap.current = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, containerInfo.transactionObj);
+				const dailyBalwChgChk: [Map<string, number>, boolean] = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, containerInfo.transactionObj);
+				dailyBalancesMap.current = dailyBalwChgChk[0];
+				dailyBalwChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
 				setContainerInfo({ date: saveDate, ...containerInfo });

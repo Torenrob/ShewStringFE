@@ -38,6 +38,7 @@ export type CalendarContextType = {
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
 	dailyBalancesMap: MutableRefObject<Map<string, number>>;
+	setStateDailyBalanceMap: MutableRefObject<Map<string, (arg: number) => void>>;
 	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
 	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
 	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
@@ -60,6 +61,8 @@ export default function CalendarContainer() {
 	const dailyBalancesMap = useRef(new Map());
 
 	const dateTransactionsMap = useRef(new Map());
+
+	const setStateDailyBalance = useRef(new Map());
 
 	const addTransToDate = useRef(undefined);
 
@@ -134,6 +137,7 @@ export default function CalendarContainer() {
 					dateTransactionsMap: dateTransactionsMap,
 					dragObject: dragObject,
 					dragScrollTrigger: firstDragScrollTrigger,
+					setStateDailyBalanceMap: setStateDailyBalance,
 					addTransToDate: addTransToDate,
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>

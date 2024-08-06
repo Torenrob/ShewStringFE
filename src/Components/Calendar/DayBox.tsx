@@ -50,7 +50,7 @@ export default function DayBox({
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
-	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap } = useContext(CalendarContext);
+	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
@@ -119,12 +119,16 @@ export default function DayBox({
 		addTransToDate.current = addTransactionToList;
 	}, [addTransToDate, addTransactionToList]);
 
+	//Collect state funcs in context with no duplicates
 	if (editTransOnDatesFuncsMap.current.get(dateString)) {
 		editTransOnDatesFuncsMap.current.delete(dateString);
-		editTransOnDatesFuncsMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
-	} else {
-		editTransOnDatesFuncsMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
 	}
+	editTransOnDatesFuncsMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
+
+	if (setStateDailyBalanceMap.current.get(dateString)) {
+		setStateDailyBalanceMap.current.delete(dateString);
+	}
+	setStateDailyBalanceMap.current.set(dateString, updateDaysBalance);
 
 	//Functions
 	function toggleAddTransactionBtn(event: MouseEvent) {
@@ -204,6 +208,13 @@ export default function DayBox({
 		if (todaysTransactions) {
 			setTransactionPage(todaysTransactions?.length - 1);
 		}
+	}
+
+	function updateDaysBalance(newBalance: number) {
+		const isNewBalance: boolean = newBalance !== dailyBalance;
+
+		setDailyBalance(newBalance);
+		isNewBalance ? setForceState(getRandomNum()) : null;
 	}
 
 	//Check to make sure no transaction is added twice to container.
