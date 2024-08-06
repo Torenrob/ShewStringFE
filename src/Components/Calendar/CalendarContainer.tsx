@@ -34,9 +34,11 @@ export type UpdateTransactionContainerInfo = {
 };
 
 export type CalendarContextType = {
-	toggle: (arg: UpdateTransactionContainerInfo) => void;
+	openDrawer: (arg: UpdateTransactionContainerInfo) => void;
 	dragObject: MutableRefObject<DragObject>;
 	dragScrollTrigger: MutableRefObject<boolean>;
+	dailyBalancesMap: MutableRefObject<Map<string, number>>;
+	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
 	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
 	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
 };
@@ -55,13 +57,17 @@ export default function CalendarContainer() {
 		dragItemY: 0,
 	});
 
+	const dailyBalancesMap = useRef(new Map());
+
+	const dateTransactionsMap = useRef(new Map());
+
 	const addTransToDate = useRef(undefined);
 
 	const firstDragScrollTrigger = useRef(true);
 
 	const editTransOnDatesFuncMap = useRef(new Map<string, editTransOnDateFuncs>());
 
-	function toggleDrawer(arg: UpdateTransactionContainerInfo) {
+	function openDrawer(arg: UpdateTransactionContainerInfo) {
 		childref.current.updateContainer(arg);
 		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
 		if (drawer.classList.contains("drawerClosed")) {
@@ -107,7 +113,11 @@ export default function CalendarContainer() {
 
 	return (
 		<div id="calendarContainer" className="relative flex flex-col calendarContainer overflow-clip">
-			<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)}></div>
+			<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center">
+				<div className="self-end" style={{ position: "relative", top: "10px" }}>
+					↑ Drag Scroll ↑
+				</div>
+			</div>
 			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
 				<div>Sunday</div>
 				<div>Monday</div>
@@ -119,7 +129,9 @@ export default function CalendarContainer() {
 			</div>
 			<CalendarContext.Provider
 				value={{
-					toggle: toggleDrawer,
+					openDrawer: openDrawer,
+					dailyBalancesMap: dailyBalancesMap,
+					dateTransactionsMap: dateTransactionsMap,
 					dragObject: dragObject,
 					dragScrollTrigger: firstDragScrollTrigger,
 					addTransToDate: addTransToDate,

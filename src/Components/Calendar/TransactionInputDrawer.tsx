@@ -10,7 +10,7 @@ import DebitIcon from "./Icons/DebitIcon";
 import CreditIcon from "./Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { closeDrawer } from "../../Utilities/CalendarComponentUtils";
+import { calcDailyBalances, closeDrawer, updateDailyBalances } from "../../Utilities/CalendarComponentUtils";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -41,7 +41,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		},
 	}));
 
-	const { addTransToDate: setDateTransactionsRef, editTransOnDatesFuncsMap } = useContext(CalendarContext);
+	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
 
 	const accountOptions = useCallback(async () => {
 		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
@@ -91,7 +91,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				const responseData: TransactionAPIData = response?.data;
 
 				const saveDate = containerInfo?.date;
-				if (!setDateTransactionsRef.current && !editingExisting) {
+				if (!addTransToDate.current && !editingExisting) {
 					setErrorMessage(true);
 					setSubmittingTransaction(false);
 					return;
@@ -108,8 +108,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 						containerInfo.editTransactionFunc!(responseData);
 					}
 				} else {
-					setDateTransactionsRef.current!(responseData);
+					addTransToDate.current!(responseData);
 				}
+				dailyBalancesMap.current = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, containerInfo.transactionObj);
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
 				setContainerInfo({ date: saveDate, ...containerInfo });

@@ -16,7 +16,7 @@ export default function CustomPaginator({ total, currentPage, onChange }: { tota
 	});
 
 	return (
-		<ul className="flex gap-1">
+		<ul className="flex gap-1 paginator">
 			{range.map((page) => {
 				if (page === PaginationItemType.NEXT) {
 					return <li key={page} onClick={onNext} aria-label="next page" className="w-1.5 h-1.5 nextTransactionPage"></li>;

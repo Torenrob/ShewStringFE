@@ -1,11 +1,12 @@
 import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext, Fragment, useContext } from "react";
 import MonthBox from "./MonthBox";
-import { focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponentUtils";
+import { calcDailyBalances, focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponentUtils";
 import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
 import { Skeleton, Input, Select, SelectItem, DateValue } from "@nextui-org/react";
 import { getAllTransactionsAPI } from "../../Services/API/TransactionAPI";
 import { CalendarContext } from "./CalendarContainer";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getMonth(): LocalMonth {
@@ -57,6 +58,8 @@ export default function Calendar(): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
 	const [transactions, setTransactions] = useState<Map<string, TransactionAPIData[]>>(new Map<string, TransactionAPIData[]>());
 
+	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
+
 	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
 		const transactionArray: TransactionAPIData[] = [];
 		transactionData?.forEach((trans) => {
@@ -69,8 +72,13 @@ export default function Calendar(): ReactNode {
 	}
 
 	const getTransactionData = useCallback(async () => {
-		const res: Map<string, TransactionAPIData[]> | null = await getAllTransactionsAPI();
-		setTransactions(res as Map<string, TransactionAPIData[]>);
+		try {
+			dateTransactionsMap.current = await getAllTransactionsAPI();
+		} catch (error) {
+			ErrorHandler(error);
+		}
+		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!);
+		setTransactions(dateTransactionsMap.current! as Map<string, TransactionAPIData[]>);
 		let yTrans: number = 0;
 		const monthArr = [...Array(23)].map((_, index) => {
 			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
@@ -83,11 +91,11 @@ export default function Calendar(): ReactNode {
 		});
 		focusToday();
 		setMonthComps(monthArr);
-	}, []);
+	}, [dailyBalancesMap, dateTransactionsMap]);
 
 	useEffect(() => {
 		getTransactionData();
-	}, [getTransactionData]);
+	}, [getTransactionData, dailyBalancesMap]);
 
 	//Intersect Observer to highlight current month/year label
 	const labelObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();

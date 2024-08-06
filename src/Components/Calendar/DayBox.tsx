@@ -50,7 +50,7 @@ export default function DayBox({
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
-	const { toggle: openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap: addTransToDatesMap } = useContext(CalendarContext);
+	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
@@ -81,6 +81,7 @@ export default function DayBox({
 	const [transactionPage, setTransactionPage] = useState<number>(0);
 	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
 	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][]>(transactionsPaginated());
+	const [dailyBalance, setDailyBalance] = useState<number>(getTodaysBalance(dailyBalancesMap.current, dateString));
 	const [forceState, setForceState] = useState<number>(getRandomNum());
 
 	//CallBack Hooks
@@ -118,11 +119,11 @@ export default function DayBox({
 		addTransToDate.current = addTransactionToList;
 	}, [addTransToDate, addTransactionToList]);
 
-	if (addTransToDatesMap.current.get(dateString)) {
-		addTransToDatesMap.current.delete(dateString);
-		addTransToDatesMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
+	if (editTransOnDatesFuncsMap.current.get(dateString)) {
+		editTransOnDatesFuncsMap.current.delete(dateString);
+		editTransOnDatesFuncsMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
 	} else {
-		addTransToDatesMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
+		editTransOnDatesFuncsMap.current.set(dateString, [addTransactionToList, removeTransactionFromList]);
 	}
 
 	//Functions
@@ -240,7 +241,7 @@ export default function DayBox({
 						{date === 1 && <span className="text-right text-sm">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
 						<span className="text-right text-sm">{date}</span>
 					</div>
-					<span></span>
+					<span>{dailyBalance}</span>
 				</div>
 				<Divider />
 				<div onMouseEnter={handleDragOver} onMouseLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
@@ -273,4 +274,18 @@ export default function DayBox({
 
 function getRandomNum(): number {
 	return Math.floor(Math.random() * 10000000);
+}
+
+function getTodaysBalance(balMap: Map<string, number>, dateString: string): number {
+	let daysBalance: number | undefined = balMap.get(dateString);
+
+	if (daysBalance) return daysBalance;
+
+	const mapIter = balMap.keys();
+	let dateKey;
+	while (new Date((dateKey = mapIter.next().value)) < new Date(dateString)) {
+		daysBalance = balMap.get(dateKey);
+	}
+
+	return daysBalance!;
 }

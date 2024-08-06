@@ -1,3 +1,4 @@
+import { TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
 
 export function getMonthName(num: number) {
@@ -125,4 +126,54 @@ export function highlightEditedTransactionSwitch(transID?: string) {
 			element.classList.remove("selectedTransaction");
 		});
 	}
+}
+
+export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>): Map<string, number> {
+	const dailyBalanceMap = new Map();
+	let balanceKeeper: number = 0;
+
+	Array.from(allTransactions.entries()).forEach((day) => {
+		balanceKeeper = day[1].reduce((balAcc: number, trans: TransactionAPIData): number => balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount), balanceKeeper);
+
+		dailyBalanceMap.set(day[0], balanceKeeper.toFixed(2));
+	});
+
+	return dailyBalanceMap;
+}
+
+export function updateDailyBalances(
+	transMap: Map<string, TransactionAPIData[]>,
+	dateBalMap: Map<string, number>,
+	newTransInfo: TransactionAPIData,
+	oldTransInfo?: TransactionAPIData
+): Map<string, number> {
+	if (!oldTransInfo) {
+		const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
+		transMap.set(newTransInfo.date, newTrsDateTrsArr);
+		return calcDailyBalances(transMap);
+	}
+
+	if (newTransInfo.date === oldTransInfo.date && newTransInfo.amount === oldTransInfo.amount) {
+		return dateBalMap;
+	}
+
+	if (newTransInfo.date === oldTransInfo.date) {
+		const updatedDateTransArr = transMap.get(newTransInfo.date)!;
+		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].amount = newTransInfo.amount;
+		transMap.set(newTransInfo.date, updatedDateTransArr);
+		return calcDailyBalances(transMap);
+	}
+
+	const oldTrsDateTrsArr = transMap.get(oldTransInfo.date)!;
+	const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
+	oldTrsDateTrsArr.splice(oldTrsDateTrsArr.indexOf(oldTransInfo), 1);
+
+	transMap.set(newTransInfo.date, newTrsDateTrsArr);
+	if (oldTrsDateTrsArr.length === 0) {
+		transMap.delete(oldTransInfo.date);
+	} else {
+		transMap.set(oldTransInfo.date, oldTrsDateTrsArr);
+	}
+
+	return calcDailyBalances(transMap);
 }

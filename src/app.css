@@ -46,7 +46,7 @@
 .dayBox {
 	min-height: 128px;
 	max-height: 128px;
-	cursor: pointer;
+	cursor: default;
 	pointer-events: auto;
 	position: static;
 }
@@ -212,4 +212,8 @@ div > .weekdayLabel {
 .selectedTransaction {
 	border: solid 2px black;
 	padding-top: 2px;
+}
+
+.paginator {
+	cursor: pointer;
 }

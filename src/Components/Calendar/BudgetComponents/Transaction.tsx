@@ -92,7 +92,7 @@ export default function Transaction({
 				onDragEnd={handleEndDrag}
 				drag
 				dragSnapToOrigin
-				style={{ display: mouseOver ? "block" : "none" }}
+				style={{ display: mouseOver || dragActive ? "block" : "none" }}
 				className={`${transactionInfo.date}`}
 				whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 				id={`transaction${transactionInfo.id}`}>
@@ -114,24 +114,26 @@ export default function Transaction({
 					{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
 				</Button>
 			</motion.div>
-			<Button
-				onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
-				onMouseEnter={marqueeSwitch}
-				onMouseLeave={marqueeSwitch}
-				style={{ display: !mouseOver ? "flex" : "none" }}
-				variant={dragActive ? "solid" : "ghost"}
-				color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
-				radius="none"
-				size="sm"
-				className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-				<span style={{ fontWeight: "bold" }}>
-					${transactionInfo?.transactionType === "Credit" ? "" : "("}
-					{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
-					{transactionInfo?.transactionType === "Debit" && ")"}
-				</span>
-				{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
-				{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
-			</Button>
+			{!dragActive && (
+				<Button
+					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
+					onMouseEnter={marqueeSwitch}
+					onMouseLeave={marqueeSwitch}
+					style={{ display: !mouseOver ? "flex" : "none" }}
+					variant={dragActive ? "solid" : "ghost"}
+					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
+					radius="none"
+					size="sm"
+					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
+					<span style={{ fontWeight: "bold" }}>
+						${transactionInfo?.transactionType === "Credit" ? "" : "("}
+						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
+						{transactionInfo?.transactionType === "Debit" && ")"}
+					</span>
+					{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
+					{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
+				</Button>
+			)}
 		</div>
 	);
 }
