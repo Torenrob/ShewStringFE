@@ -44,7 +44,7 @@ export const updateTransactionAPI = async (transaction: TransactionAPIData, newD
 	}
 	try {
 		const data = await axios.put(api + `/${transaction.id}`, updateTransactionAPIData);
-		console.log(data.data);
+
 		return data;
 	} catch (error) {
 		ErrorHandler(error);

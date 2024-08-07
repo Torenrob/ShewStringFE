@@ -18,7 +18,6 @@ async function signUpLoader({ request }: { request: Request }) {
 
 	const res = await axios.post("http://localhost:3000/sign-up", form);
 
-	console.log(res);
 	return null;
 }
 

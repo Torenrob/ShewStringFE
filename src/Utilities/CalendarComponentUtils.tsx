@@ -132,12 +132,20 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 	const dailyBalanceMap = new Map();
 	let balanceKeeper: number = 0;
 
-	Array.from(allTransactions.entries()).forEach((day) => {
-		balanceKeeper = day[1].reduce((balAcc: number, trans: TransactionAPIData): number => balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount), balanceKeeper);
+	const sortedTransMap = Array.from(allTransactions);
+	sortedTransMap.sort((a, b) => {
+		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
+	});
+
+	console.log(sortedTransMap);
+
+	sortedTransMap.forEach((day) => {
+		balanceKeeper = day[1].reduce((balAcc, trans): number => balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount), balanceKeeper);
 
 		dailyBalanceMap.set(day[0], balanceKeeper.toFixed(2));
 	});
 
+	console.log(dailyBalanceMap);
 	return dailyBalanceMap;
 }
 
@@ -150,7 +158,10 @@ export function updateDailyBalances(
 	if (!oldTransInfo) {
 		const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
 		transMap.set(newTransInfo.date, newTrsDateTrsArr);
-		return [calcDailyBalances(transMap), true];
+		//Sometimes map comes through with duplicate of new Transaction - removing any duplicates
+		const transMapNoDups = removeMapDups(transMap, newTransInfo);
+
+		return [calcDailyBalances(transMapNoDups), true];
 	}
 
 	if (newTransInfo.date === oldTransInfo.date && newTransInfo.amount === oldTransInfo.amount && newTransInfo.transactionType === oldTransInfo.transactionType) {
@@ -162,7 +173,9 @@ export function updateDailyBalances(
 		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].amount = newTransInfo.amount;
 		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].transactionType = newTransInfo.transactionType;
 		transMap.set(newTransInfo.date, updatedDateTransArr);
-		return [calcDailyBalances(transMap), true];
+
+		const transMapNoDups = removeMapDups(transMap, newTransInfo);
+		return [calcDailyBalances(transMapNoDups), true];
 	}
 
 	const oldTrsDateTrsArr = transMap.get(oldTransInfo.date)!;
@@ -176,19 +189,18 @@ export function updateDailyBalances(
 		transMap.set(oldTransInfo.date, oldTrsDateTrsArr);
 	}
 
-	return [calcDailyBalances(transMap), true];
+	const transMapNoDups = removeMapDups(transMap, newTransInfo);
+	return [calcDailyBalances(transMapNoDups), true];
 }
 
 export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: number) => void>, dailyBalMap: Map<string, number>): void {
 	let balanceKeeper: number = 0;
 	const dailyBalArr = Array.from(dailyBalMap.entries());
 
-	const unsortedBalStateMap = Array.from(setBalStateMap);
-	const sortedBalStateMap = unsortedBalStateMap.sort((a, b) => {
-		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
-	});
+	console.log(dailyBalArr);
+	console.log(Array.from(setBalStateMap.keys()));
 
-	sortedBalStateMap.forEach((entry, i) => {
+	Array.from(setBalStateMap.entries()).forEach((entry, i) => {
 		if (i == 0) {
 			if (new Date(dailyBalArr[0][0]).toDateString() === new Date(entry[0]).toDateString() || new Date(dailyBalArr[0][0]) < new Date(entry[0])) {
 				balanceKeeper = dailyBalArr[0][1];
@@ -200,11 +212,6 @@ export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: numbe
 			}
 		}
 
-		// if (entry[0] === "2024-08-16") {
-		// 	console.log("ran");
-		// 	console.log("ran");
-		// }
-
 		if (!dailyBalMap.get(entry[0])) {
 			entry[1](balanceKeeper);
 			return;
@@ -213,4 +220,18 @@ export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: numbe
 		balanceKeeper = dailyBalMap.get(entry[0])!;
 		entry[1](balanceKeeper);
 	});
+}
+
+function removeMapDups(transMapPosDups: Map<string, TransactionAPIData[]>, newTrans: TransactionAPIData): Map<string, TransactionAPIData[]> {
+	const arrPosDups = transMapPosDups.get(newTrans.date);
+
+	const idCnt = arrPosDups!.reduce((idCnt, trans) => {
+		return trans.id === newTrans.id ? ++idCnt : idCnt;
+	}, 0);
+
+	idCnt > 1 ? arrPosDups!.pop() : null;
+
+	transMapPosDups.set(newTrans.date, arrPosDups!);
+
+	return transMapPosDups;
 }

@@ -137,6 +137,7 @@ export default function DayBox({
 	}
 
 	function clickAddTransaction() {
+		highlightEditedTransactionSwitch();
 		openDrawer({ date: parseDate(dateString), editingExisting: false });
 		addTransToDate.current = addTransactionToList;
 	}

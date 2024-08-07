@@ -81,7 +81,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 		if (!response) {
 			setTimeout(() => {
-				console.log("ran");
 				setErrorMessage(true);
 				setSubmittingTransaction(false);
 				return;
