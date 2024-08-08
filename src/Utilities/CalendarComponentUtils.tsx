@@ -137,15 +137,15 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
 	});
 
-	console.log(sortedTransMap);
-
 	sortedTransMap.forEach((day) => {
-		balanceKeeper = day[1].reduce((balAcc, trans): number => balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount), balanceKeeper);
+		balanceKeeper = day[1].reduce((balAcc, trans): number => {
+			return parseFloat((balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount)).toFixed(2));
+		}, balanceKeeper);
 
+		dailyBalanceMap.delete(day[0]);
 		dailyBalanceMap.set(day[0], balanceKeeper.toFixed(2));
 	});
 
-	console.log(dailyBalanceMap);
 	return dailyBalanceMap;
 }
 
@@ -156,12 +156,24 @@ export function updateDailyBalances(
 	oldTransInfo?: TransactionAPIData
 ): [Map<string, number>, boolean] {
 	if (!oldTransInfo) {
-		const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
-		transMap.set(newTransInfo.date, newTrsDateTrsArr);
-		//Sometimes map comes through with duplicate of new Transaction - removing any duplicates
-		const transMapNoDups = removeMapDups(transMap, newTransInfo);
+		let newTrsDateTrsArr;
+		const targetArr = transMap.get(newTransInfo.date);
 
-		return [calcDailyBalances(transMapNoDups), true];
+		//Due to func call being inside setTimeout newTransInfo gets added to targetArr twice
+		//Ensuring it isn't added again if it already exists
+		if (targetArr) {
+			if (!targetArr.includes(newTransInfo)) {
+				newTrsDateTrsArr = targetArr.concat(newTransInfo);
+			} else {
+				newTrsDateTrsArr = targetArr;
+			}
+		} else {
+			newTrsDateTrsArr = [newTransInfo];
+		}
+
+		transMap.set(newTransInfo.date, newTrsDateTrsArr);
+
+		return [calcDailyBalances(transMap), true];
 	}
 
 	if (newTransInfo.date === oldTransInfo.date && newTransInfo.amount === oldTransInfo.amount && newTransInfo.transactionType === oldTransInfo.transactionType) {
@@ -173,9 +185,7 @@ export function updateDailyBalances(
 		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].amount = newTransInfo.amount;
 		updatedDateTransArr[updatedDateTransArr.indexOf(oldTransInfo)].transactionType = newTransInfo.transactionType;
 		transMap.set(newTransInfo.date, updatedDateTransArr);
-
-		const transMapNoDups = removeMapDups(transMap, newTransInfo);
-		return [calcDailyBalances(transMapNoDups), true];
+		return [calcDailyBalances(transMap), true];
 	}
 
 	const oldTrsDateTrsArr = transMap.get(oldTransInfo.date)!;
@@ -189,18 +199,19 @@ export function updateDailyBalances(
 		transMap.set(oldTransInfo.date, oldTrsDateTrsArr);
 	}
 
-	const transMapNoDups = removeMapDups(transMap, newTransInfo);
-	return [calcDailyBalances(transMapNoDups), true];
+	return [calcDailyBalances(transMap), true];
 }
 
 export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: number) => void>, dailyBalMap: Map<string, number>): void {
 	let balanceKeeper: number = 0;
 	const dailyBalArr = Array.from(dailyBalMap.entries());
 
-	console.log(dailyBalArr);
-	console.log(Array.from(setBalStateMap.keys()));
+	const sortedBalStateMap = Array.from(setBalStateMap.entries());
+	sortedBalStateMap.sort((a, b) => {
+		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
+	});
 
-	Array.from(setBalStateMap.entries()).forEach((entry, i) => {
+	sortedBalStateMap.forEach((entry, i) => {
 		if (i == 0) {
 			if (new Date(dailyBalArr[0][0]).toDateString() === new Date(entry[0]).toDateString() || new Date(dailyBalArr[0][0]) < new Date(entry[0])) {
 				balanceKeeper = dailyBalArr[0][1];
