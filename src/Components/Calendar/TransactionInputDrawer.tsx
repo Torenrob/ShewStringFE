@@ -31,8 +31,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		updateContainer(arg: UpdateTransactionContainerInfo) {
 			const { date: newDate, ...transactionContainerInfo } = arg;
 
-			if (JSON.stringify(transactionContainerInfo) === "{}") {
-				setContainerInfo({ date: arg.date, amount: "0.00", editingExisting: false });
+			if (Object.keys(transactionContainerInfo).length === 0) {
+				setContainerInfo({ date: arg.date, amount: "0.00", title: "", editingExisting: false });
 				return;
 			} else {
 				setContainerInfo(arg);
@@ -88,6 +88,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		} else {
 			setTimeout(() => {
 				const responseData: TransactionAPIData = response?.data;
+				const oldContTransObj = { ...containerInfo!.transactionObj };
 
 				const saveDate = containerInfo?.date;
 				if (!addTransToDate.current && !editingExisting) {
@@ -109,7 +110,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 				} else {
 					addTransToDate.current!(responseData);
 				}
-				const dailyBalwChgChk: [Map<string, number>, boolean] = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, containerInfo.transactionObj);
+				const dailyBalwChgChk = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, oldContTransObj as TransactionAPIData);
 				dailyBalancesMap.current = dailyBalwChgChk[0];
 				dailyBalwChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
@@ -146,6 +147,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 		const resp = await deleteTransactionAPI(containerInfo.id!);
 		if (resp?.statusText === "OK") {
 			containerInfo.deleteTransactionFromDate!(containerInfo.transactionObj!);
+			const updBalanceMap = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, undefined, containerInfo.transactionObj);
+			updateDailyBalanceStates(setStateDailyBalanceMap.current, updBalanceMap[0]);
 			closeDrawer();
 		} else {
 			ErrorHandler("Transaction Delete API Failed");

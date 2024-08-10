@@ -40,10 +40,14 @@ export default function Transaction({
 		}
 	}
 
-	function marqueeSwitch(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+	function marqueeOn(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
 		if (!shouldMarqueePlay()) return;
-		const bool = event.type == "mouseenter" ? true : false;
-		setMarqueePlay(bool);
+		setMarqueePlay(true);
+	}
+
+	function marqueeOff(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+		if (!shouldMarqueePlay()) return;
+		setMarqueePlay(false);
 	}
 
 	const marqueeStyle: CSSProperties = {
@@ -98,8 +102,8 @@ export default function Transaction({
 				id={`transaction${transactionInfo.id}`}>
 				<Button
 					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
-					onMouseEnter={marqueeSwitch}
-					onMouseLeave={marqueeSwitch}
+					onMouseEnter={marqueeOn}
+					onMouseLeave={marqueeOff}
 					variant={dragActive ? "solid" : "ghost"}
 					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
 					radius="none"
@@ -117,8 +121,8 @@ export default function Transaction({
 			{!dragActive && (
 				<Button
 					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
-					onMouseEnter={marqueeSwitch}
-					onMouseLeave={marqueeSwitch}
+					onMouseEnter={marqueeOn}
+					onMouseLeave={marqueeOff}
 					style={{ display: !mouseOver ? "flex" : "none" }}
 					variant={dragActive ? "solid" : "ghost"}
 					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}

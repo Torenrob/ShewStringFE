@@ -139,7 +139,7 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 
 	sortedTransMap.forEach((day) => {
 		balanceKeeper = day[1].reduce((balAcc, trans): number => {
-			return parseFloat((balAcc + (trans.transactionType === "Debit" ? -trans.amount : trans.amount)).toFixed(2));
+			return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
 		}, balanceKeeper);
 
 		dailyBalanceMap.delete(day[0]);
@@ -152,24 +152,26 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 export function updateDailyBalances(
 	transMap: Map<string, TransactionAPIData[]>,
 	dateBalMap: Map<string, number>,
-	newTransInfo: TransactionAPIData,
+	newTransInfo?: TransactionAPIData,
 	oldTransInfo?: TransactionAPIData
 ): [Map<string, number>, boolean] {
-	if (!oldTransInfo) {
-		let newTrsDateTrsArr;
+	if (!newTransInfo) {
+		const oldTransDateArr = transMap.get(oldTransInfo!.date)!;
+		oldTransDateArr?.splice(oldTransDateArr.indexOf(oldTransInfo!), 1);
+		if (oldTransDateArr?.length == 0) {
+			transMap.delete(oldTransInfo!.date);
+		} else {
+			transMap.set(oldTransInfo!.date, oldTransDateArr);
+		}
+		return [calcDailyBalances(transMap), true];
+	}
+
+	if (!oldTransInfo || Object.keys(oldTransInfo).length === 0) {
 		const targetArr = transMap.get(newTransInfo.date);
 
 		//Due to func call being inside setTimeout newTransInfo gets added to targetArr twice
 		//Ensuring it isn't added again if it already exists
-		if (targetArr) {
-			if (!targetArr.includes(newTransInfo)) {
-				newTrsDateTrsArr = targetArr.concat(newTransInfo);
-			} else {
-				newTrsDateTrsArr = targetArr;
-			}
-		} else {
-			newTrsDateTrsArr = [newTransInfo];
-		}
+		const newTrsDateTrsArr = stopArrDups(targetArr, newTransInfo);
 
 		transMap.set(newTransInfo.date, newTrsDateTrsArr);
 
@@ -189,7 +191,7 @@ export function updateDailyBalances(
 	}
 
 	const oldTrsDateTrsArr = transMap.get(oldTransInfo.date)!;
-	const newTrsDateTrsArr = transMap.get(newTransInfo.date) ? transMap.get(newTransInfo.date)!.concat(newTransInfo) : [newTransInfo];
+	const newTrsDateTrsArr = stopArrDups(transMap.get(newTransInfo.date), newTransInfo);
 	oldTrsDateTrsArr.splice(oldTrsDateTrsArr.indexOf(oldTransInfo), 1);
 
 	transMap.set(newTransInfo.date, newTrsDateTrsArr);
@@ -233,16 +235,16 @@ export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: numbe
 	});
 }
 
-function removeMapDups(transMapPosDups: Map<string, TransactionAPIData[]>, newTrans: TransactionAPIData): Map<string, TransactionAPIData[]> {
-	const arrPosDups = transMapPosDups.get(newTrans.date);
-
-	const idCnt = arrPosDups!.reduce((idCnt, trans) => {
-		return trans.id === newTrans.id ? ++idCnt : idCnt;
-	}, 0);
-
-	idCnt > 1 ? arrPosDups!.pop() : null;
-
-	transMapPosDups.set(newTrans.date, arrPosDups!);
-
-	return transMapPosDups;
+function stopArrDups(targetArr: TransactionAPIData[] | undefined, newTransInfo: TransactionAPIData): TransactionAPIData[] {
+	let newTrsDateTrsArr;
+	if (targetArr) {
+		if (!targetArr.includes(newTransInfo)) {
+			newTrsDateTrsArr = targetArr.concat(newTransInfo);
+		} else {
+			newTrsDateTrsArr = targetArr;
+		}
+	} else {
+		newTrsDateTrsArr = [newTransInfo];
+	}
+	return newTrsDateTrsArr;
 }

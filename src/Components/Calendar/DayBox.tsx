@@ -25,7 +25,7 @@ import AddTransactionIcon from "./Icons/AddTransactionIcon";
 import { parseDate, today } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI, postTransactionAPI } from "../../Services/API/TransactionAPI";
-import { highlightEditedTransactionSwitch } from "../../Utilities/CalendarComponentUtils";
+import { highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/CalendarComponentUtils";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
@@ -119,7 +119,7 @@ export default function DayBox({
 		addTransToDate.current = addTransactionToList;
 	}, [addTransToDate, addTransactionToList]);
 
-	//Collect state funcs in context with no duplicates
+	//Collect state funcs in calendar context with no duplicates
 	if (editTransOnDatesFuncsMap.current.get(dateString)) {
 		editTransOnDatesFuncsMap.current.delete(dateString);
 	}
@@ -193,6 +193,8 @@ export default function DayBox({
 			try {
 				const updatedTransaction = await updateTransactionAPI(transaction, dropContainerDate);
 				addTransToDate.current!(updatedTransaction?.data);
+				const updBalanceMap = updateDailyBalances(transactions, dailyBalancesMap.current, updatedTransaction?.data, transaction);
+				updateDailyBalanceStates(setStateDailyBalanceMap.current, updBalanceMap[0]);
 			} catch (error) {
 				ErrorHandler(error);
 			}
@@ -256,6 +258,11 @@ export default function DayBox({
 					<span>{dailyBalance}</span>
 				</div>
 				<Divider />
+				<div style={{ position: "absolute", top: "107px", left: "5px", width: "60%" }}>
+					{todaysTransactions && todaysTransactions.length > 1 && !dragObject.current.globalDragOn && (
+						<CustomPaginator total={todaysTransactions.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
+					)}
+				</div>
 				<div onMouseEnter={handleDragOver} onMouseLeave={handleDragLeave} id={`${dateString}Transactions`} className="transactionContainer overflow-y-scroll pt-0.5">
 					{todaysTransactions &&
 						todaysTransactions[paginationDragState && !dragActive ? todaysTransactions.length - 1 : transactionPage].map((trans: TransactionAPIData, i: number) => (
@@ -268,11 +275,6 @@ export default function DayBox({
 								onClick={handleClickOnTransaction}
 							/>
 						))}
-				</div>
-				<div style={{ position: "relative", bottom: "15px", left: "1.5px", width: "60%" }}>
-					{todaysTransactions && todaysTransactions.length > 1 && !dragObject.current.globalDragOn && (
-						<CustomPaginator total={todaysTransactions.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
-					)}
 				</div>
 				{addTransactionBtnVisible && !dragObject.current.globalDragOn && (
 					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
