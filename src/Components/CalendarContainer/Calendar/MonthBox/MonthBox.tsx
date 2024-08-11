@@ -1,14 +1,12 @@
-import { Dispatch, ReactNode, Ref, SetStateAction } from "react";
-import DayBox from "./DayBox";
-import { TransactionAPIData } from "../../Types/APIDataTypes";
-import { DateComponentInfo, LocalMonth } from "../../Types/CalendarTypes";
-import { Dropdown, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { ReactNode, Ref } from "react";
+import DayBox from "./DayBox/DayBox";
+import { TransactionAPIData } from "../../../../Types/APIDataTypes";
+import { DateComponentInfo, LocalMonth } from "../../../../Types/CalendarTypes";
 
 export default function MonthBox({
 	monthObj,
 	endRef,
 	transactions,
-	id,
 	translateY,
 }: {
 	monthObj: LocalMonth;
@@ -19,16 +17,6 @@ export default function MonthBox({
 }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
-	}
-
-	function getTransactions({ date, transactions }: { date: number; transactions: TransactionAPIData[] }): TransactionAPIData[] {
-		const dateTransactions: TransactionAPIData[] = [];
-		transactions.forEach((trans) => {
-			if (trans.date.substring(8) === date.toString().padStart(2, "0")) {
-				dateTransactions.push(trans);
-			}
-		});
-		return dateTransactions;
 	}
 
 	function getDate({ month, date }: { month: LocalMonth; date: number }): DateComponentInfo {
@@ -44,10 +32,6 @@ export default function MonthBox({
 	}
 
 	const monthLength: number = getDaysOfMonth(monthObj);
-
-	const alignMonths = {
-		transform: `translateY(-${monthObj.styleYtransition}px)`,
-	};
 
 	return (
 		<div id={`${monthObj.year}-${monthObj.month.toString().padStart(2, "0")}`} className="monthBox" style={{ top: -translateY }}>

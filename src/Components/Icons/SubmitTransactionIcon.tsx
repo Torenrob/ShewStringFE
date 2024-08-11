@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function SubmitTransactionIcon() {
 	return (
 		<svg width="800px" height="800px" viewBox="-200 -200 1424 1424" version="1.1" xmlns="http://www.w3.org/2000/svg">

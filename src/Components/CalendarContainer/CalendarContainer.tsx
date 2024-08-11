@@ -1,13 +1,10 @@
-import { createContext, useState, SetStateAction, Dispatch, useRef, MutableRefObject, Ref, RefObject, useCallback, useEffect } from "react";
-import Calendar from "./Calendar";
-import { Button, DateInput, DateValue } from "@nextui-org/react";
+import { createContext, useRef, MutableRefObject } from "react";
+import Calendar from "./Calendar/Calendar";
+import { DateValue } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
-import { parseDate } from "@internationalized/date";
 import { TransactionAPIData } from "../../Types/APIDataTypes";
-import { useMotionValue } from "framer-motion";
-import { getDragScrollYOffset } from "../../Utilities/CalendarComponentUtils";
-import InvalidSubmitIcon from "./Icons/InvalidSubmitIcon";
-import { editTransOnDateFuncs } from "./DayBox";
+import { getDragScrollYOffset } from "../../Utilities/UtilityFuncs";
+import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
 
 export type DragObject = {
 	globalDragOn: boolean;

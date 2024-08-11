@@ -1,12 +1,11 @@
-import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, useMemo, createContext, Fragment, useContext } from "react";
-import MonthBox from "./MonthBox";
-import { calcDailyBalances, focusToday, getMonthName, setYtrans } from "../../Utilities/CalendarComponentUtils";
-import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes";
-import { TransactionAPIData } from "../../Types/APIDataTypes";
-import { Skeleton, Input, Select, SelectItem, DateValue } from "@nextui-org/react";
-import { getAllTransactionsAPI } from "../../Services/API/TransactionAPI";
-import { CalendarContext } from "./CalendarContainer";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, Fragment, useContext } from "react";
+import MonthBox from "./MonthBox/MonthBox";
+import { calcDailyBalances, focusToday, getMonthName, setYtrans } from "../../../Utilities/UtilityFuncs";
+import { LocalMonth, MonthComponentInfo } from "../../../Types/CalendarTypes";
+import { TransactionAPIData } from "../../../Types/APIDataTypes";
+import { getAllTransactionsAPI } from "../../../Services/API/TransactionAPI";
+import { CalendarContext } from "../CalendarContainer";
+import { ErrorHandler } from "../../../Helpers/ErrorHandler";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getMonth(): LocalMonth {
@@ -59,17 +58,6 @@ export default function Calendar(): ReactNode {
 	const [transactions, setTransactions] = useState<Map<string, TransactionAPIData[]>>(new Map<string, TransactionAPIData[]>());
 
 	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
-
-	function assignTransactions(monthInfo: LocalMonth, transactionData: TransactionAPIData[] | null) {
-		const transactionArray: TransactionAPIData[] = [];
-		transactionData?.forEach((trans) => {
-			const monthYrMnth = monthInfo.year.toString() + "-" + monthInfo.month.toString().padStart(2, "0");
-			if (trans.date.substring(0, 7) === monthYrMnth) {
-				transactionArray.push(trans);
-			}
-		});
-		return transactionArray;
-	}
 
 	const getTransactionData = useCallback(async () => {
 		try {

@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function AddTransactionIcon() {
 	return (
 		<svg width="200px" height="200px" viewBox="-4 -4 32 32" xmlns="http://www.w3.org/2000/svg" fill="none">

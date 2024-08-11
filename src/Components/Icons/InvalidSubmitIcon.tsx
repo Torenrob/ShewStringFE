@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function InvalidSubmitIcon({ white }: { white: boolean }) {
 	return (
 		<svg width="800px" height="800px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">

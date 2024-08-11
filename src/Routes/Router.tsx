@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../app";
-import SignUp from "../Components/SignUp";
+import SignUp from "../Components/SignUp/SignUp";
 import { signUpLoader } from "./Loaders";
-import Calendar from "../Components/Calendar/Calendar";
 
 const router = createBrowserRouter([
 	{

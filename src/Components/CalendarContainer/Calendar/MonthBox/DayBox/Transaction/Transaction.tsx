@@ -1,16 +1,15 @@
-import { CSSProperties, MutableRefObject, useEffect, useState, useRef, useContext } from "react";
+import { CSSProperties, useEffect, useState, useRef, useContext } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
-import { TransactionAPIData } from "../../../Types/APIDataTypes";
+import { TransactionAPIData } from "../../../../../../Types/APIDataTypes";
 import "./Transaction.css";
-import { MotionStyle, motion } from "framer-motion";
-import { CalendarContext } from "../CalendarContainer";
-import { closeDrawer } from "../../../Utilities/CalendarComponentUtils";
+import { motion } from "framer-motion";
+import { CalendarContext } from "../../../../CalendarContainer";
+import { closeDrawer } from "../../../../../../Utilities/UtilityFuncs";
 
 export default function Transaction({
 	transaction,
 	onClick,
-	index,
 	handleDragStart,
 	handleDragEnd,
 }: {

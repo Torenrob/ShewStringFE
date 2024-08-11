@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function CreditIcon() {
 	return (
 		<svg width="800px" height="800px" viewBox="-2.75 -2.75 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">

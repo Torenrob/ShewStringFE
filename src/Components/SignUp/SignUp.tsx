@@ -2,8 +2,8 @@ import { ReactNode, useState } from "react";
 import { Form } from "react-router-dom";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
-import { EyeSlashFilledIcon } from "./EyeSlashFilledIcon";
-import { EyeFilledIcon } from "./EyeFilledIcon";
+import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
+import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 
 export default function SignUp(): ReactNode {
 	const [createIsVisible, setCreateIsVisible] = useState(false);

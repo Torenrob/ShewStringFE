@@ -1,8 +1,8 @@
 import { ReactNode, useState } from "react";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
-import { EyeSlashFilledIcon } from "./EyeSlashFilledIcon";
-import { EyeFilledIcon } from "./EyeFilledIcon";
+import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
+import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 
 export default function Login(): ReactNode {
 	const [isVisible, setIsVisible] = useState(false);

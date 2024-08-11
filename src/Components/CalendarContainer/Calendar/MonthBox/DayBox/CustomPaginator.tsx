@@ -1,6 +1,4 @@
 import { PaginationItemType, cn, usePagination } from "@nextui-org/react";
-import React from "react";
-import { ChevronIcon } from "./Icons/ChevronIcon";
 
 export default function CustomPaginator({ total, currentPage, onChange }: { total: number; currentPage: number; onChange: (page: number) => void }) {
 	const { activePage, range, setPage, onNext, onPrevious } = usePagination({

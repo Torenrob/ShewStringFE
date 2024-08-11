@@ -1,5 +1,3 @@
-import { TransactionAPIData } from "./APIDataTypes";
-
 export interface LocalMonth {
 	month: number;
 	monthName: string;
