@@ -1,9 +1,9 @@
 import "./app.css";
-import CalendarContainer from "./Components/CalendarContainer/CalendarContainer";
 import { ReactNode } from "react";
+import CalendarCtrl from "./Components/CalendarCtrl/CalendarCtrl";
 
 function App(): ReactNode {
-	return <CalendarContainer />;
+	return <CalendarCtrl />;
 }
 
 export default App;

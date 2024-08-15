@@ -1,10 +1,11 @@
-import { createContext, useRef, MutableRefObject } from "react";
+import { createContext, useRef, MutableRefObject, useCallback, useEffect, useState } from "react";
 import Calendar from "./Calendar/Calendar";
-import { DateValue } from "@nextui-org/react";
+import { DateValue, Tab, Tabs } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
-import { TransactionAPIData } from "../../Types/APIDataTypes";
-import { getDragScrollYOffset } from "../../Utilities/UtilityFuncs";
+import { BankAccountAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
+import { getDragScrollYOffset } from "../../../Utilities/UtilityFuncs";
 import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
+import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
 
 export type DragObject = {
 	globalDragOn: boolean;
@@ -43,7 +44,7 @@ export type CalendarContextType = {
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
-export default function CalendarContainer() {
+export default function CalendarContainer({ selectAccount, bankAccounts }: { selectAccount: BankAccountAPIData; bankAccounts: BankAccountAPIData[] }) {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
 	const dragObject = useRef<DragObject>({
@@ -114,9 +115,9 @@ export default function CalendarContainer() {
 	return (
 		<div id="calendarContainer" className="relative flex flex-col calendarContainer overflow-clip">
 			<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center">
-				<div className="self-end" style={{ position: "relative", top: "10px" }}>
+				{/* <div className="self-end" style={{ position: "relative", top: "10px" }}>
 					↑ Drag Scroll ↑
-				</div>
+				</div> */}
 			</div>
 			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
 				<div>Sunday</div>
@@ -138,7 +139,7 @@ export default function CalendarContainer() {
 					addTransToDate: addTransToDate,
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
-				<TransactionInputDrawer ref={childref} />
+				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} />
 				<Calendar />
 			</CalendarContext.Provider>
 			<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>

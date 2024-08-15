@@ -1,5 +1,5 @@
 :root {
-	--60color: rgb(133, 66, 163);
+	--60color: rgb(162, 28, 175);
 	--30color: rgb(103, 103, 192);
 	--10color: white;
 }
@@ -216,4 +216,47 @@ div > .weekdayLabel {
 
 .paginator {
 	cursor: pointer;
+}
+
+.acctTabs {
+	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+}
+
+.acctTabs::before {
+	content: "";
+	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+	width: 128px;
+	height: 24px;
+	position: absolute;
+	z-index: -1 /*  */;
+	background-color: black;
+}
+
+.acctTabs::after {
+	content: "";
+	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+	width: 126px;
+	height: 23.1px;
+	position: absolute;
+	z-index: 1;
+	background-color: inherit;
+}
+
+.tabCont {
+	min-width: 1200px;
+	max-width: 1200px;
+	overflow-x: auto;
+	border: solid 1px black;
+}
+
+.tabCont::-webkit-scrollbar {
+	height: 3px;
+}
+
+.tabCont::-webkit-scrollbar-track {
+	background: black;
+}
+
+.tabCont::-webkit-scrollbar-thumb {
+	background-color: var(--60color);
 }

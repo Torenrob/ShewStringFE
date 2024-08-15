@@ -1,15 +1,15 @@
 import { Ref, ReactNode, useContext, useState, MouseEvent, useRef, useEffect, useCallback } from "react";
-import { DateComponentInfo } from "../../../../../Types/CalendarTypes";
+import { DateComponentInfo } from "../../../../../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
 import Transaction from "./Transaction/Transaction";
 import { CalendarContext } from "../../../CalendarContainer";
-import { TransactionAPIData } from "../../../../../Types/APIDataTypes";
-import AddTransactionIcon from "../../../../Icons/AddTransactionIcon";
+import { TransactionAPIData } from "../../../../../../Types/APIDataTypes";
+import AddTransactionIcon from "../../../../../Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
-import { updateTransactionAPI } from "../../../../../Services/API/TransactionAPI";
-import { highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../Utilities/UtilityFuncs";
-import { ErrorHandler } from "../../../../../Helpers/ErrorHandler";
+import { updateTransactionAPI } from "../../../../../../Services/API/TransactionAPI";
+import { highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../../Utilities/UtilityFuncs";
+import { ErrorHandler } from "../../../../../../Helpers/ErrorHandler";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 

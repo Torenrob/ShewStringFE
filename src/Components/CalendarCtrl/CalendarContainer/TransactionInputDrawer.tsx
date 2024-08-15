@@ -1,27 +1,30 @@
 import { Button, DateInput, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import { ChangeEvent, forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
-import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
-import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
-import ArrowDownIcon from "../Icons/ArrowDownIcon";
-import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
-import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../Services/API/TransactionAPI";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import DebitIcon from "../../Components/Icons/DebitIcon";
-import CreditIcon from "../Icons/CreditIcon";
+import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
+import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
+import ArrowDownIcon from "../../Icons/ArrowDownIcon";
+import SubmitTransactionIcon from "../../Icons/SubmitTransactionIcon";
+import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../../Services/API/TransactionAPI";
+import InvalidSubmitIcon from "../../Icons/InvalidSubmitIcon";
+import DebitIcon from "../../Icons/DebitIcon";
+import CreditIcon from "../../Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs";
+import { ErrorHandler } from "../../../Helpers/ErrorHandler";
+import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../../Utilities/UtilityFuncs";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
+};
+
+export type TransactionInputDrawerProps = {
+	bankAccounts: BankAccountAPIData[];
 };
 
 const countDecimals = function (value: string): number {
 	return value.split(".")[1].length || 0;
 };
 
-export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, ref) => {
-	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
+export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, TransactionInputDrawerProps>(({ bankAccounts }, ref) => {
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
@@ -43,18 +46,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef>((_, 
 
 	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap, setStateDailyBalanceMap } = useContext(CalendarContext);
 
-	const accountOptions = useCallback(async () => {
-		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
-		if (bankAccounts) {
-			setBankAccounts((p) => bankAccounts);
-		}
-	}, []);
-
 	function cancelHover(event: MouseEvent) {}
-
-	useEffect(() => {
-		accountOptions();
-	}, [accountOptions]);
 
 	const drawerStyle = {
 		zIndex: 2,
