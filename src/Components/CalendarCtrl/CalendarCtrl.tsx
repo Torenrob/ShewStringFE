@@ -57,8 +57,8 @@ export default function CalendarCtrl() {
 						}}
 						className="bg-black"
 						classNames={{
-							tabList: "rounded-none p-0 bg-fuchsia-800",
-							cursor: "w-full bg-[#A21CAF]",
+							tabList: "rounded-none p-0 bg-black tabListCont",
+							cursor: "w-full bg-[#86198f]",
 							tab: "acctTabs min-w-32 max-w-32 px-0 h-6 bg-white",
 							tabContent:
 								"group-data-[hover=true]:text-[white] group-data-[selected=true]:selTab group-data-[selected=true]:text-[white] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
