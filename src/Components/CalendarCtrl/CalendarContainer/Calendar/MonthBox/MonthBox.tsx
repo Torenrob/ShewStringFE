@@ -38,9 +38,9 @@ export default function MonthBox({
 			<div className="grid grid-cols-7" style={{ position: "static" }}>
 				{[...Array(monthLength)].map((_, i) => {
 					if (monthLength === i + 1) {
-						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} mthLength={monthLength} key={`DayBox${i}`} />;
 					} else {
-						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} key={`DayBox${i}`} />;
+						return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} mthLength={monthLength} key={`DayBox${i}`} />;
 					}
 				})}
 			</div>

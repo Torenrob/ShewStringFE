@@ -94,7 +94,7 @@ export function focusToday() {
 //Function to control Yaxis transition keeping months aligned in sync
 export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMonth): number {
 	const firstDay = new Date(monthObj.year, monthObj.month - 1, 1).getDay();
-	if (index === 0) return prevYtrans;
+	if (index === 1) return 0;
 	if (firstDay === 0) {
 		return prevYtrans;
 	} else {

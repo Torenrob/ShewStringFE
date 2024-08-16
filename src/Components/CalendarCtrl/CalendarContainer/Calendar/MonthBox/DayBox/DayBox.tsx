@@ -17,11 +17,13 @@ export default function DayBox({
 	date,
 	dateObj,
 	transactions,
+	mthLength,
 	endRef,
 }: {
 	date: number;
 	dateObj: DateComponentInfo;
 	transactions: Map<string, TransactionAPIData[]>;
+	mthLength: number;
 	endRef?: Ref<HTMLDivElement>;
 }): ReactNode {
 	//Constants
@@ -226,8 +228,42 @@ export default function DayBox({
 		});
 	}
 
+	function mkMnthStrBdr(columnStart: number, date: number): string {
+		if (date > 7) {
+			if (date === 8 && columnStart !== 1) {
+				return "the8th";
+			}
+			return "";
+		}
+
+		if (date === columnStart) {
+			return "mnthStartBrdrTop";
+		}
+
+		if (date === 1 && date !== columnStart) {
+			return "mnthStartBrdr1stNotSun";
+		}
+
+		return "mnthStartBrdrTop";
+	}
+
+	function mkMnthEndBdr(columnStart: number, date: number, mnthLength: number): string {
+		if (date <= mnthLength - 7) {
+			if (date === mnthLength - 7 && columnStart !== 7) {
+				return "theLastDay";
+			}
+			return "";
+		}
+
+		if (date === mnthLength && columnStart !== 7) {
+			return "mnthEndBrdrLastDayNotSat";
+		}
+
+		return "mnthEndBrdrBottom";
+	}
+
 	return (
-		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 outline-black`}>
+		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 ${mkMnthStrBdr(gridStyle.gridColumnStart, date)} outline-slate-500`}>
 			<CardBody
 				onMouseEnter={toggleAddTransactionBtn}
 				onMouseLeave={toggleAddTransactionBtn}

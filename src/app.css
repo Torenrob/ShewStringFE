@@ -2,6 +2,7 @@
 	--60color: #86198f;
 	--30color: rgb(103, 103, 192);
 	--10color: white;
+	--monthBorderSize: 2px;
 }
 
 #root {
@@ -51,7 +52,8 @@
 	position: static;
 }
 
-.dayBox:nth-of-type(5n) {
+.dayBox:nth-of-type(5n),
+.dayBox:nth-of-type(1) {
 	scroll-snap-align: start;
 }
 
@@ -81,15 +83,15 @@
 	color: white;
 }
 
-.focusLabelLeft {
-	/* border-top-right-radius: 7px; */
-	/* border-bottom-right-radius: 7px; */
-}
+/* .focusLabelLeft {
+	border-top-right-radius: 7px;
+	border-bottom-right-radius: 7px;
+} */
 
-.focusLabelRight {
-	/* border-top-left-radius: 7px; */
-	/* border-bottom-left-radius: 7px; */
-}
+/* .focusLabelRight {
+	border-top-left-radius: 7px;
+	border-bottom-left-radius: 7px;
+} */
 
 .focusMonthCal {
 	background-color: white;
@@ -226,7 +228,7 @@ div > .weekdayLabel {
 .acctTabs::before {
 	content: "";
 	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-	width: 130px;
+	width: 128px;
 	height: 24px;
 	position: absolute;
 	z-index: -1 /*  */;
@@ -235,22 +237,33 @@ div > .weekdayLabel {
 
 .acctTabs::after {
 	content: "";
-	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-	width: 126px;
-	height: 23.1px;
+	clip-path: polygon(10% 0%, 90% 0%, 99% 100%, 1% 100%);
+	width: 124px;
+	height: 22px;
 	position: absolute;
+	transform: translateY(1px);
 	z-index: 1;
 	background-color: inherit;
+}
+
+.calCtrlCont {
+	width: 1536px;
+	background-color: var(--60color);
 }
 
 .tabCont {
 	min-width: 1200px;
 	max-width: 1200px;
 	overflow-x: auto;
-	border-top: solid 1px black;
-	border-right: solid 1px black;
-	border-left: solid 1px black;
 	background-color: black;
+}
+
+.tabCont::before {
+	content: "";
+	position: relative;
+	width: 50px;
+	height: 50px;
+	background-color: white;
 }
 
 .tabCont::-webkit-scrollbar {
@@ -263,4 +276,71 @@ div > .weekdayLabel {
 
 .tabCont::-webkit-scrollbar-thumb {
 	background-color: var(--60color);
+}
+
+.mnthStartBrdr1stNotSun {
+	border-top: solid var(--monthBorderSize) black;
+	border-left: solid var(--monthBorderSize) black;
+}
+
+.mnthStartBrdrTop {
+	border-top: solid var(--monthBorderSize) black;
+}
+
+.mnthEndBrdrLastDayNotSat {
+	border-bottom: solid var(--monthBorderSize) black;
+	border-right: solid var(--monthBorderSize) black;
+}
+
+.mnthEndBrdrBottom {
+	border-bottom: solid var(--monthBorderSize) black;
+}
+
+.theLastDay > div {
+	transform: translateY(-1.5px);
+}
+
+.theLastDay::before {
+	content: "";
+	position: relative;
+	width: var(--monthBorderSize);
+	height: var(--monthBorderSize);
+	background: black;
+	clip-path: polygon(100% 100%, 0% 100%, 100% 0%);
+	top: 126px;
+	left: 209px;
+}
+
+.the8th::before {
+	content: "";
+	position: absolute;
+	width: var(--monthBorderSize);
+	height: var(--monthBorderSize);
+	background: black;
+	clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.mnthPicker {
+	width: 122px;
+}
+
+/* .mnthPickBox {
+	position: relative;
+	right: 50px;
+} */
+
+input[type="month"]::-webkit-calendar-picker-indicator {
+	filter: invert(100%) sepia(81%) saturate(25%) hue-rotate(18deg) brightness(107%) contrast(105%);
+}
+
+input[type="month"]:focus {
+	outline: none;
+}
+
+.submitDatesBtn {
+	position: relative;
+	background-color: black;
+	left: 16px;
+	width: 26px;
+	height: 24px;
 }

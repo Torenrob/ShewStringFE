@@ -2,12 +2,14 @@ import React, { act, Key, RefObject, UIEventHandler, useCallback, useEffect, use
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
-import { Tab, Tabs, useTabs } from "@nextui-org/react";
+import { Button, DateRangePicker, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
+import SpanIcon from "../Icons/SpanIcon";
+import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
+import CheckIcon from "../Icons/CheckIcon";
 
 export default function CalendarCtrl() {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
 	const [selectedAcct, setSelectedAcct] = useState<number>(0);
-	const [scrollAmt, setScrollAmt] = useState<number>(0);
 
 	const AddAccountTabHolder: BankAccountAPIData = useMemo(() => {
 		const x: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: [] };
@@ -27,6 +29,7 @@ export default function CalendarCtrl() {
 	}, [getAccountOptions]);
 
 	const tabsRef = useRef<HTMLDivElement>(null);
+	const acctScrollCont = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (tabsRef.current === null) return;
@@ -40,13 +43,27 @@ export default function CalendarCtrl() {
 	}
 
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
-		console.log(e);
+		e.preventDefault();
+		//@ts-expect-error - deltaY is on nativeEvent
+		if (e.nativeEvent.deltaY > 0) {
+			acctScrollCont.current!.scrollLeft += 40;
+		} else {
+			acctScrollCont.current!.scrollLeft -= 40;
+		}
 	}
 
 	return (
 		<>
-			<div>
-				<div onWheel={tabScroll} className="tabCont">
+			<div style={{ width: "1536px", height: "18px" }} className="flex text-sm text-white bg-black">
+				<div className="flex justify-center" style={{ width: "1200px" }}>
+					<span>Accounts</span>
+				</div>
+				<div className="flex justify-center" style={{ width: "336px" }}>
+					<span>Month Range</span>
+				</div>
+			</div>
+			<div className="flex calCtrlCont">
+				<div onWheel={tabScroll} className="tabCont" ref={acctScrollCont}>
 					<Tabs
 						ref={tabsRef}
 						variant="underlined"
@@ -64,17 +81,6 @@ export default function CalendarCtrl() {
 								"group-data-[hover=true]:text-[white] group-data-[selected=true]:selTab group-data-[selected=true]:text-[white] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
 						}}>
 						{bankAccounts.map((bA, i) => {
-							if (bA.title === "Add Account") {
-								<Tab
-									style={{
-										position: "relative",
-										transform: `translateX(-${bankAccounts.length * 17}px)`,
-										zIndex: `55`,
-										background: `black`,
-									}}
-									key="addAcct"
-									title="Add Account"></Tab>;
-							}
 							return (
 								<Tab
 									style={{
@@ -89,7 +95,14 @@ export default function CalendarCtrl() {
 						})}
 					</Tabs>
 				</div>
-				<div></div>
+				<form action="" className="flex px-2 bg-fuchsia-800 mnthPickBox">
+					<input name="startMonth" id="start" type="month" className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white" />
+					<SpanIcon />
+					<input name="endMonth" id="endMonth" type="month" className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white" />
+					<Button type="submit" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
+						<CheckIcon />
+					</Button>
+				</form>
 			</div>
 			<CalendarContainer selectAccount={bankAccounts.find((bA) => bA!.id === selectedAcct)!} bankAccounts={bankAccounts} />
 		</>
