@@ -53,20 +53,13 @@ function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; cur
 	}
 }
 
-export default function Calendar(): ReactNode {
+export default function Calendar({ transactions }: { transactions: Map<string, TransactionAPIData[]> }): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
-	const [transactions, setTransactions] = useState<Map<string, TransactionAPIData[]>>(new Map<string, TransactionAPIData[]>());
-
 	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
 
-	const getTransactionData = useCallback(async () => {
-		try {
-			dateTransactionsMap.current = await getAllTransactionsAPI();
-		} catch (error) {
-			ErrorHandler(error);
-		}
+	const getTransactionData = useCallback(() => {
+		dateTransactionsMap.current = transactions;
 		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!);
-		setTransactions(dateTransactionsMap.current! as Map<string, TransactionAPIData[]>);
 		let yTrans: number = 0;
 		const monthArr = [...Array(23)].map((_, index) => {
 			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
@@ -77,13 +70,14 @@ export default function Calendar(): ReactNode {
 			};
 			return monthBoxObj;
 		});
-		focusToday();
 		setMonthComps(monthArr);
-	}, [dailyBalancesMap, dateTransactionsMap]);
+	}, [dailyBalancesMap, dateTransactionsMap, transactions]);
 
 	useEffect(() => {
 		getTransactionData();
-	}, [getTransactionData, dailyBalancesMap]);
+	}, [getTransactionData]);
+
+	useEffect(() => focusToday(), []);
 
 	//Intersect Observer to highlight current month/year label
 	const labelObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();

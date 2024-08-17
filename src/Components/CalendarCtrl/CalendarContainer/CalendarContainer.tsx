@@ -1,6 +1,6 @@
 import { createContext, useRef, MutableRefObject, useCallback, useEffect, useState } from "react";
 import Calendar from "./Calendar/Calendar";
-import { DateValue, Tab, Tabs } from "@nextui-org/react";
+import { calendar, DateValue, select, Tab, Tabs } from "@nextui-org/react";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { BankAccountAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
 import { getDragScrollYOffset } from "../../../Utilities/UtilityFuncs";
@@ -34,7 +34,6 @@ export type UpdateTransactionContainerInfo = {
 export type CalendarContextType = {
 	openDrawer: (arg: UpdateTransactionContainerInfo) => void;
 	dragObject: MutableRefObject<DragObject>;
-	dragScrollTrigger: MutableRefObject<boolean>;
 	dailyBalancesMap: MutableRefObject<Map<string, number>>;
 	setStateDailyBalanceMap: MutableRefObject<Map<string, (arg: number) => void>>;
 	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
@@ -44,7 +43,15 @@ export type CalendarContextType = {
 
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
-export default function CalendarContainer({ selectAccount, bankAccounts }: { selectAccount: BankAccountAPIData; bankAccounts: BankAccountAPIData[] }) {
+export default function CalendarContainer({
+	selectAccount,
+	bankAccounts,
+	updAcctTrans,
+}: {
+	selectAccount: BankAccountAPIData;
+	bankAccounts: BankAccountAPIData[];
+	updAcctTrans: (arg0: TransactionAPIData) => void;
+}) {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
 	const dragObject = useRef<DragObject>({
@@ -63,8 +70,6 @@ export default function CalendarContainer({ selectAccount, bankAccounts }: { sel
 	const setStateDailyBalance = useRef(new Map());
 
 	const addTransToDate = useRef(undefined);
-
-	const firstDragScrollTrigger = useRef(true);
 
 	const editTransOnDatesFuncMap = useRef(new Map<string, editTransOnDateFuncs>());
 
@@ -134,13 +139,12 @@ export default function CalendarContainer({ selectAccount, bankAccounts }: { sel
 					dailyBalancesMap: dailyBalancesMap,
 					dateTransactionsMap: dateTransactionsMap,
 					dragObject: dragObject,
-					dragScrollTrigger: firstDragScrollTrigger,
 					setStateDailyBalanceMap: setStateDailyBalance,
 					addTransToDate: addTransToDate,
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
-				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} />
-				<Calendar />
+				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectAccount} updAcctTrans={updAcctTrans} />
+				<Calendar transactions={selectAccount.transactions} key="calendar" />
 			</CalendarContext.Provider>
 			<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 		</div>

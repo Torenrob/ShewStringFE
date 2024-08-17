@@ -1,12 +1,16 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { BankAccountAPIData } from "../../Types/APIDataTypes";
+import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 
 const api = import.meta.env.VITE_API_URL + "/bankaccounts";
 
 export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => {
 	try {
-		const data = await axios.get(api);
+		const data: AxiosResponse<BankAccountAPIData[]> = await axios.get(api);
+		data.data.forEach((bA) => {
+			const transMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(bA.transactions));
+			bA.transactions = transMap;
+		});
 		return data.data;
 	} catch (error) {
 		ErrorHandler(error);

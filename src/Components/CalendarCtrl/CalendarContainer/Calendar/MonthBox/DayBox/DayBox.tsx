@@ -8,7 +8,7 @@ import AddTransactionIcon from "../../../../../Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI } from "../../../../../../Services/API/TransactionAPI";
-import { highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../../Utilities/UtilityFuncs";
+import { calcDailyBalances, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../../Utilities/UtilityFuncs";
 import { ErrorHandler } from "../../../../../../Helpers/ErrorHandler";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
@@ -26,6 +26,8 @@ export default function DayBox({
 	mthLength: number;
 	endRef?: Ref<HTMLDivElement>;
 }): ReactNode {
+	const [forceState, setForceState] = useState<number>(getRandomNum());
+
 	//Constants
 	const updatePaginationDragState = useCallback((dragOn: boolean) => {
 		setPaginationDragState(dragOn);
@@ -35,7 +37,7 @@ export default function DayBox({
 		gridColumnStart: dateObj.dayOfWeek,
 		gridColumnEnd: dateObj.dayOfWeek + 1,
 	};
-	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap } = useContext(CalendarContext);
+	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap, dateTransactionsMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
@@ -67,7 +69,6 @@ export default function DayBox({
 	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
 	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][]>(transactionsPaginated());
 	const [dailyBalance, setDailyBalance] = useState<number>(getTodaysBalance(dailyBalancesMap.current, dateString));
-	const [forceState, setForceState] = useState<number>(getRandomNum());
 
 	//CallBack Hooks
 	const addTransactionToList = useCallback((transaction: TransactionAPIData) => {
@@ -95,6 +96,14 @@ export default function DayBox({
 			return transactionsPaginated(res);
 		});
 	};
+
+	useEffect(() => {
+		const updatedTransactions = transactionsPaginated();
+		dateTransactionsMap.current = transactions;
+		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!, dateString);
+		setTodaysTransactions(updatedTransactions);
+		setDailyBalance(getTodaysBalance(dailyBalancesMap.current, dateString));
+	}, [transactions, transactionsPaginated, dailyBalancesMap, dateString, dateTransactionsMap]);
 
 	useEffect(() => {
 		if (firstRender.current) {
@@ -274,7 +283,7 @@ export default function DayBox({
 						{date === 1 && <span className="text-right text-sm">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
 						<span className="text-right text-sm">{date}</span>
 					</div>
-					<span>{dailyBalance}</span>
+					<span>{Number(dailyBalance).toFixed(2)}</span>
 				</div>
 				<Divider />
 				<div style={{ position: "absolute", top: "107px", left: "5px", width: "60%" }}>
@@ -305,14 +314,16 @@ export default function DayBox({
 	);
 }
 
-function getRandomNum(): number {
-	return Math.floor(Math.random() * 10000000);
-}
-
 function getTodaysBalance(balMap: Map<string, number>, dateString: string): number {
+	if (balMap.size === 0) return 0;
+
 	let daysBalance: number | undefined = balMap.get(dateString);
 
 	if (daysBalance) return daysBalance;
+
+	if (new Date(balMap.keys().next().value) > new Date(dateString)) {
+		return 0.0;
+	}
 
 	const mapIter = balMap.keys();
 	let dateKey;

@@ -1,4 +1,6 @@
-import { TransactionAPIData } from "../Types/APIDataTypes";
+import { ErrorHandler } from "../Helpers/ErrorHandler";
+import { getAllBankAccountsAPI } from "../Services/API/BankAccountAPI";
+import { BankAccountAPIData, TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
 
 export function getMonthName(num: number) {
@@ -88,7 +90,7 @@ export function focusToday() {
 	setTimeout(() => {
 		const elem = document.getElementById(currentDate);
 		elem?.scrollIntoView({ behavior: "instant" });
-	}, 0.5);
+	}, 1.2);
 }
 
 //Function to control Yaxis transition keeping months aligned in sync
@@ -128,7 +130,7 @@ export function highlightEditedTransactionSwitch(transID?: string) {
 	}
 }
 
-export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>): Map<string, number> {
+export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>, dontRun?: string): Map<string, number> {
 	const dailyBalanceMap = new Map();
 	let balanceKeeper: number = 0;
 
@@ -138,6 +140,10 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 	});
 
 	sortedTransMap.forEach((day) => {
+		if (day[1] === undefined) {
+			console.log(dontRun);
+			console.log(allTransactions);
+		}
 		balanceKeeper = day[1].reduce((balAcc, trans): number => {
 			return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
 		}, balanceKeeper);
@@ -247,4 +253,8 @@ function stopArrDups(targetArr: TransactionAPIData[] | undefined, newTransInfo: 
 		newTrsDateTrsArr = [newTransInfo];
 	}
 	return newTrsDateTrsArr;
+}
+
+export function getRandomNum(): number {
+	return Math.floor(Math.random() * 10000000);
 }

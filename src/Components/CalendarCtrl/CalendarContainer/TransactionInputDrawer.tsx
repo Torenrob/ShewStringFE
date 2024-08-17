@@ -1,5 +1,5 @@
 import { Button, DateInput, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { ChangeEvent, forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import { ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
 import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
 import ArrowDownIcon from "../../Icons/ArrowDownIcon";
@@ -18,13 +18,15 @@ export type TransactionInputDrawerRef = {
 
 export type TransactionInputDrawerProps = {
 	bankAccounts: BankAccountAPIData[];
+	currentAcct: BankAccountAPIData;
+	updAcctTrans: (arg0: TransactionAPIData) => void;
 };
 
 const countDecimals = function (value: string): number {
 	return value.split(".")[1].length || 0;
 };
 
-export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, TransactionInputDrawerProps>(({ bankAccounts }, ref) => {
+export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, TransactionInputDrawerProps>(({ bankAccounts, currentAcct, updAcctTrans }, ref) => {
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
@@ -100,14 +102,20 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						containerInfo.editTransactionFunc!(responseData);
 					}
 				} else {
-					addTransToDate.current!(responseData);
+					if (responseData.bankAccountId === currentAcct.id) {
+						addTransToDate.current!(responseData);
+					} else {
+						updAcctTrans(responseData);
+					}
 				}
-				const dailyBalwChgChk = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, oldContTransObj as TransactionAPIData);
-				dailyBalancesMap.current = dailyBalwChgChk[0];
-				dailyBalwChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
+				if (responseData.bankAccountId === currentAcct.id) {
+					const dailyBalwChgChk = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, oldContTransObj as TransactionAPIData);
+					dailyBalancesMap.current = dailyBalwChgChk[0];
+					dailyBalwChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
+				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
-				setContainerInfo({ date: saveDate, ...containerInfo });
+				setContainerInfo({ ...containerInfo, date: saveDate, title: "", amount: "0.00" });
 				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
 				form.title.focus();
 				setSubmittingTransaction(false);
@@ -217,7 +225,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						/>
 						<Select
 							required
-							selectedKeys={containerInfo?.bankAccountId ? containerInfo.bankAccountId.toString() : bankAccounts[0]?.id.toString()}
+							selectedKeys={containerInfo?.bankAccountId ? containerInfo.bankAccountId.toString() : currentAcct.id.toString()}
 							radius="none"
 							size="sm"
 							label="Account"

@@ -1,35 +1,54 @@
 import React, { act, Key, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
-import { BankAccountAPIData } from "../../Types/APIDataTypes";
+import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
 import { Button, DateRangePicker, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
 import CheckIcon from "../Icons/CheckIcon";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { getRandomNum } from "../../Utilities/UtilityFuncs";
 
 export default function CalendarCtrl() {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
 	const [selectedAcct, setSelectedAcct] = useState<number>(0);
-
-	const AddAccountTabHolder: BankAccountAPIData = useMemo(() => {
-		const x: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: [] };
-		return x;
-	}, []);
-
-	const getAccountOptions = useCallback(async () => {
-		const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
-		if (bankAccounts) {
-			setBankAccounts((p) => bankAccounts.concat(AddAccountTabHolder));
-			setSelectedAcct(bankAccounts[0].id);
-		}
-	}, [AddAccountTabHolder]);
+	const [isLoading, setLoading] = useState<boolean>(true);
+	const [forceState, setForceState] = useState<number>(0);
 
 	useEffect(() => {
+		const AddAccountTabHolder: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: new Map() };
+
+		const getAccountOptions = async () => {
+			try {
+				const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
+				setBankAccounts((p) => bankAccounts.concat(AddAccountTabHolder));
+				setSelectedAcct(bankAccounts[0].id);
+			} catch (err) {
+				ErrorHandler(err);
+			} finally {
+				setLoading(false);
+			}
+		};
 		getAccountOptions();
-	}, [getAccountOptions]);
+	}, []);
 
 	const tabsRef = useRef<HTMLDivElement>(null);
 	const acctScrollCont = useRef<HTMLDivElement>(null);
+
+	//Function for updating acct transactions when submitting trans for a different account than currently chosen
+	const updateAcctTransactions = (arg0: TransactionAPIData) => {
+		const subTransAcctMap: Map<string, TransactionAPIData[]> = bankAccounts.find((acct) => acct.id === arg0.bankAccountId)!.transactions;
+		const updArr = subTransAcctMap.get(arg0.date)?.concat(arg0);
+		setBankAccounts((p) => {
+			const updAcctsArr: BankAccountAPIData[] = p.map((acct) => {
+				if (acct.id === arg0.bankAccountId) {
+					acct.transactions.set(arg0.date, updArr!);
+				}
+				return acct;
+			});
+			return updAcctsArr;
+		});
+	};
 
 	useEffect(() => {
 		if (tabsRef.current === null) return;
@@ -40,6 +59,7 @@ export default function CalendarCtrl() {
 
 	function controlTabZ(e: Key) {
 		setSelectedAcct(Number(e));
+		setForceState(getRandomNum());
 	}
 
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
@@ -50,6 +70,20 @@ export default function CalendarCtrl() {
 		} else {
 			acctScrollCont.current!.scrollLeft -= 40;
 		}
+	}
+
+	function selectedAccount(): BankAccountAPIData {
+		const sel: BankAccountAPIData | undefined = bankAccounts.find((bA) => bA.id === selectedAcct);
+
+		if (!sel) {
+			return bankAccounts[0];
+		}
+
+		return sel;
+	}
+
+	if (isLoading) {
+		return <div></div>;
 	}
 
 	return (
@@ -70,7 +104,7 @@ export default function CalendarCtrl() {
 						color="primary"
 						onSelectionChange={controlTabZ}
 						motionProps={{
-							transition: { duration: 0.075 },
+							transition: { duration: 0.9 },
 						}}
 						className="bg-black"
 						classNames={{
@@ -104,7 +138,7 @@ export default function CalendarCtrl() {
 					</Button>
 				</form>
 			</div>
-			<CalendarContainer selectAccount={bankAccounts.find((bA) => bA!.id === selectedAcct)!} bankAccounts={bankAccounts} />
+			<CalendarContainer selectAccount={selectedAccount()} bankAccounts={bankAccounts} updAcctTrans={updateAcctTransactions} />
 		</>
 	);
 }

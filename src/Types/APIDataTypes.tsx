@@ -3,7 +3,7 @@ export interface BankAccountAPIData {
 	title: string;
 	accountType: string;
 	repeatGroups: RepeatGroupInBankAccountAPIData[];
-	transactions: TransactionAPIData[];
+	transactions: Map<string, TransactionAPIData[]>;
 }
 
 export interface TransactionAPIData {
