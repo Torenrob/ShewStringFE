@@ -10,7 +10,7 @@ import DebitIcon from "../../Icons/DebitIcon";
 import CreditIcon from "../../Icons/CreditIcon";
 import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
 import { ErrorHandler } from "../../../Helpers/ErrorHandler";
-import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../../Utilities/UtilityFuncs";
+import { closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates } from "../../../Utilities/UtilityFuncs";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -30,7 +30,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
-	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false });
+	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
+	const [forceState, setForceState] = useState<number>(0);
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
@@ -115,7 +116,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
-				setContainerInfo({ ...containerInfo, date: saveDate, title: "", amount: "0.00" });
+				setContainerInfo((prev) => ({ ...prev, date: saveDate, title: "", amount: "0.00" }));
 				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
 				form.title.focus();
 				setSubmittingTransaction(false);
@@ -183,6 +184,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		setErrorMessage(false);
 	}
 
+	console.log(containerInfo.title);
+
 	return (
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={drawerStyle}>
 			<div style={{ padding: "0px 27px" }} className="grid">
@@ -211,7 +214,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							name="title"
 							isClearable
 							id="TransactionDrawerTitle"
-							value={containerInfo?.title ? containerInfo.title : undefined}
+							value={containerInfo?.title ? containerInfo.title : ""}
 							onChange={updateExistingTransDispaly}
 						/>
 						<DateInput

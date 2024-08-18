@@ -38,7 +38,7 @@ export default function CalendarCtrl() {
 	//Function for updating acct transactions when submitting trans for a different account than currently chosen
 	const updateAcctTransactions = (arg0: TransactionAPIData) => {
 		const subTransAcctMap: Map<string, TransactionAPIData[]> = bankAccounts.find((acct) => acct.id === arg0.bankAccountId)!.transactions;
-		const updArr = subTransAcctMap.get(arg0.date)?.concat(arg0);
+		const updArr = subTransAcctMap.get(arg0.date) ? subTransAcctMap.get(arg0.date) : [arg0];
 		setBankAccounts((p) => {
 			const updAcctsArr: BankAccountAPIData[] = p.map((acct) => {
 				if (acct.id === arg0.bankAccountId) {
@@ -53,7 +53,8 @@ export default function CalendarCtrl() {
 	useEffect(() => {
 		if (tabsRef.current === null) return;
 		if (tabsRef.current.clientWidth === 0) return;
-		const updWidth = tabsRef.current.clientWidth - (bankAccounts.length - 1) * 17;
+		const numAccts = bankAccounts.length;
+		const updWidth = numAccts * 128 - numAccts * 17 + 57;
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 	}, [bankAccounts]);
 
