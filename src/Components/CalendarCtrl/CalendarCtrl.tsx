@@ -1,4 +1,4 @@
-import React, { act, Key, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { act, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
 import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
@@ -8,12 +8,20 @@ import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
 import CheckIcon from "../Icons/CheckIcon";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { getRandomNum } from "../../Utilities/UtilityFuncs";
+import AddAccountModal from "./AddAccountModal";
+import ThreeDotIcon from "../Icons/ThreeDotIcon";
+import DelAccountModal from "./DelAccountModal";
 
 export default function CalendarCtrl() {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
-	const [selectedAcct, setSelectedAcct] = useState<number>(0);
+	const [selectedAcct, setSelectedAcct] = useState<string>("0");
 	const [isLoading, setLoading] = useState<boolean>(true);
+	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
+	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [forceState, setForceState] = useState<number>(0);
+
+	//Just to save last choice after clicking add acct
+	const curAcct: MutableRefObject<string> = useRef<string>("0");
 
 	useEffect(() => {
 		const AddAccountTabHolder: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: new Map() };
@@ -22,7 +30,8 @@ export default function CalendarCtrl() {
 			try {
 				const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
 				setBankAccounts((p) => bankAccounts.concat(AddAccountTabHolder));
-				setSelectedAcct(bankAccounts[0].id);
+				curAcct.current = bankAccounts[0].id.toString();
+				setSelectedAcct(bankAccounts[0].id.toString());
 			} catch (err) {
 				ErrorHandler(err);
 			} finally {
@@ -50,17 +59,51 @@ export default function CalendarCtrl() {
 		});
 	};
 
+	const addNewAcct = (newAcct: BankAccountAPIData) => {
+		setBankAccounts((p) => {
+			const addAcctTab: BankAccountAPIData = p.pop()!;
+			return p.concat(newAcct).concat(addAcctTab);
+		});
+		console.log(newAcct.id);
+		setSelectedAcct(newAcct.id.toString());
+	};
+
+	const delAcct = (delAcct: BankAccountAPIData) => {
+		setBankAccounts((p) => {
+			p.splice(p.indexOf(delAcct), 1);
+			return p;
+		});
+	};
+
 	useEffect(() => {
 		if (tabsRef.current === null) return;
 		if (tabsRef.current.clientWidth === 0) return;
 		const numAccts = bankAccounts.length;
-		const updWidth = numAccts * 128 - numAccts * 17 + 57;
+		const updWidth = numAccts * 130 - numAccts * 17;
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 	}, [bankAccounts]);
 
-	function controlTabZ(e: Key) {
-		setSelectedAcct(Number(e));
-		setForceState(getRandomNum());
+	function acctTabCntrlr(e: Key) {
+		if (e === "0") {
+			setAddAcctModalOpen(true);
+			curAcct.current = selectedAcct;
+			return;
+		}
+		setSelectedAcct(e.toString());
+	}
+
+	function openAddAcctModal() {
+		setAddAcctModalOpen(true);
+	}
+
+	function openDelAcctModal() {
+		setDelAcctModalOpen(true);
+	}
+
+	function closeModal() {
+		setDelAcctModalOpen(false);
+		setAddAcctModalOpen(false);
+		setSelectedAcct(curAcct.current);
 	}
 
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
@@ -74,7 +117,7 @@ export default function CalendarCtrl() {
 	}
 
 	function selectedAccount(): BankAccountAPIData {
-		const sel: BankAccountAPIData | undefined = bankAccounts.find((bA) => bA.id === selectedAcct);
+		const sel: BankAccountAPIData | undefined = bankAccounts.find((bA) => bA.id.toString() === selectedAcct);
 
 		if (!sel) {
 			return bankAccounts[0];
@@ -87,11 +130,22 @@ export default function CalendarCtrl() {
 		return <div></div>;
 	}
 
+	function removeAddAcctTabHolder(): BankAccountAPIData[] {
+		const bArr = [...bankAccounts];
+		if (bArr.length === bankAccounts.length) {
+			bArr.pop();
+			return bArr;
+		} else {
+			return bArr;
+		}
+	}
+
 	return (
-		<>
-			<div style={{ width: "1536px", height: "18px" }} className="flex text-sm text-white bg-black">
+		<div className="relative max-w-fit min-w-fit w-fit">
+			<div style={{ width: "1536px" }} className="flex relative text-sm text-white bg-black py-1 h-fit">
 				<div className="flex justify-center" style={{ width: "1200px" }}>
 					<span>Accounts</span>
+					<ThreeDotIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
 				</div>
 				<div className="flex justify-center" style={{ width: "336px" }}>
 					<span>Month Range</span>
@@ -103,13 +157,14 @@ export default function CalendarCtrl() {
 						ref={tabsRef}
 						variant="underlined"
 						color="primary"
-						onSelectionChange={controlTabZ}
+						onSelectionChange={acctTabCntrlr}
+						selectedKey={selectedAcct}
 						motionProps={{
 							transition: { duration: 0.9 },
 						}}
 						className="bg-black"
 						classNames={{
-							tabList: "rounded-none p-0 bg-black tabListCont",
+							tabList: "rounded-none p-0 bg-black tabListCont gap-0",
 							cursor: "w-full bg-[#86198f]",
 							tab: "acctTabs min-w-32 max-w-32 px-0 h-6 bg-white",
 							tabContent:
@@ -121,8 +176,8 @@ export default function CalendarCtrl() {
 									style={{
 										position: "relative",
 										transform: `translateX(-${i * 17}px)`,
-										zIndex: `${selectedAcct === bA.id ? 55 : 49 - i}`,
-										background: `${selectedAcct === bA.id ? "#86198F" : "black"}`,
+										zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+										background: `${selectedAcct === bA.id.toString() ? "#86198F" : "black"}`,
 									}}
 									title={bA.title}
 									key={bA.id}></Tab>
@@ -140,6 +195,8 @@ export default function CalendarCtrl() {
 				</form>
 			</div>
 			<CalendarContainer selectAccount={selectedAccount()} bankAccounts={bankAccounts} updAcctTrans={updateAcctTransactions} />
-		</>
+			{addAcctModalOpen && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
+			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
+		</div>
 	);
 }

@@ -5,7 +5,6 @@ import { DateComponentInfo, LocalMonth } from "../../../../../Types/CalendarType
 
 export default function MonthBox({
 	monthObj,
-	endRef,
 	transactions,
 	translateY,
 }: {
@@ -44,8 +43,6 @@ export default function MonthBox({
 					}
 				})}
 			</div>
-			{/* Hidden div to keep calendar from scrolling past last month rendered */}
-			{endRef && <div className="h-px w-px" ref={endRef}></div>}
 		</div>
 	);
 }

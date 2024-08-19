@@ -104,73 +104,71 @@ export default function Calendar({ transactions }: { transactions: Map<string, T
 		}
 	}, []);
 
-	const endObserver: MutableRefObject<IntersectionObserver | null> = useRef(null);
+	function calcCalendarHeight(): number {
+		if (monthComps.length === 0) return 0;
 
-	const addEndRefObserver: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
-		if (endObserver.current) endObserver.current?.disconnect();
-		endObserver.current = new IntersectionObserver(
-			(entry: IntersectionObserverEntry[]) => {
-				const bcr = entry[0].boundingClientRect;
-				if (bcr.top < 700) document.getElementById("lastMonth")?.scrollIntoView({ behavior: "instant" });
-			},
-			{ root: document.getElementsByClassName("calendar")[0], rootMargin: "-250px 0px" }
-		);
-		if (node) {
-			endObserver.current.observe(node);
-		}
-	}, []);
+		const initCalHt: number = monthComps.reduce((prevMCHt, nextMC) => {
+			const firstDayOfWk: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month - 1, 1).getDay();
+			const monthLength: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month - 1, 0).getDate();
+			const mnthHt: number = calcMnthHt(firstDayOfWk, monthLength);
+			return prevMCHt + mnthHt;
+		}, 0);
+
+		return initCalHt - monthComps[monthComps.length - 1].monthObj.styleYtransition + 1;
+	}
 
 	return (
-		<div key="Calendar" id="calendar" className="row-start-2 grid grid-column-3 labelGridContainer">
-			{monthComps.map((monthBoxObj, index) => {
-				if (monthComps.length === index + 1) {
+		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3">
+			<div className="grid labelGridContainer" style={{ maxHeight: `${calcCalendarHeight()}px` }}>
+				{monthComps.map((monthBoxObj, index) => {
 					return (
 						<Fragment key={`month${index}`}>
-							<div key={`leftLabel${index}`} ref={addLabelObserver} className="col-start-1 calLabelContainer">
+							<div
+								key={`leftLabel${index}`}
+								ref={addLabelObserver}
+								className="col-start-1 calLabelContainer unfocusedLabel"
+								style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
 								<h1 key={`leftLabelTitle${index}`} className="calLabelText">
 									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
 								</h1>
 							</div>
-							<MonthBox
-								transactions={transactions}
-								endRef={addEndRefObserver}
-								monthObj={monthBoxObj?.monthObj}
-								key={monthBoxObj?.key}
-								id="lastMonth"
-								translateY={monthBoxObj.monthObj.styleYtransition}
-							/>
-							<div key={`rightLabel${index}`} ref={addLabelObserver} className="col-start-3 calLabelContainer">
+							<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
+							<div
+								key={`rightLabel${index}`}
+								ref={addLabelObserver}
+								className="col-start-3 calLabelContainer unfocusedLabel"
+								style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
 								<h1 key={`rightLabelTitle${index}`} className="calLabelText">
 									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
 								</h1>
 							</div>
 						</Fragment>
 					);
-				}
-				return (
-					<Fragment key={`month${index}`}>
-						<div
-							key={`leftLabel${index}`}
-							ref={addLabelObserver}
-							className="col-start-1 calLabelContainer unfocusedLabel"
-							style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-							<h1 key={`leftLabelTitle${index}`} className="calLabelText">
-								{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-							</h1>
-						</div>
-						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
-						<div
-							key={`rightLabel${index}`}
-							ref={addLabelObserver}
-							className="col-start-3 calLabelContainer unfocusedLabel"
-							style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-							<h1 key={`rightLabelTitle${index}`} className="calLabelText">
-								{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-							</h1>
-						</div>
-					</Fragment>
-				);
-			})}
+				})}
+			</div>
 		</div>
 	);
+}
+
+function calcMnthHt(monStDayOfWk: number, lengthOfMnth: number): number {
+	if (monStDayOfWk === 0) {
+		if (lengthOfMnth === 28) {
+			return 128 * 4;
+		} else {
+			return 128 * 5;
+		}
+	} else if (monStDayOfWk === 1 || (monStDayOfWk > 1 && monStDayOfWk < 4) || monStDayOfWk === 4) {
+		return 128 * 5;
+	} else if (monStDayOfWk === 5) {
+		if (lengthOfMnth <= 30) {
+			return 128 * 5;
+		} else {
+			return 128 * 6;
+		}
+	} else {
+		if (lengthOfMnth === 28) {
+			return 128 * 5;
+		}
+		return 128 * 6;
+	}
 }

@@ -6,14 +6,35 @@ const api = import.meta.env.VITE_API_URL + "/bankaccounts";
 
 export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => {
 	try {
-		const data: AxiosResponse<BankAccountAPIData[]> = await axios.get(api);
-		data.data.forEach((bA) => {
+		const resp: AxiosResponse<BankAccountAPIData[]> = await axios.get(api);
+		resp.data.map((bA) => {
 			const transMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(bA.transactions));
 			bA.transactions = transMap;
+			return bA;
 		});
-		return data.data;
+		return resp.data;
 	} catch (error) {
 		ErrorHandler(error);
 		return [];
+	}
+};
+
+export const createBankAccountAPI = async (bankAcctInfo: { title: string; accountType: number }): Promise<BankAccountAPIData> => {
+	try {
+		const resp: AxiosResponse<BankAccountAPIData> = await axios.post(api, bankAcctInfo);
+		return resp.data;
+	} catch (err) {
+		ErrorHandler(err);
+		return {} as BankAccountAPIData;
+	}
+};
+
+export const deleteBankAccountAPI = async (bankAccountInfo: BankAccountAPIData): Promise<string> => {
+	try {
+		const resp: AxiosResponse<string> = await axios.delete(api + `/${bankAccountInfo.id}`);
+		return resp.data;
+	} catch (err) {
+		ErrorHandler(err);
+		return "";
 	}
 };

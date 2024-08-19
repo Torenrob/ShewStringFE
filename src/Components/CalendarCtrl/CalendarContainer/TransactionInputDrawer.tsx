@@ -116,7 +116,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
-				setContainerInfo((prev) => ({ ...prev, date: saveDate, title: "", amount: "0.00" }));
+				setContainerInfo({ ...containerInfo, date: saveDate, title: "", amount: "0.00" });
 				// @ts-expect-error - TS complains about title not having a focus function due to it being a string, but it does
 				form.title.focus();
 				setSubmittingTransaction(false);
@@ -183,8 +183,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	function clearErrorMessage() {
 		setErrorMessage(false);
 	}
-
-	console.log(containerInfo.title);
 
 	return (
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={drawerStyle}>
