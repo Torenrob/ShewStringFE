@@ -254,7 +254,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						</Button>
 						<Input
 							required
-							value={containerInfo.amount}
+							value={Number(containerInfo.amount).toFixed(2).toString()}
 							onValueChange={(e) => updateAmount(e)}
 							radius="none"
 							size="sm"

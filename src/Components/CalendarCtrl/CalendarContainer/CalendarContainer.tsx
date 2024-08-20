@@ -6,6 +6,7 @@ import { BankAccountAPIData, TransactionAPIData } from "../../../Types/APIDataTy
 import { getDragScrollYOffset } from "../../../Utilities/UtilityFuncs";
 import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
 import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
+import { MonthRange } from "../CalendarCtrl";
 
 export type DragObject = {
 	globalDragOn: boolean;
@@ -47,10 +48,12 @@ export default function CalendarContainer({
 	selectAccount,
 	bankAccounts,
 	updAcctTrans,
+	monthRange,
 }: {
 	selectAccount: BankAccountAPIData;
 	bankAccounts: BankAccountAPIData[];
 	updAcctTrans: (arg0: TransactionAPIData) => void;
+	monthRange: MonthRange | null;
 }) {
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
@@ -144,7 +147,7 @@ export default function CalendarContainer({
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
 				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectAccount} updAcctTrans={updAcctTrans} />
-				<Calendar transactions={selectAccount.transactions} key="calendar" />
+				<Calendar transactions={selectAccount.transactions} key="calendar" monthRange={monthRange} />
 			</CalendarContext.Provider>
 			<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 		</div>

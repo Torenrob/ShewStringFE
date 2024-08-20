@@ -6,9 +6,10 @@ import { TransactionAPIData } from "../../../../Types/APIDataTypes";
 import { getAllTransactionsAPI } from "../../../../Services/API/TransactionAPI";
 import { CalendarContext } from "../CalendarContainer";
 import { ErrorHandler } from "../../../../Helpers/ErrorHandler";
+import { MonthRange } from "../../CalendarCtrl";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
-function _getMonth(): LocalMonth {
+function _getCurrMonth(): LocalMonth {
 	const locString: string = new Date()?.toLocaleDateString();
 	const monthNumber: number = Number(locString?.match(/^([^/]+)/)![0]);
 	const yearNumber: number = Number(locString?.match(/\/(\d{4})$/)![1]);
@@ -24,12 +25,12 @@ function _getMonth(): LocalMonth {
 
 //Calculate Month Comp arr on initialization
 function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; currentMonth: LocalMonth; prevYtrans: number }): LocalMonth {
-	if (index == 12) {
+	if (index == 7) {
 		currentMonth.styleYtransition = setYtrans(index, prevYtrans, currentMonth);
 		return currentMonth;
 	}
 	const monthObject: LocalMonth = currentMonth;
-	const monthDiff: number = monthObject?.month + (index - 12);
+	const monthDiff: number = monthObject?.month + (index - 7);
 	const yearDiff: number = monthDiff % 12 === 0 ? Math.floor(monthDiff / 12) - 1 : Math.floor(monthDiff / 12);
 	if (monthDiff <= 12 && monthDiff >= 1) {
 		monthObject.month = monthDiff;
@@ -53,7 +54,56 @@ function calcInitMonth({ index, currentMonth, prevYtrans }: { index: number; cur
 	}
 }
 
-export default function Calendar({ transactions }: { transactions: Map<string, TransactionAPIData[]> }): ReactNode {
+function mkMonthCompInfo(monthInfo: Date, prevYTrans: number, index: number): MonthComponentInfo {
+	const monthHold: LocalMonth = { month: monthInfo.getMonth() + 1, year: monthInfo.getFullYear(), monthName: "", styleYtransition: 0 };
+
+	const monthObj: LocalMonth = {
+		month: monthHold.month,
+		monthName: getMonthName(monthHold.month),
+		year: monthHold.year,
+		styleYtransition: setYtrans(index, prevYTrans, monthHold),
+	};
+
+	const monthComponentInfo: MonthComponentInfo = {
+		monthObj: monthObj,
+		key: `${monthObj?.monthName}${monthObj?.year}`,
+	};
+
+	return monthComponentInfo;
+}
+
+function calcInputMonths(startDate: Date, endDate: Date): MonthComponentInfo[] {
+	const startYear = startDate.getFullYear();
+	const startMonth = startDate.getMonth();
+	const endYear = endDate.getFullYear();
+	const endMonth = endDate.getMonth();
+
+	const yearDifference = endYear - startYear;
+	const monthDifference = endMonth - startMonth;
+
+	const numOfMnths = yearDifference * 12 + monthDifference + 1;
+
+	let yTrans: number = 0;
+
+	const mArr = [...Array(numOfMnths)].map((_, i) => {
+		const newMonth = returnMonthYr(startMonth + i, startYear);
+		const monthComp = mkMonthCompInfo(newMonth, yTrans, i + 1);
+		yTrans = monthComp.monthObj.styleYtransition;
+		return monthComp;
+	});
+
+	return mArr;
+}
+
+function returnMonthYr(compMonthNum: number, year: number): Date {
+	if (compMonthNum >= 0 && compMonthNum <= 11) {
+		return new Date(`${year}-${compMonthNum + 1}-1`);
+	} else {
+		return returnMonthYr(compMonthNum - 12, year + 1);
+	}
+}
+
+export default function Calendar({ transactions, monthRange }: { transactions: Map<string, TransactionAPIData[]>; monthRange: MonthRange | null }): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
 	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
 
@@ -61,17 +111,22 @@ export default function Calendar({ transactions }: { transactions: Map<string, T
 		dateTransactionsMap.current = transactions;
 		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!);
 		let yTrans: number = 0;
-		const monthArr = [...Array(23)].map((_, index) => {
-			const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getMonth(), prevYtrans: yTrans });
-			yTrans = month.styleYtransition;
-			const monthBoxObj: MonthComponentInfo = {
-				monthObj: month,
-				key: `${month?.monthName}${month?.year}`,
-			};
-			return monthBoxObj;
-		});
-		setMonthComps(monthArr);
-	}, [dailyBalancesMap, dateTransactionsMap, transactions]);
+
+		if (!monthRange) {
+			const monthArr = [...Array(13)].map((_, index) => {
+				const month: LocalMonth = calcInitMonth({ index: index + 1, currentMonth: _getCurrMonth(), prevYtrans: yTrans });
+				yTrans = month.styleYtransition;
+				const monthBoxObj: MonthComponentInfo = {
+					monthObj: month,
+					key: `${month?.monthName}${month?.year}`,
+				};
+				return monthBoxObj;
+			});
+			setMonthComps(monthArr);
+		} else {
+			setMonthComps((p) => calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1")));
+		}
+	}, [dailyBalancesMap, dateTransactionsMap, transactions, monthRange]);
 
 	useEffect(() => {
 		getTransactionData();
@@ -109,7 +164,7 @@ export default function Calendar({ transactions }: { transactions: Map<string, T
 
 		const initCalHt: number = monthComps.reduce((prevMCHt, nextMC) => {
 			const firstDayOfWk: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month - 1, 1).getDay();
-			const monthLength: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month - 1, 0).getDate();
+			const monthLength: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month, 0).getDate();
 			const mnthHt: number = calcMnthHt(firstDayOfWk, monthLength);
 			return prevMCHt + mnthHt;
 		}, 0);
@@ -166,7 +221,7 @@ function calcMnthHt(monStDayOfWk: number, lengthOfMnth: number): number {
 			return 128 * 6;
 		}
 	} else {
-		if (lengthOfMnth === 28) {
+		if (lengthOfMnth <= 29) {
 			return 128 * 5;
 		}
 		return 128 * 6;

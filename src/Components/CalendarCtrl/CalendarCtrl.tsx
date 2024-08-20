@@ -1,4 +1,4 @@
-import React, { act, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { act, ChangeEvent, FormEvent, FormEventHandler, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
 import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
@@ -9,8 +9,13 @@ import CheckIcon from "../Icons/CheckIcon";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { getRandomNum } from "../../Utilities/UtilityFuncs";
 import AddAccountModal from "./AddAccountModal";
-import ThreeDotIcon from "../Icons/ThreeDotIcon";
+import SettingsIcon from "../Icons/SettingsIcon";
 import DelAccountModal from "./DelAccountModal";
+
+export type MonthRange = {
+	startMonth: string;
+	endMonth: string;
+};
 
 export default function CalendarCtrl() {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
@@ -18,6 +23,9 @@ export default function CalendarCtrl() {
 	const [isLoading, setLoading] = useState<boolean>(true);
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
+	const [startMonth, setStartMonth] = useState<string | null>(null);
+	const [endMonth, setEndMonth] = useState<string | null>(null);
+	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [forceState, setForceState] = useState<number>(0);
 
 	//Just to save last choice after clicking add acct
@@ -79,7 +87,7 @@ export default function CalendarCtrl() {
 		if (tabsRef.current === null) return;
 		if (tabsRef.current.clientWidth === 0) return;
 		const numAccts = bankAccounts.length;
-		const updWidth = numAccts * 130 - numAccts * 17;
+		const updWidth = numAccts * 130 - numAccts * 15.5;
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 	}, [bankAccounts]);
 
@@ -126,10 +134,6 @@ export default function CalendarCtrl() {
 		return sel;
 	}
 
-	if (isLoading) {
-		return <div></div>;
-	}
-
 	function removeAddAcctTabHolder(): BankAccountAPIData[] {
 		const bArr = [...bankAccounts];
 		if (bArr.length === bankAccounts.length) {
@@ -140,12 +144,46 @@ export default function CalendarCtrl() {
 		}
 	}
 
+	function updStartMnth(e: ChangeEvent<HTMLInputElement>) {
+		setStartMonth(e.currentTarget.value);
+	}
+
+	function updEndMnth(e: ChangeEvent<HTMLInputElement>) {
+		setEndMonth(e.currentTarget.value);
+	}
+
+	function submitMonthRange(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const form = e.currentTarget;
+		setMonthRange((p): MonthRange => {
+			//@ts-expect-error - ts says value prop does not exist
+			return { startMonth: form[0].value, endMonth: form[1].value };
+		});
+	}
+
+	function defaultMonthRange(): string[] {
+		const todayDateObj = new Date();
+		const startYear = todayDateObj.getFullYear();
+		let startMonth = todayDateObj.getMonth() - 5;
+		let endMonth = todayDateObj.getMonth() + 7;
+		todayDateObj.setMonth(todayDateObj.getMonth() + 7);
+		const endYear = todayDateObj.getFullYear();
+		startMonth = startMonth >= 0 ? startMonth : 12 - startMonth;
+		endMonth = endMonth <= 11 ? endMonth : endMonth - 12;
+		const arr = [`${startYear}-${startMonth.toString().padStart(2, "0")}`, `${endYear}-${endMonth.toString().padStart(2, "0")}`];
+		return arr;
+	}
+
+	if (isLoading) {
+		return <div></div>;
+	}
+
 	return (
 		<div className="relative max-w-fit min-w-fit w-fit">
 			<div style={{ width: "1536px" }} className="flex relative text-sm text-white bg-black py-1 h-fit">
 				<div className="flex justify-center" style={{ width: "1200px" }}>
 					<span>Accounts</span>
-					<ThreeDotIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
+					<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
 				</div>
 				<div className="flex justify-center" style={{ width: "336px" }}>
 					<span>Month Range</span>
@@ -185,16 +223,30 @@ export default function CalendarCtrl() {
 						})}
 					</Tabs>
 				</div>
-				<form action="" className="flex px-2 bg-fuchsia-800 mnthPickBox">
-					<input name="startMonth" id="start" type="month" className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white" />
+				<form id="monthRangeForm" className="flex px-2 bg-fuchsia-800 mnthPickBox" onSubmit={submitMonthRange}>
+					<input
+						name="startMonth"
+						value={startMonth ? startMonth : defaultMonthRange()[0]}
+						onChange={updStartMnth}
+						id="start"
+						type="month"
+						className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+					/>
 					<SpanIcon />
-					<input name="endMonth" id="endMonth" type="month" className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white" />
-					<Button type="submit" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
+					<input
+						name="endMonth"
+						defaultValue={endMonth ? endMonth : defaultMonthRange()[1]}
+						onChange={updEndMnth}
+						id="endMonth"
+						type="month"
+						className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+					/>
+					<Button type="submit" form="monthRangeForm" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
 						<CheckIcon />
 					</Button>
 				</form>
 			</div>
-			<CalendarContainer selectAccount={selectedAccount()} bankAccounts={bankAccounts} updAcctTrans={updateAcctTransactions} />
+			<CalendarContainer selectAccount={selectedAccount()} bankAccounts={bankAccounts} updAcctTrans={updateAcctTransactions} monthRange={monthRange} />
 			{addAcctModalOpen && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
 		</div>

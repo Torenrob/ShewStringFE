@@ -316,7 +316,7 @@ div > .weekdayLabel {
 }
 
 .mnthPicker {
-	width: 122px;
+	width: 126px;
 }
 
 /* .mnthPickBox {
@@ -335,7 +335,7 @@ input[type="month"]:focus {
 .submitDatesBtn {
 	position: relative;
 	background-color: black;
-	left: 16px;
+	left: 8px;
 	width: 26px;
 	height: 24px;
 }
@@ -361,4 +361,8 @@ input[type="month"]:focus {
 	height: fit-content;
 	padding: 1.5%;
 	padding-top: 0.9%;
+}
+
+.acctOptIcon {
+	transform: translateY(2.25px) translateX(5px);
 }
