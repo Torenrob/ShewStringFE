@@ -1,32 +1,96 @@
-import React, { act, ChangeEvent, FormEvent, FormEventHandler, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CalendarContainer from "./CalendarContainer/CalendarContainer";
+import React, { act, ChangeEvent, createContext, FormEvent, FormEventHandler, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
-import { Button, DateRangePicker, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
+import { Button, DateRangePicker, DateValue, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon";
-import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
 import CheckIcon from "../Icons/CheckIcon";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { getRandomNum } from "../../Utilities/UtilityFuncs";
 import AddAccountModal from "./AddAccountModal";
 import SettingsIcon from "../Icons/SettingsIcon";
 import DelAccountModal from "./DelAccountModal";
+import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
+import { editTransOnDateFuncs } from "./CalendarContainer/Calendar/MonthBox/DayBox/DayBox";
+import CalendarContainer from "./CalendarContainer/CalendarContainer";
 
 export type MonthRange = {
 	startMonth: string;
 	endMonth: string;
 };
 
+export type DragObject = {
+	globalDragOn: boolean;
+	dropping: boolean | null;
+	paginationDragState: { (dragOn: boolean): void }[];
+	containerDropped: () => void;
+	removeTransactionFromDate: (transaction: TransactionAPIData) => void;
+	dragItemY: number;
+};
+
+export type UpdateTransactionContainerInfo = {
+	id?: number;
+	date?: DateValue;
+	title?: string | null;
+	amount?: string;
+	transactionType?: "Debit" | "Credit";
+	category?: string;
+	description?: string | null;
+	bankAccountId?: number;
+	editingExisting: boolean;
+	transactionObj?: TransactionAPIData;
+	deleteTransactionFromDate?: (trans: TransactionAPIData) => void;
+	editTransactionFunc?: (t: TransactionAPIData) => void;
+};
+
+export type CalendarContextType = {
+	openDrawer: (arg: UpdateTransactionContainerInfo) => void;
+	dragObject: MutableRefObject<DragObject>;
+	dailyBalancesMap: MutableRefObject<Map<string, number>>;
+	setStateDailyBalanceMap: MutableRefObject<Map<string, (arg: number) => void>>;
+	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
+	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
+	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
+};
+
+export const CalendarContext = createContext<CalendarContextType>(undefined!);
+
 export default function CalendarCtrl() {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
 	const [selectedAcct, setSelectedAcct] = useState<string>("0");
-	const [isLoading, setLoading] = useState<boolean>(true);
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
-	const [startMonth, setStartMonth] = useState<string | null>(null);
-	const [endMonth, setEndMonth] = useState<string | null>(null);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
-	const [forceState, setForceState] = useState<number>(0);
+	const [isLoading, setLoading] = useState<boolean>(true);
+
+	const childref = useRef<TransactionInputDrawerRef>(null!);
+
+	const dragObject = useRef<DragObject>({
+		globalDragOn: false,
+		dropping: null,
+		paginationDragState: [],
+		containerDropped: () => {},
+		removeTransactionFromDate: (transaction: TransactionAPIData) => {},
+		dragItemY: 0,
+	});
+
+	const dailyBalancesMap = useRef(new Map());
+
+	const dateTransactionsMap = useRef(new Map());
+
+	const setStateDailyBalance = useRef(new Map());
+
+	const addTransToDate = useRef(undefined);
+
+	const editTransOnDatesFuncMap = useRef(new Map<string, editTransOnDateFuncs>());
+
+	function openDrawer(arg: UpdateTransactionContainerInfo) {
+		childref.current.updateContainer(arg);
+		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
+		if (drawer.classList.contains("drawerClosed")) {
+			drawer.classList.remove("drawerClosed");
+		}
+		const titleInput: HTMLInputElement = document.getElementById("TransactionDrawerTitle") as HTMLInputElement;
+		titleInput.focus();
+	}
 
 	//Just to save last choice after clicking add acct
 	const curAcct: MutableRefObject<string> = useRef<string>("0");
@@ -124,7 +188,7 @@ export default function CalendarCtrl() {
 		}
 	}
 
-	function selectedAccount(): BankAccountAPIData {
+	const selectedAccount = useMemo((): BankAccountAPIData => {
 		const sel: BankAccountAPIData | undefined = bankAccounts.find((bA) => bA.id.toString() === selectedAcct);
 
 		if (!sel) {
@@ -132,7 +196,7 @@ export default function CalendarCtrl() {
 		}
 
 		return sel;
-	}
+	}, [bankAccounts, selectedAcct]);
 
 	function removeAddAcctTabHolder(): BankAccountAPIData[] {
 		const bArr = [...bankAccounts];
@@ -142,14 +206,6 @@ export default function CalendarCtrl() {
 		} else {
 			return bArr;
 		}
-	}
-
-	function updStartMnth(e: ChangeEvent<HTMLInputElement>) {
-		setStartMonth(e.currentTarget.value);
-	}
-
-	function updEndMnth(e: ChangeEvent<HTMLInputElement>) {
-		setEndMonth(e.currentTarget.value);
 	}
 
 	function submitMonthRange(e: FormEvent<HTMLFormElement>) {
@@ -179,74 +235,99 @@ export default function CalendarCtrl() {
 	}
 
 	return (
-		<div className="relative max-w-fit min-w-fit w-fit">
-			<div style={{ width: "1536px" }} className="flex relative text-sm text-white bg-black py-1 h-fit">
-				<div className="flex justify-center" style={{ width: "1200px" }}>
-					<span>Accounts</span>
-					<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
+		<div className="relative max-w-fit min-w-fit w-fit calCtrlWrap overflow-clip">
+			<div className="fixed top-0 w-screen">
+				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-1 h-fit">
+					<div className="flex justify-center">
+						<span>Accounts</span>
+						<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
+					</div>
+					<div className="flex justify-center" style={{ width: "336px" }}>
+						<span>Month Range</span>
+					</div>
 				</div>
-				<div className="flex justify-center" style={{ width: "336px" }}>
-					<span>Month Range</span>
+				<div className="flex calCtrlCont">
+					<div onWheel={tabScroll} className="tabCont" ref={acctScrollCont}>
+						<Tabs
+							ref={tabsRef}
+							variant="underlined"
+							color="primary"
+							onSelectionChange={acctTabCntrlr}
+							selectedKey={selectedAcct}
+							motionProps={{
+								transition: { duration: 0.9 },
+							}}
+							classNames={{
+								tabList: "rounded-none p-0 bg-[#0A0A0A] tabListCont gap-0",
+								cursor: "w-full bg-[#86198f]",
+								tab: "acctTabs min-w-32 max-w-32 px-0 h-6",
+								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[white] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
+							}}>
+							{bankAccounts.map((bA, i) => {
+								return (
+									<Tab
+										style={{
+											position: "relative",
+											transform: `translateX(-${i * 17}px)`,
+											zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+											// background: `${}`,
+										}}
+										className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+										title={bA.title}
+										key={bA.id}></Tab>
+								);
+							})}
+						</Tabs>
+					</div>
+					<form id="monthRangeForm" className="flex pl-2 bg-fuchsia-800 mnthPickBox" onSubmit={submitMonthRange}>
+						<input
+							name="startMonth"
+							defaultValue={defaultMonthRange()[0]}
+							// value={startMonth ? startMonth : defaultMonthRange()[0]}
+							// onChange={updStartMnth}
+							id="start"
+							type="month"
+							className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+						/>
+						<SpanIcon />
+						<input
+							name="endMonth"
+							defaultValue={defaultMonthRange()[1]}
+							// onChange={updEndMnth}
+							id="endMonth"
+							type="month"
+							className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+						/>
+						<Button type="submit" form="monthRangeForm" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
+							<CheckIcon />
+						</Button>
+					</form>
+				</div>
+				<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
+					<div>Sunday</div>
+					<div>Monday</div>
+					<div>Tuesday</div>
+					<div>Wednesday</div>
+					<div>Thursday</div>
+					<div>Friday</div>
+					<div>Saturday</div>
 				</div>
 			</div>
-			<div className="flex calCtrlCont">
-				<div onWheel={tabScroll} className="tabCont" ref={acctScrollCont}>
-					<Tabs
-						ref={tabsRef}
-						variant="underlined"
-						color="primary"
-						onSelectionChange={acctTabCntrlr}
-						selectedKey={selectedAcct}
-						motionProps={{
-							transition: { duration: 0.9 },
-						}}
-						className="bg-black"
-						classNames={{
-							tabList: "rounded-none p-0 bg-black tabListCont gap-0",
-							cursor: "w-full bg-[#86198f]",
-							tab: "acctTabs min-w-32 max-w-32 px-0 h-6 bg-white",
-							tabContent:
-								"group-data-[hover=true]:text-[white] group-data-[selected=true]:selTab group-data-[selected=true]:text-[white] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
-						}}>
-						{bankAccounts.map((bA, i) => {
-							return (
-								<Tab
-									style={{
-										position: "relative",
-										transform: `translateX(-${i * 17}px)`,
-										zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
-										background: `${selectedAcct === bA.id.toString() ? "#86198F" : "black"}`,
-									}}
-									title={bA.title}
-									key={bA.id}></Tab>
-							);
-						})}
-					</Tabs>
+			<CalendarContext.Provider
+				value={{
+					openDrawer: openDrawer,
+					dailyBalancesMap: dailyBalancesMap,
+					dateTransactionsMap: dateTransactionsMap,
+					dragObject: dragObject,
+					setStateDailyBalanceMap: setStateDailyBalance,
+					addTransToDate: addTransToDate,
+					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
+				}}>
+				<div className="calWrap">
+					<CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} />
 				</div>
-				<form id="monthRangeForm" className="flex px-2 bg-fuchsia-800 mnthPickBox" onSubmit={submitMonthRange}>
-					<input
-						name="startMonth"
-						value={startMonth ? startMonth : defaultMonthRange()[0]}
-						onChange={updStartMnth}
-						id="start"
-						type="month"
-						className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
-					/>
-					<SpanIcon />
-					<input
-						name="endMonth"
-						defaultValue={endMonth ? endMonth : defaultMonthRange()[1]}
-						onChange={updEndMnth}
-						id="endMonth"
-						type="month"
-						className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
-					/>
-					<Button type="submit" form="monthRangeForm" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
-						<CheckIcon />
-					</Button>
-				</form>
-			</div>
-			<CalendarContainer selectAccount={selectedAccount()} bankAccounts={bankAccounts} updAcctTrans={updateAcctTransactions} monthRange={monthRange} />
+				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
+			</CalendarContext.Provider>
 			{addAcctModalOpen && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
 		</div>

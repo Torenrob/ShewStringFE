@@ -1,90 +1,13 @@
-import { createContext, useRef, MutableRefObject, useCallback, useEffect, useState } from "react";
-import Calendar from "./Calendar/Calendar";
-import { calendar, DateValue, select, Tab, Tabs } from "@nextui-org/react";
-import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
+import { MutableRefObject, useContext } from "react";
+import { DateValue } from "@nextui-org/react";
 import { BankAccountAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
-import { getDragScrollYOffset } from "../../../Utilities/UtilityFuncs";
 import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
-import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
-import { MonthRange } from "../CalendarCtrl";
+import { CalendarContext, MonthRange } from "../CalendarCtrl";
+import { getDragScrollYOffset } from "../../../Utilities/UtilityFuncs";
+import Calendar from "./Calendar/Calendar";
 
-export type DragObject = {
-	globalDragOn: boolean;
-	dropping: boolean | null;
-	paginationDragState: { (dragOn: boolean): void }[];
-	containerDropped: () => void;
-	removeTransactionFromDate: (transaction: TransactionAPIData) => void;
-	dragItemY: number;
-};
-
-export type UpdateTransactionContainerInfo = {
-	id?: number;
-	date?: DateValue;
-	title?: string | null;
-	amount?: string;
-	transactionType?: "Debit" | "Credit";
-	category?: string;
-	description?: string | null;
-	bankAccountId?: number;
-	editingExisting: boolean;
-	transactionObj?: TransactionAPIData;
-	deleteTransactionFromDate?: (trans: TransactionAPIData) => void;
-	editTransactionFunc?: (t: TransactionAPIData) => void;
-};
-
-export type CalendarContextType = {
-	openDrawer: (arg: UpdateTransactionContainerInfo) => void;
-	dragObject: MutableRefObject<DragObject>;
-	dailyBalancesMap: MutableRefObject<Map<string, number>>;
-	setStateDailyBalanceMap: MutableRefObject<Map<string, (arg: number) => void>>;
-	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
-	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
-	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
-};
-
-export const CalendarContext = createContext<CalendarContextType>(undefined!);
-
-export default function CalendarContainer({
-	selectAccount,
-	bankAccounts,
-	updAcctTrans,
-	monthRange,
-}: {
-	selectAccount: BankAccountAPIData;
-	bankAccounts: BankAccountAPIData[];
-	updAcctTrans: (arg0: TransactionAPIData) => void;
-	monthRange: MonthRange | null;
-}) {
-	const childref = useRef<TransactionInputDrawerRef>(null!);
-
-	const dragObject = useRef<DragObject>({
-		globalDragOn: false,
-		dropping: null,
-		paginationDragState: [],
-		containerDropped: () => {},
-		removeTransactionFromDate: (transaction: TransactionAPIData) => {},
-		dragItemY: 0,
-	});
-
-	const dailyBalancesMap = useRef(new Map());
-
-	const dateTransactionsMap = useRef(new Map());
-
-	const setStateDailyBalance = useRef(new Map());
-
-	const addTransToDate = useRef(undefined);
-
-	const editTransOnDatesFuncMap = useRef(new Map<string, editTransOnDateFuncs>());
-
-	function openDrawer(arg: UpdateTransactionContainerInfo) {
-		childref.current.updateContainer(arg);
-		const drawer: HTMLElement = document.getElementById("calendarDrawer") as HTMLElement;
-		if (drawer.classList.contains("drawerClosed")) {
-			drawer.classList.remove("drawerClosed");
-		}
-		const titleInput: HTMLInputElement = document.getElementById("TransactionDrawerTitle") as HTMLInputElement;
-		titleInput.focus();
-	}
+export default function CalendarContainer({ selectAccount, monthRange }: { selectAccount: BankAccountAPIData; monthRange: MonthRange | null }) {
+	const { dragObject } = useContext(CalendarContext);
 
 	function scrollDrag(direction: string) {
 		if (!dragObject.current?.globalDragOn) {
@@ -120,35 +43,16 @@ export default function CalendarContainer({
 		}
 	}
 
+	console.log(selectAccount);
+
 	return (
-		<div id="calendarContainer" className="relative flex flex-col calendarContainer overflow-clip">
+		<div id="calendarContainer" className="relative calendarContainer">
 			<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center">
 				{/* <div className="self-end" style={{ position: "relative", top: "10px" }}>
 					↑ Drag Scroll ↑
 				</div> */}
 			</div>
-			<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
-				<div>Sunday</div>
-				<div>Monday</div>
-				<div>Tuesday</div>
-				<div>Wednesday</div>
-				<div>Thursday</div>
-				<div>Friday</div>
-				<div>Saturday</div>
-			</div>
-			<CalendarContext.Provider
-				value={{
-					openDrawer: openDrawer,
-					dailyBalancesMap: dailyBalancesMap,
-					dateTransactionsMap: dateTransactionsMap,
-					dragObject: dragObject,
-					setStateDailyBalanceMap: setStateDailyBalance,
-					addTransToDate: addTransToDate,
-					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
-				}}>
-				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectAccount} updAcctTrans={updAcctTrans} />
-				<Calendar transactions={selectAccount.transactions} key="calendar" monthRange={monthRange} />
-			</CalendarContext.Provider>
+			<Calendar transactions={selectAccount.transactions} key="calendar" monthRange={monthRange} />
 			<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 		</div>
 	);

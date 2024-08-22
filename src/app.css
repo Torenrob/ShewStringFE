@@ -30,16 +30,11 @@
 
 #calendar {
 	position: relative;
-	width: 1536px;
-	overflow-y: scroll;
-	scroll-snap-type: y mandatory;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
 	z-index: 1;
-	background-color: black;
-}
-.calendar::-webkit-scrollbar {
-	display: none;
+	background: linear-gradient(135deg, #f5f5dc 25%, transparent 25%), linear-gradient(225deg, #f5f5dc 25%, transparent 25%), linear-gradient(45deg, #f5f5dc 25%, transparent 25%),
+		linear-gradient(315deg, #f5f5dc 25%, transparent 25%);
+	background-size: 10px 10px; /* Adjusts the size of the texture pattern */
+	background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
 }
 
 .calTitleGrid {
@@ -78,11 +73,13 @@
 }
 
 .focusLabel {
+	background: linear-gradient(145deg, #0a0a0a, #86198f, #0a0a0a);
+	background-color: black;
 	transition: all 300ms;
-	font-weight: bolder;
+	font-weight: 500;
 	font-size: xx-large;
-	background-color: var(--60color);
 	color: white;
+	/* text-shadow: 1px 1px 0 #a64cbf, -1px -1px 0 #540f62, -1px 1px 0 #540f62, 1px -1px 0 #a64cbf; */
 }
 
 /* .focusLabelLeft {
@@ -104,8 +101,7 @@
 	pointer-events: none;
 }
 
-.labelGridContainer {
-	grid-template-columns: max-content auto max-content;
+.calMonthsContainer {
 	pointer-events: none;
 }
 
@@ -141,8 +137,7 @@
 .calendarContainer {
 	/* border-bottom: solid 1px black; */
 	border-top: inset 1px solid black;
-	height: 783.5px;
-	width: 1536px;
+	width: 100vw;
 }
 
 .drawerClosed {
@@ -158,7 +153,8 @@ div > .weekdayLabel {
 	background-color: #86198f;
 	color: white;
 	text-align: center;
-	padding: 0px 26px;
+	border: #000000 1px solid;
+	box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.5), 0 3px 4px rgba(0, 0, 0, 0.329);
 }
 
 .addTransactionBtn {
@@ -225,6 +221,11 @@ div > .weekdayLabel {
 
 .acctTabs {
 	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+	background: #0a0a0a !important;
+}
+
+.selTab {
+	background: #0a0a0a !important;
 }
 
 .acctTabs::before {
@@ -249,16 +250,15 @@ div > .weekdayLabel {
 }
 
 .calCtrlCont {
-	width: 1536px;
 	background-color: var(--60color);
 }
 
 .tabCont {
-	width: 1200px;
-	min-width: 1200px;
-	max-width: 1200px;
+	width: calc(100vw - 342px);
+	min-width: calc(100vw - 342px);
+	max-width: calc(100vw - 342px);
 	overflow-x: auto;
-	background-color: black;
+	background-color: #0a0a0a;
 }
 
 .tabCont::-webkit-scrollbar {
@@ -317,12 +317,8 @@ div > .weekdayLabel {
 
 .mnthPicker {
 	width: 126px;
+	padding-top: 4px;
 }
-
-/* .mnthPickBox {
-	position: relative;
-	right: 50px;
-} */
 
 input[type="month"]::-webkit-calendar-picker-indicator {
 	filter: invert(100%) sepia(81%) saturate(25%) hue-rotate(18deg) brightness(107%) contrast(105%);
@@ -334,10 +330,10 @@ input[type="month"]:focus {
 
 .submitDatesBtn {
 	position: relative;
-	background-color: black;
-	left: 8px;
+	background-color: #0a0a0a;
 	width: 26px;
-	height: 24px;
+	height: 26px;
+	margin-left: 8px;
 }
 
 .addAcctCont {
@@ -365,4 +361,25 @@ input[type="month"]:focus {
 
 .acctOptIcon {
 	transform: translateY(2.25px) translateX(5px);
+}
+
+.calCtrlWrap {
+	max-height: 100vh;
+}
+
+.calWrap {
+	margin-top: 72px;
+	max-height: calc(100vh - 72px);
+	overflow-y: scroll;
+	scroll-snap-type: y mandatory;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.calWrap::-webkit-scrollbar {
+	display: none;
+}
+
+.spaceMake {
+	scroll-snap-align: start;
 }

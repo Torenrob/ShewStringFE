@@ -1,16 +1,16 @@
 import { Button, DateInput, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
-import { getAllBankAccountsAPI } from "../../../Services/API/BankAccountAPI";
-import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../../Types/APIDataTypes";
-import ArrowDownIcon from "../../Icons/ArrowDownIcon";
-import SubmitTransactionIcon from "../../Icons/SubmitTransactionIcon";
-import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../../Services/API/TransactionAPI";
-import InvalidSubmitIcon from "../../Icons/InvalidSubmitIcon";
-import DebitIcon from "../../Icons/DebitIcon";
-import CreditIcon from "../../Icons/CreditIcon";
-import { CalendarContext, UpdateTransactionContainerInfo } from "./CalendarContainer";
-import { ErrorHandler } from "../../../Helpers/ErrorHandler";
-import { closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates } from "../../../Utilities/UtilityFuncs";
+import { ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState } from "react";
+import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
+import ArrowDownIcon from "../Icons/ArrowDownIcon";
+import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
+import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../Services/API/TransactionAPI";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
+import DebitIcon from "../Icons/DebitIcon";
+import { UpdateTransactionContainerInfo } from "./CalendarCtrl";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs";
+import { CalendarContext } from "./CalendarCtrl";
+import CreditIcon from "../Icons/CreditIcon";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -50,15 +50,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap, setStateDailyBalanceMap } = useContext(CalendarContext);
 
 	function cancelHover(event: MouseEvent) {}
-
-	const drawerStyle = {
-		zIndex: 2,
-		width: "100%",
-	};
-
-	const formStyle = {
-		backgroundColor: "rgba(0, 0, 0,.8)",
-	};
 
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
@@ -185,12 +176,15 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	}
 
 	return (
-		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={drawerStyle}>
-			<div style={{ padding: "0px 27px" }} className="grid">
-				<Button onClick={closeDrawer} radius="full" size="sm" isIconOnly variant="light" className="absolute justify-self-start">
+		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={{ backgroundColor: "rgba(0, 0, 0,.8)", zIndex: 2, width: "100%" }}>
+			<div className="grid">
+				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute justify-self-start z-10">
 					<ArrowDownIcon />
 				</Button>
-				<form className="w-full px-64 pt-2.5 pb-0.5 grid grid-col-4 grid-rows-2 gap-3 transactionForm" style={formStyle} onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
+				<form
+					className="w-full px-64 pt-2.5 pb-0.5 grid grid-col-4 grid-rows-2 gap-3 transactionForm"
+					style={{ transform: "translateX(-25px)" }}
+					onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
 					<div className="absolute -translate-x-32 w-28 text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
 						{errorMessage && (
 							<span className="text-right">
@@ -232,7 +226,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							label="Account"
 							name="account"
 							onChange={updateExistingTransDispaly}
-							className="h-4 text-slate-500 basis-2/6 row-start-1 ">
+							className="text-slate-500 basis-2/6 row-start-1 ">
 							{bankAccounts.map((account, i) => (
 								<SelectItem key={`${account.id}`} value={account.id}>
 									{account.title}
@@ -313,7 +307,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						value={containerInfo?.description ? containerInfo.description : undefined}
 					/>
 					{containerInfo.editingExisting && (
-						<div className="absolute justify-self-end mt-1 flex-col" style={{ right: "232px" }}>
+						<div className="absolute mt-1 flex-col" style={{ right: "204px", top: "10px" }}>
 							<Button color="danger" radius="none" isIconOnly onClick={deleteTransaction}>
 								<InvalidSubmitIcon white={true} />
 							</Button>

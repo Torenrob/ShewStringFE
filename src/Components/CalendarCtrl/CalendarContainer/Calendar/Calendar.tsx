@@ -4,9 +4,8 @@ import { calcDailyBalances, focusToday, getMonthName, setYtrans } from "../../..
 import { LocalMonth, MonthComponentInfo } from "../../../../Types/CalendarTypes";
 import { TransactionAPIData } from "../../../../Types/APIDataTypes";
 import { getAllTransactionsAPI } from "../../../../Services/API/TransactionAPI";
-import { CalendarContext } from "../CalendarContainer";
 import { ErrorHandler } from "../../../../Helpers/ErrorHandler";
-import { MonthRange } from "../../CalendarCtrl";
+import { CalendarContext, MonthRange } from "../../CalendarCtrl";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getCurrMonth(): LocalMonth {
@@ -174,30 +173,30 @@ export default function Calendar({ transactions, monthRange }: { transactions: M
 
 	return (
 		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3">
-			<div className="grid labelGridContainer" style={{ maxHeight: `${calcCalendarHeight()}px` }}>
+			<div className="calMonthsContainer" style={{ maxHeight: `${calcCalendarHeight()}px` }}>
 				{monthComps.map((monthBoxObj, index) => {
 					return (
-						<Fragment key={`month${index}`}>
-							<div
-								key={`leftLabel${index}`}
-								ref={addLabelObserver}
-								className="col-start-1 calLabelContainer unfocusedLabel"
-								style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-								<h1 key={`leftLabelTitle${index}`} className="calLabelText">
-									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-								</h1>
-							</div>
-							<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
-							<div
-								key={`rightLabel${index}`}
-								ref={addLabelObserver}
-								className="col-start-3 calLabelContainer unfocusedLabel"
-								style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-								<h1 key={`rightLabelTitle${index}`} className="calLabelText">
-									{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-								</h1>
-							</div>
-						</Fragment>
+						// <Fragment key={`month${index}`}>
+						// 	<div
+						// 		key={`leftLabel${index}`}
+						// 		ref={addLabelObserver}
+						// 		className="col-start-1 calLabelContainer unfocusedLabel"
+						// 		style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+						// 		<h1 key={`leftLabelTitle${index}`} className="calLabelText">
+						// 			{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+						// 		</h1>
+						// 	</div>
+						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
+						// 	<div
+						// 		key={`rightLabel${index}`}
+						// 		ref={addLabelObserver}
+						// 		className="col-start-3 calLabelContainer unfocusedLabel"
+						// 		style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
+						// 		<h1 key={`rightLabelTitle${index}`} className="calLabelText">
+						// 			{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
+						// 		</h1>
+						// 	</div>
+						// </Fragment>
 					);
 				})}
 			</div>
