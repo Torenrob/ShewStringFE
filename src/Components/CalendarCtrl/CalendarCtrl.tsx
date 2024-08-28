@@ -11,6 +11,7 @@ import DelAccountModal from "./DelAccountModal";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
 import { editTransOnDateFuncs } from "./CalendarContainer/Calendar/MonthBox/DayBox/DayBox";
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
+import { getDragScrollYOffset, getMonthName } from "../../Utilities/UtilityFuncs";
 
 export type MonthRange = {
 	startMonth: string;
@@ -59,6 +60,7 @@ export default function CalendarCtrl() {
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
+	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().toLocaleDateString()}`);
 	const [isLoading, setLoading] = useState<boolean>(true);
 
 	const childref = useRef<TransactionInputDrawerRef>(null!);
@@ -178,6 +180,20 @@ export default function CalendarCtrl() {
 		setSelectedAcct(curAcct.current);
 	}
 
+	function cntlMonthLabel(curMonths: string[]) {
+		setMonthLabel((p) => {
+			if (curMonths.length === 1) {
+				return convertMonthLabel(curMonths[0]);
+			} else {
+				return `${convertMonthLabel(curMonths[1])}`;
+			}
+		});
+
+		function convertMonthLabel(x: string): string {
+			return `${getMonthName(Number(x.substring(5)))} ${x.substring(0, 4)}`;
+		}
+	}
+
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
 		e.preventDefault();
 		//@ts-expect-error - deltaY is on nativeEvent
@@ -230,19 +246,56 @@ export default function CalendarCtrl() {
 		return arr;
 	}
 
+	function scrollDrag(direction: string) {
+		if (!dragObject.current?.globalDragOn) {
+			return;
+		}
+		const draggedItem = document.getElementById("draggedTransaction");
+		if (!draggedItem) {
+			return;
+		}
+
+		const draggedDate = draggedItem.classList;
+		const draggedMonthBox = document.getElementById(`${draggedDate.value.substring(0, 7)}`);
+		const monthBoxRectTop = draggedMonthBox!.getBoundingClientRect().top;
+
+		// const draggedOffSet = firstDragScrollTrigger ? monthBoxRectTop + dragItemTop : monthBoxRectTop;
+
+		const calendar = document.getElementById("calWrap");
+
+		if (direction === "down") {
+			calendar?.scrollBy({
+				top: 5,
+				behavior: "smooth",
+			});
+
+			setTimeout(() => (draggedItem.style.top = `${-monthBoxRectTop + getDragScrollYOffset(dragObject.current.dragItemY) + 257}px`), 70);
+		} else if (direction === "up") {
+			calendar?.scrollBy({
+				top: -5,
+				behavior: "smooth",
+			});
+
+			setTimeout(() => (draggedItem.style.top = `${-monthBoxRectTop + getDragScrollYOffset(dragObject.current.dragItemY)}px`), 70);
+		}
+	}
+
 	if (isLoading) {
 		return <div></div>;
 	}
 
 	return (
 		<div className="relative max-w-fit min-w-fit w-fit calCtrlWrap overflow-clip">
-			<div className="fixed top-0 w-screen">
-				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-1 h-fit">
-					<div className="flex justify-center">
+			<div className="fixed top-0 w-full">
+				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-0.5 h-fit">
+					<div className="flex justify-center ml-80">
 						<span>Accounts</span>
 						<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
 					</div>
-					<div className="flex justify-center" style={{ width: "336px" }}>
+					<div className="ml-[410px] font-bold w-72">
+						<span>{monthLabel}</span>
+					</div>
+					<div className="flex justify-center relative left-[255px]" style={{ width: "336px" }}>
 						<span>Month Range</span>
 					</div>
 				</div>
@@ -303,7 +356,7 @@ export default function CalendarCtrl() {
 						</Button>
 					</form>
 				</div>
-				<div className="grid grid-cols-7 w-full text-xs font-semibold weekdayLabel">
+				<div className="grid grid-cols-7 text-xs font-semibold weekdayLabel">
 					<div>Sunday</div>
 					<div>Monday</div>
 					<div>Tuesday</div>
@@ -323,10 +376,16 @@ export default function CalendarCtrl() {
 					addTransToDate: addTransToDate,
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
-				<div className="calWrap">
-					<CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} />
+				<div id="calWrap" className="calWrap">
+					<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center">
+						{/* <div className="self-end" style={{ position: "relative", top: "10px" }}>
+					↑ Drag Scroll ↑
+				</div> */}
+					</div>
+					<CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} monthLabelCntl={cntlMonthLabel} />
 				</div>
 				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
+				<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 			</CalendarContext.Provider>
 			{addAcctModalOpen && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}

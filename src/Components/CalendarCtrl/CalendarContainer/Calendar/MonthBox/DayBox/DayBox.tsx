@@ -71,19 +71,22 @@ export default function DayBox({
 	const [dailyBalance, setDailyBalance] = useState<number>(getTodaysBalance(dailyBalancesMap.current, dateString));
 
 	//CallBack Hooks
-	const addTransactionToList = useCallback((transaction: TransactionAPIData) => {
-		setTodaysTransactions((p) => {
-			if (!p) {
-				p = [[transaction]];
-			} else if (p[p.length - 1].length < 5) {
-				p[p.length - 1].push(transaction);
-			} else {
-				p.push([transaction]);
-			}
-			return p;
-		});
-		setForceState(getRandomNum());
-	}, []);
+	const addTransactionToList = useCallback(
+		(transaction: TransactionAPIData) => {
+			setTodaysTransactions((p) => {
+				if (!p) {
+					p = [[transaction]];
+				} else if (p[p.length - 1].length < 5) {
+					p[p.length - 1].push(transaction);
+				} else {
+					p.push([transaction]);
+				}
+				return p;
+			});
+			setForceState(getRandomNum());
+		},
+		[setForceState, setTodaysTransactions]
+	);
 
 	const removeTransactionFromList = (transaction: TransactionAPIData) => {
 		if (todaysTransactions!.length > 1 && todaysTransactions![todaysTransactions!.length - 1].length === 1) {
@@ -208,10 +211,7 @@ export default function DayBox({
 	}
 
 	function updateDaysBalance(newBalance: number) {
-		const isNewBalance: boolean = newBalance !== dailyBalance;
-
 		setDailyBalance(newBalance);
-		isNewBalance ? setForceState(getRandomNum()) : null;
 	}
 
 	//Check to make sure no transaction is added twice to container.
@@ -283,7 +283,7 @@ export default function DayBox({
 						{date === 1 && <span className="text-right text-sm">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
 						<span className="text-right text-sm">{date}</span>
 					</div>
-					<span>{Number(dailyBalance).toFixed(2)}</span>
+					<span className={`${Number(dailyBalance) >= 0 ? "text-black" : "text-red-600"} text-small`}>${Number(dailyBalance).toFixed(2)}</span>
 				</div>
 				<Divider />
 				<div style={{ position: "absolute", top: "107px", left: "5px", width: "60%" }}>

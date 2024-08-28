@@ -102,7 +102,15 @@ function returnMonthYr(compMonthNum: number, year: number): Date {
 	}
 }
 
-export default function Calendar({ transactions, monthRange }: { transactions: Map<string, TransactionAPIData[]>; monthRange: MonthRange | null }): ReactNode {
+export default function Calendar({
+	transactions,
+	monthRange,
+	monthLabelCntl,
+}: {
+	transactions: Map<string, TransactionAPIData[]>;
+	monthRange: MonthRange | null;
+	monthLabelCntl: (a: string[]) => void;
+}): ReactNode {
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
 	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
 
@@ -134,25 +142,27 @@ export default function Calendar({ transactions, monthRange }: { transactions: M
 	useEffect(() => focusToday(), []);
 
 	//Intersect Observer to highlight current month/year label
-	const labelObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
-	labelObserver.current = new IntersectionObserver(
+	const monthObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
+	monthObserver.current = new IntersectionObserver(
 		async (entries: IntersectionObserverEntry[]) => {
-			for (const entry of entries) {
-				const targetClassList = entry?.target?.classList;
-				targetClassList?.toggle("focusLabel", entry?.isIntersecting);
-				if (targetClassList?.contains("col-start-1")) {
-					targetClassList?.toggle("focusLabelLeft", entry?.isIntersecting);
-				} else if (targetClassList?.contains("col-start-3")) {
-					targetClassList?.toggle("focusLabelRight", entry?.isIntersecting);
+			const monthLabels: string[] = [];
+			entries.forEach((entry, i) => {
+				const target = entry?.target;
+				target.classList?.toggle("focusMonth", entry?.isIntersecting);
+				if (target.classList.contains("focusMonth")) {
+					monthLabels.push(target.id);
 				}
+			});
+			if (monthLabels.length > 0) {
+				monthLabelCntl(monthLabels);
 			}
 		},
 		{ threshold: 0.62 }
 	);
 
-	const addLabelObserver: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
+	const monthRef: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
 		try {
-			await labelObserver?.current?.observe(node);
+			await monthObserver?.current?.observe(node);
 		} catch {
 			return;
 		}
@@ -186,7 +196,7 @@ export default function Calendar({ transactions, monthRange }: { transactions: M
 						// 			{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
 						// 		</h1>
 						// 	</div>
-						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} />
+						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} monthObserver={monthRef} />
 						// 	<div
 						// 		key={`rightLabel${index}`}
 						// 		ref={addLabelObserver}
