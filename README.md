@@ -77,6 +77,10 @@ Welcome to the frontend repository of the Calendar Budgeting Application. This f
 
 Ensure that your API endpoints match those defined in the backend repository. Update API URLs in the `src/api/` directory if needed.
 
+## Backend Repository
+
+For the backend of the Calendar Budgeting Application, please refer to the [EndsAPI](https://github.com/torenrob/endsapi).
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
