@@ -52,7 +52,6 @@ export default function Transaction({
 	const marqueeStyle: CSSProperties = {
 		marginRight: "3px",
 		position: "relative",
-		fontWeight: "bold",
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
@@ -88,7 +87,7 @@ export default function Transaction({
 	}
 
 	return (
-		<div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+		<div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} className="transWrap">
 			<motion.div
 				ref={btnRef}
 				onDragStart={(e) => handleStartDrag(e)}
@@ -104,11 +103,10 @@ export default function Transaction({
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					variant={dragActive ? "solid" : "ghost"}
-					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
 					radius="none"
 					size="sm"
 					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span style={{ fontWeight: "bold" }}>
+					<span>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
 						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}
@@ -124,11 +122,10 @@ export default function Transaction({
 					onMouseLeave={marqueeOff}
 					style={{ display: !mouseOver ? "flex" : "none" }}
 					variant={dragActive ? "solid" : "ghost"}
-					color={transactionInfo?.transactionType === "Credit" ? "success" : "danger"}
 					radius="none"
 					size="sm"
 					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span style={{ fontWeight: "bold" }}>
+					<span>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
 						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}

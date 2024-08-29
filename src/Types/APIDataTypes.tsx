@@ -33,3 +33,9 @@ export interface PostTransactionAPIData {
 export interface RepeatGroupInBankAccountAPIData {
 	id: number;
 }
+
+export interface UserProfile {
+	userName: string;
+	email: string;
+	token: string;
+}

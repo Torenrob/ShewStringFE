@@ -1,13 +1,48 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, MouseEvent, ChangeEventHandler, ChangeEvent, useContext } from "react";
 import { Form } from "react-router-dom";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
 import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
+import * as Yup from "yup";
+import { UserContext } from "../../Services/Auth/UserAuth";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-export default function SignUp(): ReactNode {
+type SignUpFormsInputs = {
+	firstname: string;
+	lastname: string;
+	email: string;
+	username: string;
+	password: string;
+};
+
+const validation = Yup.object().shape({
+	email: Yup.string().required("Email is required"),
+	firstname: Yup.string().required("First Name is required"),
+	lastname: Yup.string().required("Last Name is required"),
+	username: Yup.string().required("Username is required"),
+	password: Yup.string().required("Password is required"),
+});
+
+export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: () => void; toggleLogin: () => void }): ReactNode {
 	const [createIsVisible, setCreateIsVisible] = useState(false);
 	const [confirmIsVisible, setConfirmIsVisible] = useState(false);
+	const [password, setPassword] = useState("");
+	const { registerUser } = useContext(UserContext);
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<SignUpFormsInputs>({ resolver: yupResolver(validation) });
+
+	function handleSignUp(form: SignUpFormsInputs) {
+		registerUser(form.email, form.username, form.password, form.firstname, form.lastname);
+	}
+
+	const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setPassword(e.target.value);
+	};
 
 	function toggleCreateVisibility(): void {
 		setCreateIsVisible(createIsVisible ? false : true);
@@ -17,53 +52,82 @@ export default function SignUp(): ReactNode {
 		setConfirmIsVisible(confirmIsVisible ? false : true);
 	}
 
+	function onClickOutsideModal(e: MouseEvent<HTMLDivElement>) {
+		//@ts-expect-error - e.target does have id prop
+		if (e.target.id === "signUpBackground") {
+			toggleSignUp();
+		}
+	}
+
+	function clickLogin() {
+		toggleSignUp();
+		toggleLogin();
+	}
+
 	return (
-		<Form className="signUpCard" id="sign-up" action="/register" method="post">
-			<Card className="w-fit">
-				<CardBody className="w-auto gap-y-2 grid">
-					<span className="text-center text-xl">Join ENDS</span>
-					<Input isRequired name="firstName" type="text" label="First Name" variant="bordered" placeholder="First Name" className="max-w-xs justify-self-center" />
-					<Input isRequired name="lastName" type="text" label="Last Name" variant="bordered" placeholder="Last Name" className="max-w-xs justify-self-center" />
-					<Input isRequired name="email" type="email" label="Email" variant="bordered" placeholder="your@email.com" className="max-w-xs justify-self-center" />
-					<Input
-						isRequired
-						name="password"
-						type={createIsVisible ? "text" : "password"}
-						label="Create Password"
-						variant="bordered"
-						placeholder="Create password"
-						className="max-w-xs justify-self-center"
-						endContent={
-							<button className="focus:outline-none" type="button" onClick={toggleCreateVisibility}>
-								{createIsVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" /> : <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />}
-							</button>
-						}
-					/>
-					<Input
-						isRequired
-						type={confirmIsVisible ? "text" : "password"}
-						label="Confirm Password"
-						variant="bordered"
-						placeholder="Confirm password"
-						className="max-w-xs justify-self-center"
-						endContent={
-							<button className="focus:outline-none" type="button" onClick={toggleConfirmVisibility}>
-								{confirmIsVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" /> : <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />}
-							</button>
-						}
-					/>
-					<Button form="sign-up" type="submit" color="primary" className="loginBtn justify-self-center">
-						Login
-					</Button>
-					<Divider />
-					<span className="text-sm text-center text-black/50">
-						Already have an account?{" "}
-						<a className="text-sky-600" href="/" rel="noopener noreferrer">
-							Log In
-						</a>
-					</span>
-				</CardBody>
-			</Card>
-		</Form>
+		<div id="signUpBackground" className="w-[100vw] absolute h-[100vh] bg-[#0000009a]" onClick={onClickOutsideModal}>
+			<Form className="signUpCard" id="sign-up" action="/register" method="post" onSubmit={handleSubmit(handleSignUp)}>
+				<Card className="w-fit p-2">
+					<CardBody className="w-auto gap-y-2 grid">
+						<span className="text-center text-xl">Join ShewString</span>
+						<Input isRequired {...register("firstname")} type="text" label="First Name" variant="bordered" placeholder="First Name" size="sm" className="max-w-xs justify-self-center" />
+						<Input isRequired {...register("lastname")} type="text" label="Last Name" variant="bordered" placeholder="Last Name" size="sm" className="max-w-xs justify-self-center" />
+						<Input isRequired {...register("email")} name="email" type="email" label="Email" variant="bordered" placeholder="your@email.com" size="sm" className="max-w-xs justify-self-center" />
+						<Input isRequired {...register("username")} name="username" type="text" label="Username" variant="bordered" placeholder="Username" size="sm" className="max-w-xs justify-self-center" />
+						<Input
+							isRequired
+							{...register("password")}
+							name="password"
+							type={createIsVisible ? "text" : "password"}
+							label="Create Password"
+							onChange={(e) => handlePasswordChange(e)}
+							variant="bordered"
+							placeholder="Create password"
+							className="max-w-xs justify-self-center"
+							size="sm"
+							endContent={
+								<button className="focus:outline-none" type="button" onClick={toggleCreateVisibility}>
+									{createIsVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" /> : <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />}
+								</button>
+							}
+						/>
+						<Input
+							isRequired
+							type={confirmIsVisible ? "text" : "password"}
+							label="Confirm Password"
+							variant="bordered"
+							placeholder="Confirm password"
+							className="max-w-xs justify-self-center"
+							validate={(s) => {
+								if (s !== password) {
+									return "Passwords must match";
+								} else {
+									return null;
+								}
+							}}
+							size="sm"
+							endContent={
+								<button className="focus:outline-none" type="button" onClick={toggleConfirmVisibility}>
+									{confirmIsVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" /> : <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />}
+								</button>
+							}
+						/>
+						<Button form="sign-up" type="submit" color="primary" className="loginBtn justify-self-center bg-[#6EC4A7] font-bold text-[#0a0a0a]">
+							Create Account
+						</Button>
+						<Divider />
+						<span className="text-sm text-center text-[#0a0a0a]">
+							Already have an account?{" "}
+							<a className="text-[#67b49a] font-bold cursor-pointer" onClick={clickLogin}>
+								Log In
+							</a>
+							<span className="block">
+								Or Use a <a className="text-[#67b49a] font-bold cursor-pointer">Test Account</a>
+							</span>
+						</span>
+					</CardBody>
+				</Card>
+			</Form>
+		</div>
 	);
 }

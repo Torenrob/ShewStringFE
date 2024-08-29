@@ -12,6 +12,7 @@ import TransactionInputDrawer, { TransactionInputDrawerRef } from "./Transaction
 import { editTransOnDateFuncs } from "./CalendarContainer/Calendar/MonthBox/DayBox/DayBox";
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
 import { getDragScrollYOffset, getMonthName } from "../../Utilities/UtilityFuncs";
+import Calendar from "./CalendarContainer/Calendar/Calendar";
 
 export type MonthRange = {
 	startMonth: string;
@@ -312,9 +313,9 @@ export default function CalendarCtrl() {
 							}}
 							classNames={{
 								tabList: "rounded-none p-0 bg-[#0A0A0A] tabListCont gap-0",
-								cursor: "w-full bg-[#86198f]",
+								cursor: "w-full bg-[#6EC4A7]",
 								tab: "acctTabs min-w-32 max-w-32 px-0 h-6",
-								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[white] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
+								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
 							}}>
 							{bankAccounts.map((bA, i) => {
 								return (
@@ -332,7 +333,7 @@ export default function CalendarCtrl() {
 							})}
 						</Tabs>
 					</div>
-					<form id="monthRangeForm" className="flex pl-2 bg-fuchsia-800 mnthPickBox" onSubmit={submitMonthRange}>
+					<form id="monthRangeForm" className="flex pl-2 bg-[#6EC4A7] mnthPickBox" onSubmit={submitMonthRange}>
 						<input
 							name="startMonth"
 							defaultValue={defaultMonthRange()[0]}
@@ -340,7 +341,7 @@ export default function CalendarCtrl() {
 							// onChange={updStartMnth}
 							id="start"
 							type="month"
-							className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+							className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
 						/>
 						<SpanIcon />
 						<input
@@ -349,7 +350,7 @@ export default function CalendarCtrl() {
 							// onChange={updEndMnth}
 							id="endMonth"
 							type="month"
-							className="mnthPicker text-sm border-none bg-fuchsia-800 shadow-none text-white"
+							className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
 						/>
 						<Button type="submit" form="monthRangeForm" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
 							<CheckIcon />
@@ -382,7 +383,8 @@ export default function CalendarCtrl() {
 					↑ Drag Scroll ↑
 				</div> */}
 					</div>
-					<CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} monthLabelCntl={cntlMonthLabel} />
+					{/* <CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} monthLabelCntl={cntlMonthLabel} /> */}
+					<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
 				</div>
 				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
 				<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>

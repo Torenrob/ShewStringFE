@@ -28,7 +28,7 @@ export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { open
 				<svg
 					onMouseEnter={(e) => hoverSwitch()}
 					onMouseLeave={(e) => hoverSwitch()}
-					fill={hover ? "#ab59b3e7" : "#ffffff"}
+					fill={hover ? "#6EC4A7" : "#ffffff"}
 					className="acctOptIcon"
 					width="13px"
 					height="13px"

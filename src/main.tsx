@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 import { NextUIProvider } from "@nextui-org/react";
 import "./index.css";
 import router from "./Routes/Router.tsx";
+import { UserProvider } from "./Services/Auth/UserAuth.tsx";
 
 document.addEventListener("DOMContentLoaded", () =>
 	ReactDOM.createRoot(document.getElementById("root")!).render(

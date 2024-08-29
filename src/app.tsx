@@ -1,15 +1,16 @@
 import "./app.css";
 import { ReactNode } from "react";
 import CalendarCtrl from "./Components/CalendarCtrl/CalendarCtrl";
-import TransactionInputDrawer from "./Components/CalendarCtrl/TransactionInputDrawer";
 import UserPanel from "./Components/UserPanel/UserPanel";
+import LandingPage from "./Components/LandingPage/LandingPage";
+import { Outlet } from "react-router-dom";
+import { UserProvider } from "./Services/Auth/UserAuth";
 
 function App(): ReactNode {
 	return (
-		<div className="flex">
-			<UserPanel />
-			<CalendarCtrl />
-		</div>
+		<UserProvider>
+			<Outlet />
+		</UserProvider>
 	);
 }
 

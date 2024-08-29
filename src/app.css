@@ -1,8 +1,8 @@
 :root {
-	--60color: #86198f;
+	--60color: #45596b;
 	--30color: rgb(103, 103, 192);
 	--10color: white;
-	--60colorTransparent: #85198fcc;
+	--60colorTransparent: #45596bbd;
 	--monthBorderSize: 2px;
 	--color: #ab59b3e7;
 }
@@ -18,9 +18,10 @@
 .loginCard,
 .signUpCard {
 	position: absolute;
-	top: 40%;
+	top: 45%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .loginBtn {
@@ -100,6 +101,7 @@
 
 .transaction {
 	max-width: 100%;
+	font-weight: 600;
 }
 
 .transactionContainer {
@@ -127,12 +129,6 @@
 	grid-template-rows: min-content;
 }
 
-.calendarContainer {
-	/* border-bottom: solid 1px black; */
-	border-top: inset 1px solid black;
-	width: 1700px;
-}
-
 .drawerClosed {
 	transform: translateY(130px);
 }
@@ -143,11 +139,10 @@ div > .weekdayLabel {
 
 .weekdayLabel {
 	width: 1700px;
-	background-color: #86198f;
-	color: white;
+	background-color: #6ec4a7;
+	color: #0a0a0a;
 	text-align: center;
-	border: #000000 1px solid;
-	box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.4), inset 2px 2px 5px rgba(255, 255, 255, 0.5), 0 3px 4px rgba(0, 0, 0, 0.329);
+	box-shadow: 0 3px 4px rgba(0, 0, 0, 0.329);
 }
 
 .addTransactionBtn {
@@ -218,7 +213,7 @@ div > .weekdayLabel {
 }
 
 .selTab {
-	background: #0a0a0a !important;
+	background: #6ec4a7 !important;
 }
 
 .acctTabs::before {
@@ -228,7 +223,7 @@ div > .weekdayLabel {
 	height: 24px;
 	position: absolute;
 	z-index: -1 /*  */;
-	background-color: #86198f;
+	background-color: #6ec4a7;
 }
 
 .acctTabs::after {
@@ -315,7 +310,7 @@ div > .weekdayLabel {
 }
 
 input[type="month"]::-webkit-calendar-picker-indicator {
-	filter: invert(100%) sepia(81%) saturate(25%) hue-rotate(18deg) brightness(107%) contrast(105%);
+	filter: invert(0%) sepia(48%) saturate(656%) hue-rotate(55deg) brightness(110%) contrast(92%);
 }
 
 input[type="month"]:focus {
@@ -380,4 +375,41 @@ input[type="month"]:focus {
 
 .userPanel {
 	background-color: #0a0a0a;
+}
+
+@keyframes zoomIn {
+	from {
+		transform: translateX(-50%) translateY(-125%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(-50%) translateY(-85%);
+		opacity: 1;
+	}
+}
+
+@keyframes appear {
+	0% {
+		opacity: 0;
+	}
+	50% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.landingPageTitle {
+	animation: zoomIn 2.5s ease-in-out;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-85%);
+	color: #45596b;
+}
+
+.landingPageBtns,
+.landingTagLine {
+	animation: appear 5s ease-in-out;
 }

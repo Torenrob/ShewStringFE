@@ -31,7 +31,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
-	const [forceState, setForceState] = useState<number>(0);
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
@@ -238,17 +237,16 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						<Button
 							isIconOnly
 							disabled={validateAmount || errorMessage ? true : false}
-							color={validateAmount || errorMessage ? "default" : "primary"}
 							size="md"
 							isLoading={submittingTransaction}
 							radius="none"
-							className={`self-center ${validateAmount ? "mb-6" : "mb-2"}`}
+							className={`self-center ${validateAmount ? "mb-6" : "mb-2"} bg-[${validateAmount || errorMessage ? "#D4D4" : "#6EC4A7"}]`}
 							type="submit">
 							{errorMessage ? <InvalidSubmitIcon white={false} /> : validateAmount ? <InvalidSubmitIcon white={false} /> : <SubmitTransactionIcon />}
 						</Button>
 						<Input
 							required
-							value={Number(containerInfo.amount).toFixed(2).toString()}
+							value={containerInfo.amount}
 							onValueChange={(e) => updateAmount(e)}
 							radius="none"
 							size="sm"

@@ -145,7 +145,7 @@ export default function DayBox({
 		openDrawer({
 			id: trans.id,
 			date: parseDate(dateString),
-			amount: trans.amount.toString(),
+			amount: trans.amount.toFixed(2).toString(),
 			bankAccountId: trans.bankAccountId,
 			category: trans.category,
 			description: trans.description,
@@ -305,7 +305,7 @@ export default function DayBox({
 						))}
 				</div>
 				{addTransactionBtnVisible && !dragObject.current.globalDragOn && (
-					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" color="danger" size="sm" className={`absolute addTransactionBtn`}>
+					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" size="sm" className="absolute addTransactionBtn bg-[#6EC4A7]">
 						<AddTransactionIcon />
 					</Button>
 				)}

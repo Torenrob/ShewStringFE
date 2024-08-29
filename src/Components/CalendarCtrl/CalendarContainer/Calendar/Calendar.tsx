@@ -182,32 +182,10 @@ export default function Calendar({
 	}
 
 	return (
-		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3">
+		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3 w-[1700px]">
 			<div className="calMonthsContainer" style={{ maxHeight: `${calcCalendarHeight()}px` }}>
 				{monthComps.map((monthBoxObj, index) => {
-					return (
-						// <Fragment key={`month${index}`}>
-						// 	<div
-						// 		key={`leftLabel${index}`}
-						// 		ref={addLabelObserver}
-						// 		className="col-start-1 calLabelContainer unfocusedLabel"
-						// 		style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-						// 		<h1 key={`leftLabelTitle${index}`} className="calLabelText">
-						// 			{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-						// 		</h1>
-						// 	</div>
-						<MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} monthObserver={monthRef} />
-						// 	<div
-						// 		key={`rightLabel${index}`}
-						// 		ref={addLabelObserver}
-						// 		className="col-start-3 calLabelContainer unfocusedLabel"
-						// 		style={{ transform: `translateY(-${monthBoxObj.monthObj.styleYtransition}px` }}>
-						// 		<h1 key={`rightLabelTitle${index}`} className="calLabelText">
-						// 			{monthBoxObj.monthObj.monthName + "   " + monthBoxObj.monthObj.year}
-						// 		</h1>
-						// 	</div>
-						// </Fragment>
-					);
+					return <MonthBox transactions={transactions} monthObj={monthBoxObj?.monthObj} key={monthBoxObj?.key} translateY={monthBoxObj.monthObj.styleYtransition} monthObserver={monthRef} />;
 				})}
 			</div>
 		</div>

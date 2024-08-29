@@ -25,26 +25,28 @@ export default function AddAccountModal({ closeModal, deleteAcct, bankAccounts }
 	return (
 		<div className="w-full h-full top-0 absolute addAcctCont gap-4">
 			<form className="addAcctModal flex-col" onSubmit={(e) => delAcct(e)} ref={formRef}>
-				<h2 className="text-center mb-1">Delete Account</h2>
+				<h2 className="text-center mb-1">
+					Delete Account
+					<Button
+						isIconOnly
+						className="bg-transparent relative h-4 left-28"
+						onClick={(e) => {
+							formRef.current?.reset();
+							closeModal();
+						}}>
+						<InvalidSubmitIcon white={true} />
+					</Button>
+				</h2>
 				<div className="flex gap-4">
 					<Select radius="none" label="Account" name="account" size="sm" className="addAcctInputs text-black">
 						{bankAccounts.map((bA) => {
 							return <SelectItem key={bA.id}>{bA.title}</SelectItem>;
 						})}
 					</Select>
-					<Button className="self-center bg-black" radius="none" isIconOnly size="sm" type="submit">
+					<Button className="self-center bg-[#6EC4A7]" radius="none" isIconOnly size="sm" type="submit">
 						<CheckIcon />
 					</Button>
 				</div>
-				<Button
-					isIconOnly
-					className="absolute bg-transparent bottom-20 left-80"
-					onClick={(e) => {
-						formRef.current?.reset();
-						closeModal();
-					}}>
-					<InvalidSubmitIcon white={true} />
-				</Button>
 			</form>
 		</div>
 	);
