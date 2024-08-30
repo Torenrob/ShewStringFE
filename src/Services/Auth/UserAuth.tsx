@@ -36,20 +36,26 @@ export const UserProvider = ({ children }: Props) => {
 	}, []);
 
 	const registerUser = async (email: string, username: string, firstname: string, lastname: string, password: string) => {
-		await userRegisterAPI({ email, username, password, firstname, lastname }).then((res) => {
-			if (res) {
-				localStorage.setItem("token", res?.data.token);
-				const userObj = {
-					userName: res?.data.userName,
-					email: res?.data.email,
-					token: res.data.token,
-				};
-				localStorage.setItem("user", JSON.stringify(userObj));
-				setToken(res?.data.token);
-				setUser(userObj);
-				navigate("/main");
-			}
-		});
+		console.log("ran");
+		await userRegisterAPI({ email: email, userName: username, password: password, firstName: firstname, lastName: lastname })
+			.then((res) => {
+				console.log(res);
+				if (res) {
+					localStorage.setItem("token", res?.data.token);
+					const userObj = {
+						userName: res?.data.userName,
+						email: res?.data.email,
+						token: res.data.token,
+					};
+					localStorage.setItem("user", JSON.stringify(userObj));
+					setToken(res?.data.token);
+					setUser(userObj);
+					navigate("/main");
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	};
 
 	const loginUser = async (username: string, password: string) => {

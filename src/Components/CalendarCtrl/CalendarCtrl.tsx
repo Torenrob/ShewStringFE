@@ -63,6 +63,7 @@ export default function CalendarCtrl() {
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().toLocaleDateString()}`);
 	const [isLoading, setLoading] = useState<boolean>(true);
+	const [mouseDownInTabs, setMouseDownInTabs] = useState(false);
 
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
@@ -154,7 +155,8 @@ export default function CalendarCtrl() {
 		if (tabsRef.current === null) return;
 		if (tabsRef.current.clientWidth === 0) return;
 		const numAccts = bankAccounts.length;
-		const updWidth = numAccts * 130 - numAccts * 15.5;
+		const updWidth = numAccts * 128 - (numAccts - 1) * 17;
+		console.log(updWidth);
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 	}, [bankAccounts]);
 
@@ -311,8 +313,9 @@ export default function CalendarCtrl() {
 							motionProps={{
 								transition: { duration: 0.9 },
 							}}
+							className="box-border"
 							classNames={{
-								tabList: "rounded-none p-0 bg-[#0A0A0A] tabListCont gap-0",
+								tabList: "rounded-none p-0 gap-0 bg-[#0A0A0A]",
 								cursor: "w-full bg-[#6EC4A7]",
 								tab: "acctTabs min-w-32 max-w-32 px-0 h-6",
 								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",

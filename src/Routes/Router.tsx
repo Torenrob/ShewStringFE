@@ -9,9 +9,9 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <App />,
 		children: [
-			// { path: "", element: <LandingPage /> },
+			{ path: "", element: <LandingPage /> },
 			{
-				path: "",
+				path: "/main",
 				element: (
 					<div className="flex">
 						<UserPanel />

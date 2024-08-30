@@ -16,17 +16,20 @@ export const userLoginAPI = async (username: string, password: string) => {
 	}
 };
 
-export const userRegisterAPI = async ({ username, password, firstname, lastname, email }: { username: string; password: string; firstname: string; lastname: string; email: string }) => {
+export const userRegisterAPI = async ({ userName, password, firstName, lastName, email }: { userName: string; password: string; firstName: string; lastName: string; email: string }) => {
+	console.log("ran");
 	try {
-		const data = await axios.post<UserProfile>(api + "/login", {
-			userName: username,
+		const data = await axios.post<UserProfile>(api + "/register", {
+			userName: userName,
 			password: password,
-			firstName: firstname,
-			lastName: lastname,
+			firstName: firstName,
+			lastName: lastName,
 			email: email,
 		});
+		console.log(data);
 		return data;
 	} catch (err) {
+		console.log(err);
 		ErrorHandler(err);
 	}
 };
