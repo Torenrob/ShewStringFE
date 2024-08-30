@@ -76,7 +76,7 @@ Welcome to the frontend repository of the Calendar Budgeting Application. This f
 
 ## API Integration
 
-Ensure that your API endpoints match those defined in the backend repository. Update API URLs in the `src/api/` directory if needed.
+Ensure that your API endpoints match those defined in the backend repository.
 
 ## Backend Repository
 
