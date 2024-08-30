@@ -20,6 +20,7 @@ Welcome to the frontend repository of the Calendar Budgeting Application. This f
 - **NextUI:** Component library providing pre-styled React components with a focus on ease of use and modern design. It helps in building consistent and visually appealing user interfaces quickly.
 
 ## Setup
+- Working Link coming soon. Currently still learning how to deploy a Full Stack Application. If you would like to test the functionality please follow the steps below. 
 
 ### Prerequisites
 
