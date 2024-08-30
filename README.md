@@ -4,6 +4,8 @@
 
 Welcome to the frontend repository of the Calendar Budgeting Application. This frontend application is built with TypeScript, React, and Vite, and is designed to help individuals who live paycheck to paycheck manage and track their budgets effectively. It interfaces with the backend API to provide a user-friendly experience for budget management and financial tracking.
 
+Note: "Ends" was the initial name for the application. Such as "Making ends meet". I have since changed the name to "ShewString", since it's for those working with a "shoestring budget".
+
 ## Features
 
 - **Interactive Calendar:** View and manage transactions within an interactive calendar.
