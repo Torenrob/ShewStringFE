@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import axios from "axios";
-import { UserProfile } from "../../Types/APIDataTypes";
+import { RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
 import { userLoginAPI, userRegisterAPI } from "../API/UserAPI";
 
 type UserContextType = {
 	user: UserProfile | null;
 	token: string | null;
-	registerUser: (email: string, username: string, password: string, firstName: string, lastname: string) => void;
+	registerUser: (arg0: RegisterUserInfo) => void;
 	loginUser: (username: string, password: string) => void;
 	logout: () => void;
 	isLoggedIn: () => boolean;
@@ -35,11 +35,10 @@ export const UserProvider = ({ children }: Props) => {
 		setIsReady(true);
 	}, []);
 
-	const registerUser = async (email: string, username: string, firstname: string, lastname: string, password: string) => {
+	const registerUser = async (registerUser: RegisterUserInfo) => {
 		console.log("ran");
-		await userRegisterAPI({ email: email, userName: username, password: password, firstName: firstname, lastName: lastname })
+		await userRegisterAPI(registerUser)
 			.then((res) => {
-				console.log(res);
 				if (res) {
 					localStorage.setItem("token", res?.data.token);
 					const userObj = {
@@ -59,13 +58,17 @@ export const UserProvider = ({ children }: Props) => {
 	};
 
 	const loginUser = async (username: string, password: string) => {
+		const now = new Date();
+		console.log(now.getTime());
 		await userLoginAPI(username, password).then((res) => {
 			if (res) {
+				const tokenStorage = { token: res.data.token, expiresOn: now.getTime() + 500 };
 				localStorage.setItem("token", res?.data.token);
 				const userObj = {
 					userName: res?.data.userName,
 					email: res?.data.email,
 					token: res.data.token,
+					expiresOn: now.getTime() + 500,
 				};
 				localStorage.setItem("user", JSON.stringify(userObj));
 				setToken(res?.data.token);

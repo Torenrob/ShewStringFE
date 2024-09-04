@@ -258,3 +258,10 @@ function stopArrDups(targetArr: TransactionAPIData[] | undefined, newTransInfo: 
 export function getRandomNum(): number {
 	return Math.floor(Math.random() * 10000000);
 }
+
+export function checkForUser(): boolean {
+	if (localStorage.getItem("token")) {
+		return true;
+	}
+	return false;
+}

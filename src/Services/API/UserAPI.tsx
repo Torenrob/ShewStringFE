@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { UserProfile } from "../../Types/APIDataTypes";
+import { RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
 
 const api = import.meta.env.VITE_API_URL + "/user";
 
@@ -16,16 +16,9 @@ export const userLoginAPI = async (username: string, password: string) => {
 	}
 };
 
-export const userRegisterAPI = async ({ userName, password, firstName, lastName, email }: { userName: string; password: string; firstName: string; lastName: string; email: string }) => {
-	console.log("ran");
+export const userRegisterAPI = async (registerUser: RegisterUserInfo) => {
 	try {
-		const data = await axios.post<UserProfile>(api + "/register", {
-			userName: userName,
-			password: password,
-			firstName: firstName,
-			lastName: lastName,
-			email: email,
-		});
+		const data = await axios.post<UserProfile>(api + "/register", registerUser);
 		console.log(data);
 		return data;
 	} catch (err) {

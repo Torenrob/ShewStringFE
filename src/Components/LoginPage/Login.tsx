@@ -7,6 +7,7 @@ import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../../Services/Auth/UserAuth";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 
 type LoginFormsInputs = {
 	username: string;
@@ -28,6 +29,7 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 	} = useForm<LoginFormsInputs>({ resolver: yupResolver(validation) });
 
 	function handleLogin(form: LoginFormsInputs) {
+		console.log("ran");
 		loginUser(form.username, form.password);
 	}
 
@@ -35,11 +37,8 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 		setIsVisible(isVisible ? false : true);
 	}
 
-	function handleClickOutsideLogin(e: MouseEvent<HTMLDivElement>) {
-		//@ts-expect-error - id does exist on e.target
-		if (e.target.id === "loginBackground") {
-			toggleLogin();
-		}
+	function closeLogin() {
+		toggleLogin();
 	}
 
 	function clickSignUp() {
@@ -48,10 +47,13 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 	}
 
 	return (
-		<div id="loginBackground" className="absolute w-[100vw] h-[100vh] bg-[#0000009a]" onClick={(e) => handleClickOutsideLogin(e)}>
+		<div id="loginBackground" className="absolute w-[100vw] h-[100vh] bg-[#0000009a]">
 			<form className="loginCard" name="login" action="/log-in" method="POST" onSubmit={handleSubmit(handleLogin)}>
 				<Card className="w-fit p-2">
-					<CardBody className="w-auto gap-y-2 grid">
+					<CardBody className="w-auto gap-y-2 grid overflow-hidden">
+						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onClick={closeLogin}>
+							<InvalidSubmitIcon white={false} />
+						</Button>
 						<span className="text-center text-xl text-[#0a0a0a]">Login to Your Account</span>
 						<Input isRequired type="text" label="Username" variant="bordered" placeholder="Username" className="max-w-xs justify-self-center" {...register("username")} />
 						<Input
@@ -71,7 +73,7 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 						<span className="text-sm text-center text-[#0a0a0a]">
 							<a>Forgot Password/Username</a>
 						</span>
-						<Button color="primary" className="loginBtn justify-self-center bg-[#6EC4A7] text-[#0a0a0a] font-bold">
+						<Button color="primary" type="submit" className="loginBtn justify-self-center bg-[#6EC4A7] text-[#0a0a0a] font-bold">
 							Login
 						</Button>
 						<Divider />

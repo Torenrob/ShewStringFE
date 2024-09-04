@@ -13,6 +13,7 @@ import { editTransOnDateFuncs } from "./CalendarContainer/Calendar/MonthBox/DayB
 import CalendarContainer from "./CalendarContainer/CalendarContainer";
 import { getDragScrollYOffset, getMonthName } from "../../Utilities/UtilityFuncs";
 import Calendar from "./CalendarContainer/Calendar/Calendar";
+import { useLoaderData, useNavigate } from "react-router-dom";
 
 export type MonthRange = {
 	startMonth: string;
@@ -56,6 +57,11 @@ export type CalendarContextType = {
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
 export default function CalendarCtrl() {
+	const navigate = useNavigate();
+	if (!useLoaderData()) {
+		navigate("/");
+	}
+
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
 	const [selectedAcct, setSelectedAcct] = useState<string>("0");
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
@@ -156,7 +162,6 @@ export default function CalendarCtrl() {
 		if (tabsRef.current.clientWidth === 0) return;
 		const numAccts = bankAccounts.length;
 		const updWidth = numAccts * 128 - (numAccts - 1) * 17;
-		console.log(updWidth);
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 	}, [bankAccounts]);
 

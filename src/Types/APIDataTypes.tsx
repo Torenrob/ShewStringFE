@@ -34,6 +34,14 @@ export interface RepeatGroupInBankAccountAPIData {
 	id: number;
 }
 
+export interface RegisterUserInfo {
+	email: string;
+	userName: string;
+	firstName: string;
+	lastName: string;
+	password: string;
+}
+
 export interface UserProfile {
 	userName: string;
 	email: string;

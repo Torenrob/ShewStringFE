@@ -8,6 +8,8 @@ import * as Yup from "yup";
 import { UserContext } from "../../Services/Auth/UserAuth";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
+import { RegisterUserInfo } from "../../Types/APIDataTypes";
 
 type SignUpFormsInputs = {
 	firstname: string;
@@ -37,7 +39,14 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	} = useForm<SignUpFormsInputs>({ resolver: yupResolver(validation) });
 
 	function handleSignUp(form: SignUpFormsInputs) {
-		registerUser(form.email, form.username, form.password, form.firstname, form.lastname);
+		const registerUserInfo: RegisterUserInfo = {
+			email: form.email,
+			userName: form.username,
+			password: form.password,
+			firstName: form.firstname,
+			lastName: form.lastname,
+		};
+		registerUser(registerUserInfo);
 	}
 
 	const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,11 +61,8 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 		setConfirmIsVisible(confirmIsVisible ? false : true);
 	}
 
-	function onClickOutsideModal(e: MouseEvent<HTMLDivElement>) {
-		//@ts-expect-error - e.target does have id prop
-		if (e.target.id === "signUpBackground") {
-			toggleSignUp();
-		}
+	function closeSignUp() {
+		toggleSignUp();
 	}
 
 	function clickLogin() {
@@ -65,10 +71,13 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	}
 
 	return (
-		<div id="signUpBackground" className="w-[100vw] absolute h-[100vh] bg-[#0000009a]" onClick={onClickOutsideModal}>
+		<div id="signUpBackground" className="w-[100vw] absolute h-[100vh] bg-[#0000009a]">
 			<Form className="signUpCard" id="sign-up" action="/register" method="post" onSubmit={handleSubmit(handleSignUp)}>
 				<Card className="w-fit p-2">
-					<CardBody className="w-auto gap-y-2 grid">
+					<CardBody className="w-auto gap-y-2 grid overflow-hidden">
+						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onClick={closeSignUp}>
+							<InvalidSubmitIcon white={false} />
+						</Button>
 						<span className="text-center text-xl">Join ShewString</span>
 						<Input isRequired {...register("firstname")} type="text" label="First Name" variant="bordered" placeholder="First Name" size="sm" className="max-w-xs justify-self-center" />
 						<Input isRequired {...register("lastname")} type="text" label="Last Name" variant="bordered" placeholder="Last Name" size="sm" className="max-w-xs justify-self-center" />
