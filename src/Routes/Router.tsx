@@ -4,6 +4,7 @@ import LandingPage from "../Components/LandingPage/LandingPage";
 import UserPanel from "../Components/UserPanel/UserPanel";
 import CalendarCtrl from "../Components/CalendarCtrl/CalendarCtrl";
 import { checkForUser } from "../Utilities/UtilityFuncs";
+import MainPage from "../Components/Main/MainPage";
 
 const router = createBrowserRouter([
 	{
@@ -14,12 +15,7 @@ const router = createBrowserRouter([
 			{
 				path: "/main",
 				loader: checkForUser,
-				element: (
-					<div className="flex">
-						<UserPanel />
-						<CalendarCtrl />
-					</div>
-				),
+				element: <MainPage />,
 			},
 		],
 	},

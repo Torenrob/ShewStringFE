@@ -57,11 +57,6 @@ export type CalendarContextType = {
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
 export default function CalendarCtrl() {
-	const navigate = useNavigate();
-	if (!useLoaderData()) {
-		navigate("/");
-	}
-
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
 	const [selectedAcct, setSelectedAcct] = useState<string>("0");
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
