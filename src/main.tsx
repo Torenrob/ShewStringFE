@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
-import { NextUIProvider } from "@nextui-org/react";
+import { NextUIProvider, ThemeColors } from "@nextui-org/react";
 import "./index.css";
 import router from "./Routes/Router.tsx";
 import { UserProvider } from "./Services/Auth/UserAuth.tsx";

@@ -121,7 +121,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 								</button>
 							}
 						/>
-						<Button form="sign-up" type="submit" color="primary" className="loginBtn justify-self-center bg-[#6EC4A7] font-bold text-[#0a0a0a]">
+						<Button form="sign-up" type="submit" color="primary" className="loginBtn justify-self-center font-bold">
 							Create Account
 						</Button>
 						<Divider />

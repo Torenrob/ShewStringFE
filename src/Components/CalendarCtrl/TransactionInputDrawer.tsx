@@ -277,7 +277,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 								<label htmlFor="creditBtn" className="text-xs mb-0.5 text-slate-300 font-semibold relative -translate-x-0.5">
 									Credit
 								</label>
-								<Button isIconOnly radius="none" size="sm" name="creditBtn" onClick={transactionTypeClick} color={transactionType ? "default" : "success"}>
+								<Button isIconOnly radius="none" size="sm" name="creditBtn" onClick={transactionTypeClick} color={transactionType ? "default" : "primary"}>
 									<CreditIcon />
 								</Button>
 							</div>

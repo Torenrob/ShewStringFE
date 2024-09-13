@@ -48,7 +48,7 @@ export const UserProvider = ({ children }: Props) => {
 					};
 					localStorage.setItem("user", JSON.stringify(userObj));
 					setToken(res?.data.token);
-					setUser(userObj);
+					setUser(res?.data);
 					navigate("/main");
 				}
 			})
@@ -62,17 +62,10 @@ export const UserProvider = ({ children }: Props) => {
 		console.log(now.getTime());
 		await userLoginAPI(username, password).then((res) => {
 			if (res) {
-				const tokenStorage = { token: res.data.token, expiresOn: now.getTime() + 500 };
 				localStorage.setItem("token", res?.data.token);
-				const userObj = {
-					userName: res?.data.userName,
-					email: res?.data.email,
-					token: res.data.token,
-					expiresOn: now.getTime() + 500,
-				};
-				localStorage.setItem("user", JSON.stringify(userObj));
+				localStorage.setItem("user", JSON.stringify(res?.data));
 				setToken(res?.data.token);
-				setUser(userObj);
+				setUser(res?.data);
 				navigate("/main");
 			}
 		});

@@ -23,7 +23,7 @@ export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { open
 	}
 
 	return (
-		<Dropdown closeOnSelect={true} showArrow triggerScaleOnOpen={false}>
+		<Dropdown closeOnSelect={true} showArrow triggerScaleOnOpen={false} className="bg-[#0a0a0a] text-[#6EC4A7] border-[#45596b] border-1 shadow-lg shadow-[#0a0a0a7e] rounded-none">
 			<DropdownTrigger>
 				<svg
 					onMouseEnter={(e) => hoverSwitch()}
@@ -40,9 +40,13 @@ export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { open
 					/>
 				</svg>
 			</DropdownTrigger>
-			<DropdownMenu onAction={handleDropDown}>
-				<DropdownItem key="addAccount">Add Account</DropdownItem>
-				<DropdownItem key="deleteAccount">Delete Account</DropdownItem>
+			<DropdownMenu onAction={handleDropDown} color="primary">
+				<DropdownItem className="rounded-none" key="addAccount">
+					Add Account
+				</DropdownItem>
+				<DropdownItem className="rounded-none" key="deleteAccount">
+					Delete Account
+				</DropdownItem>
 			</DropdownMenu>
 		</Dropdown>
 	);

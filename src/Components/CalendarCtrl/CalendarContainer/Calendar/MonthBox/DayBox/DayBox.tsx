@@ -321,14 +321,14 @@ function getTodaysBalance(balMap: Map<string, number>, dateString: string): numb
 
 	if (daysBalance) return daysBalance;
 
-	if (new Date(balMap.keys().next().value) > new Date(dateString)) {
+	if (new Date(balMap.keys().next().value as string) > new Date(dateString)) {
 		return 0.0;
 	}
 
 	const mapIter = balMap.keys();
 	let dateKey;
-	while (new Date((dateKey = mapIter.next().value)) < new Date(dateString)) {
-		daysBalance = balMap.get(dateKey);
+	while (new Date((dateKey = mapIter.next().value as string)) < new Date(dateString)) {
+		daysBalance = balMap.get(dateKey as string);
 	}
 
 	return daysBalance!;

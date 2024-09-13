@@ -73,7 +73,7 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 						<span className="text-sm text-center text-[#0a0a0a]">
 							<a>Forgot Password/Username</a>
 						</span>
-						<Button color="primary" type="submit" className="loginBtn justify-self-center bg-[#6EC4A7] text-[#0a0a0a] font-bold">
+						<Button color="primary" type="submit" className="loginBtn justify-self-center font-bold">
 							Login
 						</Button>
 						<Divider />
