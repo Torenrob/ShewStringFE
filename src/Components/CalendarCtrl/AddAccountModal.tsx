@@ -5,14 +5,17 @@ import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import { createBankAccountAPI } from "../../Services/API/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { json } from "react-router-dom";
 
 export default function AddAccountModal({ closeModal, addNewAcct }: { closeModal: () => void; addNewAcct: (newAcct: BankAccountAPIData) => void }) {
 	const formRef = useRef<HTMLFormElement>(null);
 
 	async function submitNewAcct(f: FormEvent<HTMLFormElement>) {
 		f.preventDefault();
+		const user = JSON.parse(localStorage.getItem("user")!);
+
 		//@ts-expect-error - ts saying that value property not present
-		const addAcctObj = { title: f.currentTarget[0].value, accountType: f.currentTarget[1].value === "Checking" ? 0 : 1 };
+		const addAcctObj = { title: f.currentTarget[1].value, accountType: f.currentTarget[2].value === "Checking" ? 0 : 1, userId: user.userId };
 
 		try {
 			const newAcct: BankAccountAPIData = await createBankAccountAPI(addAcctObj);
@@ -38,7 +41,7 @@ export default function AddAccountModal({ closeModal, addNewAcct }: { closeModal
 						<InvalidSubmitIcon white={true} />
 					</Button>
 				</h2>
-				<Input radius="none" label="Title" name="type" size="sm" className="addAcctInputs mb-4" />
+				<Input radius="none" label="Title" name="type" size="sm" className="addAcctInputs mb-4" color="default" />
 				<div className="flex gap-4">
 					<Select radius="none" label="Type" name="type" size="sm" className="addAcctInputs text-black">
 						<SelectItem key="Checking">Checking</SelectItem>

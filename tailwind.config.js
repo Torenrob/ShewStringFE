@@ -17,7 +17,7 @@ export default {
 						},
 						default: {
 							DEFAULT: "#45596B",
-							foreground: "#ffffff",
+							foreground: "#0a0a0a",
 						},
 						success: {
 							DEFAULT: "#647F94",
@@ -37,7 +37,7 @@ export default {
 						},
 						default: {
 							DEFAULT: "#45596B",
-							foreground: "#ffffff",
+							foreground: "#0a0a0a",
 						},
 						success: {
 							DEFAULT: "#647F94",

@@ -325,6 +325,7 @@ export default TransactionInputDrawer;
 
 function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean): PostTransactionAPIData {
 	const transactionData: PostTransactionAPIData = {
+		userId: JSON.parse(localStorage.getItem("user")!).userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
 		title: targetData.title.value,
 		transactionType: transactionType ? 0 : 1,

@@ -21,6 +21,7 @@ export interface TransactionAPIData {
 }
 
 export interface PostTransactionAPIData {
+	userId: string;
 	title: string | null;
 	transactionType: 0 | 1;
 	amount: number;
@@ -43,6 +44,7 @@ export interface RegisterUserInfo {
 }
 
 export interface UserProfile {
+	userId: string;
 	userName: string;
 	email: string;
 	firstName: string;
