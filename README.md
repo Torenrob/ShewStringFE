@@ -25,7 +25,7 @@ You can access the live application at: [Shewstring](https://shewstring.com)
 
 ## Backend Repository
 
-For the backend of the ShewString application, please refer to the [EndsAPI repository](https://github.com/YourUsername/EndsAPI).
+For the backend of the ShewString application, please refer to the [EndsAPI repository](https://github.com/torenrob/endsAPI).
 
 ## License
 
