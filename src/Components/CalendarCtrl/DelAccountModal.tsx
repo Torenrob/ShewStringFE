@@ -1,13 +1,23 @@
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { FormEvent, FormEventHandler, useRef } from "react";
+import React, { FormEvent, FormEventHandler, useContext, useRef } from "react";
 import CheckIcon from "../Icons/CheckIcon";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import { createBankAccountAPI, deleteBankAccountAPI } from "../../Services/API/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { UserContext } from "../../Services/Auth/UserAuth";
 
-export default function AddAccountModal({ closeModal, deleteAcct, bankAccounts }: { closeModal: () => void; deleteAcct: (acct2Del: BankAccountAPIData) => void; bankAccounts: BankAccountAPIData[] }) {
+export default function AddAccountModal({
+	closeModal,
+	deleteAcct,
+	bankAccounts,
+}: {
+	closeModal: () => void;
+	deleteAcct: (acct2Del: BankAccountAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => void;
+	bankAccounts: BankAccountAPIData[];
+}) {
 	const formRef = useRef<HTMLFormElement>(null);
+	const { updBankAccts } = useContext(UserContext);
 
 	async function delAcct(f: FormEvent<HTMLFormElement>) {
 		f.preventDefault();
@@ -15,7 +25,7 @@ export default function AddAccountModal({ closeModal, deleteAcct, bankAccounts }
 		const acct2Del: BankAccountAPIData = bankAccounts.find((bA) => bA.id.toString() === f.currentTarget[0].value)!;
 		try {
 			const delResult: string = await deleteBankAccountAPI(acct2Del);
-			deleteAcct(acct2Del);
+			deleteAcct(acct2Del, updBankAccts);
 			closeModal();
 		} catch (err) {
 			ErrorHandler(err);

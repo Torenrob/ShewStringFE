@@ -1,25 +1,31 @@
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { FormEvent, FormEventHandler, useRef } from "react";
+import React, { FormEvent, FormEventHandler, useContext, useRef } from "react";
 import CheckIcon from "../Icons/CheckIcon";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import { createBankAccountAPI } from "../../Services/API/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { json } from "react-router-dom";
+import { UserContext } from "../../Services/Auth/UserAuth";
 
-export default function AddAccountModal({ closeModal, addNewAcct }: { closeModal: () => void; addNewAcct: (newAcct: BankAccountAPIData) => void }) {
+export default function AddAccountModal({
+	closeModal,
+	addNewAcct,
+}: {
+	closeModal: () => void;
+	addNewAcct: (newAcct: BankAccountAPIData, bankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => void;
+}) {
 	const formRef = useRef<HTMLFormElement>(null);
+	const { user, updBankAccts } = useContext(UserContext);
 
 	async function submitNewAcct(f: FormEvent<HTMLFormElement>) {
 		f.preventDefault();
-		const user = JSON.parse(localStorage.getItem("user")!);
-
 		//@ts-expect-error - ts saying that value property not present
-		const addAcctObj = { title: f.currentTarget[1].value, accountType: f.currentTarget[2].value === "Checking" ? 0 : 1, userId: user.userId };
+		const addAcctObj = { title: f.currentTarget[1].value, accountType: f.currentTarget[2].value === "Checking" ? 0 : 1, userId: user.id };
 
 		try {
 			const newAcct: BankAccountAPIData = await createBankAccountAPI(addAcctObj);
-			addNewAcct(newAcct);
+			addNewAcct(newAcct, updBankAccts);
 			closeModal();
 		} catch (err) {
 			ErrorHandler(err);
@@ -30,7 +36,7 @@ export default function AddAccountModal({ closeModal, addNewAcct }: { closeModal
 		<div className="w-full h-full top-0 absolute addAcctCont gap-4">
 			<form className="addAcctModal flex-col" onSubmit={(e) => submitNewAcct(e)} ref={formRef}>
 				<h2 className="text-center mb-1 flex justify-center">
-					New Account
+					Add Bank Account
 					<Button
 						isIconOnly
 						className="relative bg-transparent h-4 left-28"
@@ -41,9 +47,9 @@ export default function AddAccountModal({ closeModal, addNewAcct }: { closeModal
 						<InvalidSubmitIcon white={true} />
 					</Button>
 				</h2>
-				<Input radius="none" label="Title" name="type" size="sm" className="addAcctInputs mb-4" color="default" />
+				<Input radius="none" label="Account Name" name="type" size="sm" className="addAcctInputs mb-4" color="default" />
 				<div className="flex gap-4">
-					<Select radius="none" label="Type" name="type" size="sm" className="addAcctInputs text-black">
+					<Select radius="none" label="Account Type" name="type" size="sm" className="addAcctInputs text-black">
 						<SelectItem key="Checking">Checking</SelectItem>
 						<SelectItem key="Saving">Saving</SelectItem>
 					</Select>

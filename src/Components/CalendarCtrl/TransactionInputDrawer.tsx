@@ -11,6 +11,7 @@ import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs";
 import { CalendarContext } from "./CalendarCtrl";
 import CreditIcon from "../Icons/CreditIcon";
+import { UserContext } from "../../Services/Auth/UserAuth";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -19,7 +20,7 @@ export type TransactionInputDrawerRef = {
 export type TransactionInputDrawerProps = {
 	bankAccounts: BankAccountAPIData[];
 	currentAcct: BankAccountAPIData;
-	updAcctTrans: (arg0: TransactionAPIData) => void;
+	updAcctTrans: (arg0: TransactionAPIData, arg1: (arg0: BankAccountAPIData[]) => void) => void;
 };
 
 const countDecimals = function (value: string): number {
@@ -31,6 +32,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
+
+	const { user, updBankAccts } = useContext(UserContext);
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
@@ -53,7 +56,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
 		event.preventDefault();
-		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType);
+		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType, user!.id);
 		let response;
 		let editTransactionIsSameDate: boolean;
 		if (containerInfo.editingExisting) {
@@ -96,7 +99,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					if (responseData.bankAccountId === currentAcct.id) {
 						addTransToDate.current!(responseData);
 					} else {
-						updAcctTrans(responseData);
+						updAcctTrans(responseData, updBankAccts);
 					}
 				}
 				if (responseData.bankAccountId === currentAcct.id) {
@@ -184,7 +187,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					className="w-full px-64 pt-2.5 pb-0.5 grid grid-col-4 grid-rows-2 gap-3 transactionForm"
 					style={{ transform: "translateX(-25px)" }}
 					onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
-					<div className="absolute -translate-x-32 w-28 text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
+					<div className="absolute w-28 text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
 						{errorMessage && (
 							<span className="text-right">
 								Error Submitting Transaction <br /> Try Again
@@ -323,9 +326,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 export default TransactionInputDrawer;
 
-function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean): PostTransactionAPIData {
+function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string): PostTransactionAPIData {
 	const transactionData: PostTransactionAPIData = {
-		userId: JSON.parse(localStorage.getItem("user")!).userId,
+		userId: userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
 		title: targetData.title.value,
 		transactionType: transactionType ? 0 : 1,

@@ -20,6 +20,23 @@ export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => 
 	}
 };
 
+export const getUserBankAccountsAPI = async (userId: string): Promise<BankAccountAPIData[]> => {
+	try {
+		const resp: AxiosResponse<BankAccountAPIData[]> = await axios.get(api + "/user/" + userId);
+
+		console.log("ran");
+		resp.data.map((bA) => {
+			const transMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(bA.transactions));
+			bA.transactions = transMap;
+			return bA;
+		});
+		return resp.data;
+	} catch (error) {
+		ErrorHandler(error);
+		return [];
+	}
+};
+
 export const createBankAccountAPI = async (bankAcctInfo: { title: string; accountType: number; userId: string }): Promise<BankAccountAPIData> => {
 	try {
 		const resp: AxiosResponse<BankAccountAPIData> = await axios.post(api, bankAcctInfo);

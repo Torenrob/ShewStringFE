@@ -44,7 +44,17 @@ export interface RegisterUserInfo {
 }
 
 export interface UserProfile {
-	userId: string;
+	id: string;
+	userName: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+	token: string;
+}
+
+export interface UserProfile_BankAccts {
+	id: string;
+	bankAccounts: BankAccountAPIData[];
 	userName: string;
 	email: string;
 	firstName: string;

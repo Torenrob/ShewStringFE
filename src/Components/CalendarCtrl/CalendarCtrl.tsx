@@ -1,4 +1,20 @@
-import React, { act, ChangeEvent, createContext, FormEvent, FormEventHandler, Key, MutableRefObject, RefObject, UIEventHandler, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+	act,
+	ChangeEvent,
+	createContext,
+	FormEvent,
+	FormEventHandler,
+	Key,
+	MutableRefObject,
+	RefObject,
+	UIEventHandler,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
 import { Button, DateRangePicker, DateValue, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
@@ -9,11 +25,12 @@ import AddAccountModal from "./AddAccountModal";
 import SettingsIcon from "../Icons/SettingsIcon";
 import DelAccountModal from "./DelAccountModal";
 import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
-import { editTransOnDateFuncs } from "./CalendarContainer/Calendar/MonthBox/DayBox/DayBox";
-import CalendarContainer from "./CalendarContainer/CalendarContainer";
-import { getDragScrollYOffset, getMonthName } from "../../Utilities/UtilityFuncs";
-import Calendar from "./CalendarContainer/Calendar/Calendar";
+import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
+import { getDragScrollYOffset, getMonthName, getRandomNum } from "../../Utilities/UtilityFuncs";
+import Calendar from "./Calendar/Calendar";
 import { small } from "framer-motion/client";
+import { UserContext } from "../../Services/Auth/UserAuth";
+import Cookie from "js-cookie";
 
 export type MonthRange = {
 	startMonth: string;
@@ -57,14 +74,29 @@ export type CalendarContextType = {
 export const CalendarContext = createContext<CalendarContextType>(undefined!);
 
 export default function CalendarCtrl() {
-	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([]);
-	const [selectedAcct, setSelectedAcct] = useState<string>("0");
+	const { bankAccounts } = useContext(UserContext);
+	const [selectedAcct, setSelectedAcct] = useState<string>(bankAccounts[0]?.id.toString() ?? "0");
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().toLocaleDateString()}`);
-	const [isLoading, setLoading] = useState<boolean>(true);
-	const [mouseDownInTabs, setMouseDownInTabs] = useState(false);
+	const [isReady, setIsReady] = useState<boolean>(false);
+
+	useEffect(() => {
+		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
+		if (tabsRef.current === null) {
+			setIsReady(true);
+			return;
+		}
+		if (tabsRef.current.clientWidth === 0) {
+			setIsReady(true);
+			return;
+		}
+		const numAccts = bankAccounts.length;
+		const updWidth = numAccts * 128 - (numAccts - 1) * 17;
+		tabsRef.current.style.width = `${updWidth.toString()}px`;
+		setIsReady(true);
+	}, [bankAccounts]);
 
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
@@ -97,76 +129,40 @@ export default function CalendarCtrl() {
 		titleInput.focus();
 	}
 
-	//Just to save last choice after clicking add acct
-	const curAcct: MutableRefObject<string> = useRef<string>("0");
-
-	useEffect(() => {
-		const AddAccountTabHolder: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: new Map() };
-
-		const getAccountOptions = async () => {
-			try {
-				const bankAccounts: BankAccountAPIData[] | null = await getAllBankAccountsAPI();
-				setBankAccounts((p) => bankAccounts.concat(AddAccountTabHolder));
-				curAcct.current = bankAccounts[0].id.toString();
-				setSelectedAcct(bankAccounts[0].id.toString());
-			} catch (err) {
-				ErrorHandler(err);
-			} finally {
-				setLoading(false);
-			}
-		};
-		getAccountOptions();
-	}, []);
-
 	const tabsRef = useRef<HTMLDivElement>(null);
 	const acctScrollCont = useRef<HTMLDivElement>(null);
 
 	//Function for updating acct transactions when submitting trans for a different account than currently chosen
-	const updateAcctTransactions = (arg0: TransactionAPIData) => {
+	const updateAcctTransactions = (arg0: TransactionAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => {
 		const subTransAcctMap: Map<string, TransactionAPIData[]> = bankAccounts.find((acct) => acct.id === arg0.bankAccountId)!.transactions;
 		const updArr = subTransAcctMap.get(arg0.date) ? subTransAcctMap.get(arg0.date) : [arg0];
-		setBankAccounts((p) => {
-			const updAcctsArr: BankAccountAPIData[] = p.map((acct) => {
-				if (acct.id === arg0.bankAccountId) {
-					acct.transactions.set(arg0.date, updArr!);
-				}
-				return acct;
-			});
-			return updAcctsArr;
+		const updAcctsArr: BankAccountAPIData[] = bankAccounts.map((acct: BankAccountAPIData) => {
+			if (acct.id === arg0.bankAccountId) {
+				acct.transactions.set(arg0.date, updArr!);
+			}
+			return acct;
 		});
+		updBankAcctStateFunc(updAcctsArr);
 	};
 
-	const addNewAcct = (newAcct: BankAccountAPIData) => {
-		setBankAccounts((p) => {
-			const addAcctTab: BankAccountAPIData = p.pop()!;
-			return p.concat(newAcct).concat(addAcctTab);
-		});
-		console.log(newAcct.id);
+	const addNewAcct = (newAcct: BankAccountAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => {
+		const addAcctTab: BankAccountAPIData = bankAccounts.pop()!;
+		updBankAcctStateFunc(bankAccounts.concat({ ...newAcct, transactions: new Map() }).concat(addAcctTab));
 		setSelectedAcct(newAcct.id.toString());
 	};
 
-	const delAcct = (delAcct: BankAccountAPIData) => {
-		setBankAccounts((p) => {
-			p.splice(p.indexOf(delAcct), 1);
-			return p;
-		});
+	const delAcct = (delAcct: BankAccountAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => {
+		bankAccounts.splice(bankAccounts.indexOf(delAcct), 1);
+		updBankAcctStateFunc(bankAccounts);
 	};
-
-	useEffect(() => {
-		if (tabsRef.current === null) return;
-		if (tabsRef.current.clientWidth === 0) return;
-		const numAccts = bankAccounts.length;
-		const updWidth = numAccts * 128 - (numAccts - 1) * 17;
-		tabsRef.current.style.width = `${updWidth.toString()}px`;
-	}, [bankAccounts]);
 
 	function acctTabCntrlr(e: Key) {
 		if (e === "0") {
+			// curAcct.current = selectedAcct;
 			setAddAcctModalOpen(true);
-			curAcct.current = selectedAcct;
 			return;
 		}
-		setSelectedAcct(e.toString());
+		setSelectedAcct((p) => e.toString());
 	}
 
 	function openAddAcctModal() {
@@ -180,7 +176,7 @@ export default function CalendarCtrl() {
 	function closeModal() {
 		setDelAcctModalOpen(false);
 		setAddAcctModalOpen(false);
-		setSelectedAcct(curAcct.current);
+		setSelectedAcct(selectedAcct);
 	}
 
 	function cntlMonthLabel(curMonths: string[]) {
@@ -283,10 +279,6 @@ export default function CalendarCtrl() {
 		}
 	}
 
-	if (isLoading) {
-		return <div></div>;
-	}
-
 	return (
 		<div className="relative max-w-fit min-w-fit w-fit calCtrlWrap overflow-clip">
 			<div className="fixed top-0 w-full">
@@ -386,13 +378,12 @@ export default function CalendarCtrl() {
 					↑ Drag Scroll ↑
 				</div> */}
 					</div>
-					{/* <CalendarContainer selectAccount={selectedAccount} monthRange={monthRange} monthLabelCntl={cntlMonthLabel} /> */}
 					<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
 				</div>
 				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
 				<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 			</CalendarContext.Provider>
-			{addAcctModalOpen && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
+			{(addAcctModalOpen || selectedAccount.id == 0) && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
 		</div>
 	);
