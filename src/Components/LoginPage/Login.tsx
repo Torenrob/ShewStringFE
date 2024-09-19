@@ -33,6 +33,10 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 		loginUser(form.username, form.password);
 	}
 
+	function loginTestAcct() {
+		loginUser("Test", "Tester77!");
+	}
+
 	function toggleVisibility() {
 		setIsVisible(isVisible ? false : true);
 	}
@@ -83,7 +87,10 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 								Sign Up
 							</a>
 							<span className="block">
-								Or Use a <a className="text-[#67b49a] font-bold cursor-pointer">Test Account</a>
+								Or Use a{" "}
+								<a className="text-[#67b49a] font-bold cursor-pointer" onClick={loginTestAcct}>
+									Test Account
+								</a>
 							</span>
 						</span>
 					</CardBody>

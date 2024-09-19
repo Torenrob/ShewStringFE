@@ -31,7 +31,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	const [createIsVisible, setCreateIsVisible] = useState(false);
 	const [confirmIsVisible, setConfirmIsVisible] = useState(false);
 	const [password, setPassword] = useState("");
-	const { registerUser } = useContext(UserContext);
+	const { registerUser, loginUser } = useContext(UserContext);
 	const {
 		register,
 		handleSubmit,
@@ -47,6 +47,10 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 			lastName: form.lastname,
 		};
 		registerUser(registerUserInfo);
+	}
+
+	function loginTestAcct() {
+		loginUser("Test", "Tester");
 	}
 
 	const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +135,10 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 								Log In
 							</a>
 							<span className="block">
-								Or Use a <a className="text-[#67b49a] font-bold cursor-pointer">Test Account</a>
+								Or Use a{" "}
+								<a className="text-[#67b49a] font-bold cursor-pointer" onClick={loginTestAcct}>
+									Test Account
+								</a>
 							</span>
 						</span>
 					</CardBody>

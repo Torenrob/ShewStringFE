@@ -1,5 +1,5 @@
-import { Button, DateInput, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
-import { ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState } from "react";
+import { Button, DateInput, Input, Select, SelectItem, SharedSelection, Textarea } from "@nextui-org/react";
+import { ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import ArrowDownIcon from "../Icons/ArrowDownIcon";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
@@ -32,6 +32,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
+	const [select, setSelect] = useState<Selection>();
 
 	const { user, updBankAccts } = useContext(UserContext);
 
@@ -56,7 +57,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
 		event.preventDefault();
-		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType, user!.id);
+		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType, user!.id, currentAcct);
 		let response;
 		let editTransactionIsSameDate: boolean;
 		if (containerInfo.editingExisting) {
@@ -149,6 +150,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		}
 	}
 
+	function sel(e: SharedSelection) {}
+
 	function updateExistingTransDispaly(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) {
 		switch (e.target.name) {
 			case "title":
@@ -222,17 +225,15 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						/>
 						<Select
 							required
-							selectedKeys={containerInfo?.bankAccountId ? containerInfo.bankAccountId.toString() : currentAcct.id.toString()}
+							placeholder={`${currentAcct.title}`}
 							radius="none"
 							size="sm"
 							label="Account"
 							name="account"
 							onChange={updateExistingTransDispaly}
 							className="text-slate-500 basis-2/6 row-start-1 ">
-							{bankAccounts.map((account, i) => (
-								<SelectItem key={`${account.id}`} value={account.id}>
-									{account.title}
-								</SelectItem>
+							{bankAccounts.slice(0, bankAccounts.length - 1).map((account, i) => (
+								<SelectItem key={account.id}>{account.title}</SelectItem>
 							))}
 						</Select>
 					</div>
@@ -326,13 +327,13 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 export default TransactionInputDrawer;
 
-function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string): PostTransactionAPIData {
+function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string, curAcct: BankAccountAPIData): PostTransactionAPIData {
 	const transactionData: PostTransactionAPIData = {
 		userId: userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
 		title: targetData.title.value,
 		transactionType: transactionType ? 0 : 1,
-		bankAccountId: targetData.account.value,
+		bankAccountId: targetData.account.value ? targetData.account.value : curAcct.id,
 		date: targetData.date.value,
 		amount: targetData.amount.value,
 		category: targetData.category.value,
