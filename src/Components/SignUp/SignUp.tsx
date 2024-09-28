@@ -50,7 +50,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	}
 
 	function loginTestAcct() {
-		loginUser("Test", "Tester");
+		loginUser("Test", "Tester77!");
 	}
 
 	const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
