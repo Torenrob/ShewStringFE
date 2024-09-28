@@ -7,15 +7,15 @@ export default function UserPanel() {
 	const { user } = useContext(UserContext);
 
 	return (
-		<div className="min-w-[220px] w-[220px] h-[100vh] userPanel text-white text-center">
-			<div className="flex justify-center pt-6 gap-2">
+		<div className="userPanel text-white text-center">
+			<div className="flex justify-center pt-1 lg:pt-6 gap-2">
 				<Button isIconOnly className="bg-transparent" size="sm">
 					<UserIcon />
 				</Button>
 				<div className="flex items-center">{user?.userName}</div>
 			</div>
 
-			<div className="relative top-[35%]">
+			<div className="relative top-[35%] hidden lg:block">
 				This application is still under construction. Please feel free to test the current functionality of the budget calendar. Use your mouse wheel to scroll up and down the calendar.
 			</div>
 		</div>

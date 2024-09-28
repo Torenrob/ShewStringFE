@@ -29,7 +29,6 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 	} = useForm<LoginFormsInputs>({ resolver: yupResolver(validation) });
 
 	function handleLogin(form: LoginFormsInputs) {
-		console.log("ran");
 		loginUser(form.username, form.password);
 	}
 

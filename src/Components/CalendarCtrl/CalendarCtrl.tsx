@@ -79,7 +79,8 @@ export default function CalendarCtrl() {
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
-	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().toLocaleDateString()}`);
+	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().getFullYear()}`);
+	const [isMobile, setIsMobile] = useState(window.innerWidth < 481);
 	const [isReady, setIsReady] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -280,17 +281,17 @@ export default function CalendarCtrl() {
 	}
 
 	return (
-		<div className="relative max-w-fit min-w-fit w-fit calCtrlWrap overflow-clip">
-			<div className="fixed top-0 w-full">
+		<div className="relative calCtrlWrap overflow-clip grid">
+			<div className="w-full">
 				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-0.5 h-fit">
-					<div className="flex justify-center ml-80">
+					<div id="calCntrlAcctsLabel" className="flex lg:justify-center md:ml-80">
 						<span>Accounts</span>
 						<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
 					</div>
-					<div className="ml-[410px] font-bold w-72">
+					<div className="calCntrlMonthLabel lg:ml-[410px] font-bold lg:w-72">
 						<span>{monthLabel}</span>
 					</div>
-					<div className="flex justify-center relative left-[255px]" style={{ width: "336px" }}>
+					<div className="hidden md:flex justify-center relative md:left-[255px] md:w-[336px]">
 						<span>Month Range</span>
 					</div>
 				</div>
@@ -305,12 +306,12 @@ export default function CalendarCtrl() {
 							motionProps={{
 								transition: { duration: 0.9 },
 							}}
-							className="box-border"
+							className="border-b-1 border-b-[#6ec4a7]"
 							classNames={{
 								tabList: "rounded-none p-0 gap-0 bg-[#0A0A0A]",
 								cursor: "w-full bg-[#6EC4A7]",
-								tab: "acctTabs min-w-32 max-w-32 px-0 h-6",
-								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate pl-4 pr-4 pt-0.5",
+								tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
 							}}>
 							{bankAccounts.map((bA, i) => {
 								return (
@@ -319,7 +320,6 @@ export default function CalendarCtrl() {
 											position: "relative",
 											transform: `translateX(-${i * 17}px)`,
 											zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
-											// background: `${}`,
 										}}
 										className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
 										title={bA.title}
@@ -372,16 +372,12 @@ export default function CalendarCtrl() {
 					addTransToDate: addTransToDate,
 					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 				}}>
-				<div id="calWrap" className="calWrap">
-					<div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center">
-						{/* <div className="self-end" style={{ position: "relative", top: "10px" }}>
-					↑ Drag Scroll ↑
-				</div> */}
-					</div>
+				<div id="calWrap" className="calWrap max-h-full">
+					{/* <div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center"></div> */}
 					<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
+					{/* <div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)} style={{ background: "red" }}></div> */}
 				</div>
 				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
-				<div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)}></div>
 			</CalendarContext.Provider>
 			{(addAcctModalOpen || selectedAccount.id == 0) && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}

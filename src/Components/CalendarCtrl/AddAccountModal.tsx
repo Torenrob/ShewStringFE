@@ -39,7 +39,7 @@ export default function AddAccountModal({
 					Add Bank Account
 					<Button
 						isIconOnly
-						className="relative bg-transparent h-4 left-28"
+						className="absolute bg-transparent h-4 right-0 mt-1 md:-mt-1"
 						onClick={(e) => {
 							formRef.current?.reset();
 							closeModal();

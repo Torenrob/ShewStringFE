@@ -1,8 +1,17 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
-import React from "react";
+import React, { Key, useContext } from "react";
 import "./UserIcon.css";
+import { UserContext } from "../../Services/Auth/UserAuth";
 
 export default function UserIcon() {
+	const { logout } = useContext(UserContext);
+
+	function handleUserDrop(e: Key) {
+		if (e == "logout") {
+			logout();
+		}
+	}
+
 	return (
 		<Dropdown placement="bottom-start" showArrow triggerScaleOnOpen={false} className="bg-[#0a0a0a] border-[#45596b] border-1 shadow-lg shadow-[#0a0a0a7e] rounded-none">
 			<DropdownTrigger>
@@ -14,7 +23,7 @@ export default function UserIcon() {
 						fill="#ffffff"></path>
 				</svg>
 			</DropdownTrigger>
-			<DropdownMenu className="dark bg-[#0a0a0a] text-[#6EC4A7]" color="primary">
+			<DropdownMenu className="dark bg-[#0a0a0a] text-[#6EC4A7]" color="primary" onAction={handleUserDrop}>
 				<DropdownItem className="rounded-none" key="settings">
 					Settings
 				</DropdownItem>

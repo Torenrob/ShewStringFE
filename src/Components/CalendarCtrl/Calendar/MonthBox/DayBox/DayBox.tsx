@@ -8,7 +8,7 @@ import AddTransactionIcon from "../../../../Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI } from "../../../../../Services/API/TransactionAPI";
-import { calcDailyBalances, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../Utilities/UtilityFuncs";
+import { calcDailyBalances, getDayOfWeek, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../Utilities/UtilityFuncs";
 import { ErrorHandler } from "../../../../../Helpers/ErrorHandler";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
@@ -17,14 +17,12 @@ export default function DayBox({
 	date,
 	dateObj,
 	transactions,
-	mthLength,
-	endRef,
+	dayGridSpot,
 }: {
 	date: number;
 	dateObj: DateComponentInfo;
 	transactions: Map<string, TransactionAPIData[]>;
-	mthLength: number;
-	endRef?: Ref<HTMLDivElement>;
+	dayGridSpot: number;
 }): ReactNode {
 	const [forceState, setForceState] = useState<number>(getRandomNum());
 
@@ -33,10 +31,11 @@ export default function DayBox({
 		setPaginationDragState(dragOn);
 	}, []);
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
+
 	const gridStyle = {
-		gridColumnStart: dateObj.dayOfWeek,
-		gridColumnEnd: dateObj.dayOfWeek + 1,
+		gridColumnStart: 1,
 	};
+
 	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap, dateTransactionsMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
@@ -44,7 +43,7 @@ export default function DayBox({
 		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] => {
 			const transArr = todayTransArr ? todayTransArr : transactions.get(dateString) ? transactions.get(dateString)! : [];
 			if (transArr.length == 0) return [[]];
-			else if (transArr.length <= 5) {
+			else if (transArr.length <= 6) {
 				return [transArr];
 			} else {
 				if (!dragObject.current.paginationDragState.includes(updatePaginationDragState)) {
@@ -53,7 +52,7 @@ export default function DayBox({
 				const transactionsPaginated: TransactionAPIData[][] = [];
 				const transactionCopy = [...transArr];
 				do {
-					const fourTransactions = transactionCopy.splice(0, 5);
+					const fourTransactions = transactionCopy.splice(0, 6);
 					transactionsPaginated.push(fourTransactions);
 				} while (transactionCopy.length > 0);
 				return transactionsPaginated;
@@ -256,23 +255,28 @@ export default function DayBox({
 		return "mnthStartBrdrTop";
 	}
 
-	function mkMnthEndBdr(columnStart: number, date: number, mnthLength: number): string {
-		if (date <= mnthLength - 7) {
-			if (date === mnthLength - 7 && columnStart !== 7) {
-				return "theLastDay";
+	function mkMobileMnthStrBrdr(columnStart: number, date: number) {
+		if (date > 2) {
+			if (date == 3 && columnStart == 2) {
+				return "theMobile3rd";
 			}
 			return "";
 		}
 
-		if (date === mnthLength && columnStart !== 7) {
-			return "mnthEndBrdrLastDayNotSat";
+		if (date == 1 && columnStart == 2) {
+			return "mob1st2colborder";
 		}
 
-		return "mnthEndBrdrBottom";
+		return "mobileTopBorder";
 	}
 
 	return (
-		<Card ref={endRef} radius="none" shadow="none" id={dateString} style={gridStyle} className={`dayBox outline outline-1 ${mkMnthStrBdr(gridStyle.gridColumnStart, date)} outline-slate-500`}>
+		<Card
+			radius="none"
+			shadow="none"
+			id={dateString}
+			style={{}}
+			className={`dayBox mobCol${dayGridSpot} ${mkMobileMnthStrBrdr(dayGridSpot, date)} col${dateObj.dayOfWeek} outline outline-1 ${mkMnthStrBdr(dateObj.dayOfWeek, date)} outline-slate-500`}>
 			<CardBody
 				onMouseEnter={toggleAddTransactionBtn}
 				onMouseLeave={toggleAddTransactionBtn}
@@ -280,13 +284,14 @@ export default function DayBox({
 				style={{ position: `${dragActive ? "static" : "relative"}` }}>
 				<div className="flex justify-between">
 					<div className="flex">
-						{date === 1 && <span className="text-right text-sm">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
-						<span className="text-right text-sm">{date}</span>
+						<span className="text-sm md:hidden">{`${dateObj.month}-${date}-${dateObj.year.toString().substring(2)} ${getDayOfWeek(dateObj.dayOfWeek).substring(0, 3).toUpperCase()}`}</span>
+						{date === 1 && <span className="text-right text-sm dayBoxMonthLabel">{dateObj.monthName.substring(0, 3)} &nbsp;</span>}
+						<span className="hidden md:inline text-sm">{date}</span>
 					</div>
 					<span className={`${Number(dailyBalance) >= 0 ? "text-black" : "text-red-600"} text-small`}>${Number(dailyBalance).toFixed(2)}</span>
 				</div>
 				<Divider />
-				<div style={{ position: "absolute", top: "107px", left: "5px", width: "60%" }}>
+				<div style={{ position: "absolute", top: "84%", left: "5%", width: "60%" }}>
 					{todaysTransactions && todaysTransactions.length > 1 && !dragObject.current.globalDragOn && (
 						<CustomPaginator total={todaysTransactions.length} onChange={pageChangeHandler} currentPage={transactionPage + 1} />
 					)}

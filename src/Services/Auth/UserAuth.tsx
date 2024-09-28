@@ -86,13 +86,11 @@ export const UserProvider = ({ children }: Props) => {
 
 	const loginUser = async (username: string, password: string) => {
 		const now = new Date();
-		console.log(now.getTime());
 		await userLoginAPI(username, password)
 			.then((res) => {
 				if (res) {
-					console.log(res);
 					setBankAccounts(res.data.bankAccounts.concat(AddAccountTabHolder));
-					Cookies.set("token", res?.data.token);
+					Cookies.set("token", res?.data.token, { expires: new Date(new Date().getTime() + 60000 * 30) });
 					const userObj: UserProfile = {
 						id: res.data.id,
 						userName: res.data.userName,
@@ -101,7 +99,7 @@ export const UserProvider = ({ children }: Props) => {
 						lastName: res.data.lastName,
 						token: res.data.token,
 					};
-					Cookies.set("user", JSON.stringify(userObj));
+					Cookies.set("user", JSON.stringify(userObj), { expires: new Date(new Date().getTime() + 60000 * 30) });
 					setToken(res?.data.token);
 					setUser(userObj);
 					navigate("/main");
@@ -117,8 +115,8 @@ export const UserProvider = ({ children }: Props) => {
 	};
 
 	const logout = () => {
-		localStorage.removeItem("token");
-		localStorage.removeItem("user");
+		Cookies.remove("token");
+		Cookies.remove("user");
 		setUser(null);
 		setToken("");
 		navigate("/");

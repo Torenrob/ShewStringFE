@@ -32,7 +32,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
-	const [select, setSelect] = useState<Selection>();
 
 	const { user, updBankAccts } = useContext(UserContext);
 
@@ -182,15 +181,12 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 	return (
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={{ backgroundColor: "rgba(0, 0, 0,.8)", zIndex: 2, width: "100%" }}>
-			<div className="grid">
-				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute justify-self-start z-10">
+			<div className="grid h-full">
+				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute pt-2 lg:pt-0 justify-self-center md:justify-self-start z-10">
 					<ArrowDownIcon />
 				</Button>
-				<form
-					className="w-full px-64 pt-2.5 pb-0.5 grid grid-col-4 grid-rows-2 gap-3 transactionForm"
-					style={{ transform: "translateX(-25px)" }}
-					onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
-					<div className="absolute w-28 text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
+				<form className="grid grid-cols-2 grid-rows-4 lg:grid-col-4 lg:grid-rows-2 lg:gap-3 transactionForm" onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
+					<div className="absolute w-[5vw] text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
 						{errorMessage && (
 							<span className="text-right">
 								Error Submitting Transaction <br /> Try Again
@@ -200,12 +196,12 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							</span>
 						)}
 					</div>
-					<div className=" col-start-1 row-start-1 col-span-3 flex gap-3">
+					<div className="grid grid-cols-2 gap-x-3 grid-rows-2 lg:col-start-1 lg:row-start-1 lg:col-span-3 lg:flex lg:gap-3">
 						<Input
 							required
 							radius="none"
 							size="sm"
-							className="w-3/5 text-slate-500 basis-3/6"
+							className="lg:w-3/5 col-span-2 text-slate-500 basis-3/6"
 							type="text"
 							label="Title"
 							name="title"
@@ -215,7 +211,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							onChange={updateExistingTransDispaly}
 						/>
 						<DateInput
-							className="col-start-2 row-start-1 basis-1/6"
+							className="row-start-2 lg:col-start-2 lg:row-start-1 lg:basis-1/6"
 							radius="none"
 							label="Date"
 							name="date"
@@ -231,20 +227,20 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							label="Account"
 							name="account"
 							onChange={updateExistingTransDispaly}
-							className="text-slate-500 basis-2/6 row-start-1 ">
+							className="text-slate-500 basis-2/6 lg:row-start-1">
 							{bankAccounts.slice(0, bankAccounts.length - 1).map((account, i) => (
 								<SelectItem key={account.id}>{account.title}</SelectItem>
 							))}
 						</Select>
 					</div>
-					<div className="col-start-1 row-start-2 col-span-2 flex gap-3">
+					<div className="flex gap-2 lg:col-start-1 lg:row-start-2 lg:col-span-2 lg:gap-3">
 						<Button
 							isIconOnly
 							disabled={validateAmount || errorMessage ? true : false}
 							size="md"
 							isLoading={submittingTransaction}
 							radius="none"
-							className={`self-center ${validateAmount ? "mb-6" : "mb-2"} bg-[${validateAmount || errorMessage ? "#D4D4" : "#6EC4A7"}]`}
+							className={`self-center align-middle ${validateAmount ? "lg:mb-6" : "mb-4 lg:mb-5"} bg-[${validateAmount || errorMessage ? "#D4D4" : "#6EC4A7"}]`}
 							type="submit">
 							{errorMessage ? <InvalidSubmitIcon white={false} /> : validateAmount ? <InvalidSubmitIcon white={false} /> : <SubmitTransactionIcon />}
 						</Button>
@@ -255,7 +251,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							radius="none"
 							size="sm"
 							isInvalid={validateAmount}
-							className="text-slate-500 col-start-2 row-start-2 "
+							className="text-slate-500 mb-2 self-center lg:col-start-2 lg:row-start-2 "
 							type="number"
 							label="Amount"
 							name="amount"
@@ -268,7 +264,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 								</div>
 							}
 						/>
-						<div className="flex gap-3 relative -translate-y-1.5">
+						<div className="flex gap-3 relative -translate-y-1 lg:-translate-y-1.5">
 							<div className="flex flex-col">
 								<label htmlFor="debitBtn" className="text-xs mb-0.5 text-slate-300 font-semibold text-center">
 									Debit
@@ -294,7 +290,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						label="Category"
 						name="category"
 						onChange={updateExistingTransDispaly}
-						className="h-4 text-slate-500 col-start-3 row-start-2 ">
+						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
 						<SelectItem key="None">None</SelectItem>
 						<SelectItem key="income">Income</SelectItem>
 						<SelectItem key="groceries">Groceries</SelectItem>
@@ -302,22 +298,22 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					</Select>
 					<Textarea
 						radius="none"
-						className="col-start-4 row-start-1 row-span-2 mt-1"
+						className="lg:col-start-4 lg:row-start-1 lg:row-span-2 mt-1"
 						label="Description"
 						name="description"
 						onChange={updateExistingTransDispaly}
 						value={containerInfo?.description ? containerInfo.description : undefined}
 					/>
 					{containerInfo.editingExisting && (
-						<div className="absolute mt-1 flex-col" style={{ right: "204px", top: "10px" }}>
+						<div className="delTransBtn absolute lg:flex-col">
 							<Button color="danger" radius="none" isIconOnly onClick={deleteTransaction}>
 								<InvalidSubmitIcon white={true} />
 							</Button>
-							<div className="text-sm text-white">Delete</div>
+							<div className="text-sm -translate-y-2 lg:translate-y-0 text-white">Delete</div>
 						</div>
 					)}
 				</form>
-				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute justify-self-end">
+				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute hidden md:flex md:justify-self-end">
 					<ArrowDownIcon />
 				</Button>
 			</div>

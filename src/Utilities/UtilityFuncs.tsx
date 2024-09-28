@@ -3,6 +3,27 @@ import { getAllBankAccountsAPI } from "../Services/API/BankAccountAPI";
 import { BankAccountAPIData, TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
 
+export function getDayOfWeek(num: number): string {
+	switch (num) {
+		case 1:
+			return "Sunday";
+		case 2:
+			return "Monday";
+		case 3:
+			return "Tuesday";
+		case 4:
+			return "Wednesday";
+		case 5:
+			return "Thursday";
+		case 6:
+			return "Friday";
+		case 7:
+			return "Saturday";
+		default:
+			return "";
+	}
+}
+
 export function getMonthName(num: number) {
 	let name: string = "";
 
@@ -100,8 +121,20 @@ export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMont
 	if (firstDay === 0) {
 		return prevYtrans;
 	} else {
-		return prevYtrans + 128;
+		return prevYtrans + 15;
 	}
+}
+
+export function setMobileProps(index: number, prevMobileY: number, prevMobileEnd: number, monthObj: LocalMonth): { mobileEnd: number; mobileStart: number; mobileY: number } {
+	const lengthOfMnth = new Date(monthObj.year, monthObj.month, 0).getDate();
+
+	if (index == 1) {
+		return { mobileStart: 1, mobileEnd: lengthOfMnth % 2 == 0 ? 2 : 1, mobileY: 0 };
+	}
+
+	const mS = prevMobileEnd == 1 ? 2 : 1;
+
+	return { mobileStart: mS, mobileEnd: lengthOfMnth % 2 == 0 ? (mS == 1 ? 2 : 1) : mS, mobileY: mS == 1 ? prevMobileY : prevMobileY + 15 };
 }
 
 export function closeDrawer() {
@@ -140,10 +173,6 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 	});
 
 	sortedTransMap.forEach((day) => {
-		if (day[1] === undefined) {
-			console.log(dontRun);
-			console.log(allTransactions);
-		}
 		balanceKeeper = day[1].reduce((balAcc, trans): number => {
 			return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
 		}, balanceKeeper);

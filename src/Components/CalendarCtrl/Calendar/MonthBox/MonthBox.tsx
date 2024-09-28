@@ -8,11 +8,13 @@ export default function MonthBox({
 	transactions,
 	translateY,
 	monthObserver,
+	windowWidth,
 }: {
 	monthObj: LocalMonth;
 	transactions: Map<string, TransactionAPIData[]>;
 	translateY: number;
 	monthObserver: Ref<HTMLDivElement>;
+	windowWidth: string;
 }): ReactNode {
 	function getDaysOfMonth(monthObj: LocalMonth): number {
 		return new Date(monthObj.year, monthObj.month, 0).getDate();
@@ -33,10 +35,22 @@ export default function MonthBox({
 	const monthLength: number = getDaysOfMonth(monthObj);
 
 	return (
-		<div ref={monthObserver} id={`${monthObj.year}-${monthObj.month.toString().padStart(2, "0")}`} className="monthBox" style={{ top: -translateY }}>
-			<div className="grid grid-cols-7" style={{ position: "static" }}>
+		<div
+			ref={monthObserver}
+			id={`${monthObj.year}-${monthObj.month.toString().padStart(2, "0")}`}
+			className={`monthBox`}
+			style={{ top: `-${windowWidth == "lg" || windowWidth == "md" ? translateY : monthObj.mobileY}vh` }}>
+			<div className="grid grid-cols-2 lg:grid-cols-7" style={{ position: "static" }}>
 				{[...Array(monthLength)].map((_, i) => {
-					return <DayBox transactions={transactions} date={i + 1} dateObj={getDate({ month: monthObj, date: i + 1 })} mthLength={monthLength} key={`DayBox${i}`} />;
+					return (
+						<DayBox
+							transactions={transactions}
+							dayGridSpot={i % 2 == 0 ? monthObj.mobileStart : monthObj.mobileStart == 1 ? 2 : 1}
+							date={i + 1}
+							dateObj={getDate({ month: monthObj, date: i + 1 })}
+							key={`DayBox${i}`}
+						/>
+					);
 				})}
 			</div>
 		</div>

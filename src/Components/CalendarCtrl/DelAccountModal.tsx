@@ -39,7 +39,7 @@ export default function AddAccountModal({
 					Delete Account
 					<Button
 						isIconOnly
-						className="bg-transparent relative h-4 left-28"
+						className="bg-transparent absolute h-4 right-0 mt-1 md:-mt-1"
 						onClick={(e) => {
 							formRef.current?.reset();
 							closeModal();

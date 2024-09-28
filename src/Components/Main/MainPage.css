@@ -1,0 +1,14 @@
+.mainPage {
+	display: grid;
+	grid-template-columns: 5fr 6fr;
+	height: 100vh;
+	background-color: #0a0a0a;
+	padding: 0.5% 0.5% 0% 0.5%;
+}
+
+@media (max-width: 560px) {
+	.mainPage {
+		display: flex;
+		flex-direction: column;
+	}
+}

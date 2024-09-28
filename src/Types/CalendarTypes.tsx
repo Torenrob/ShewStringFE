@@ -3,6 +3,9 @@ export interface LocalMonth {
 	monthName: string;
 	year: number;
 	styleYtransition: number;
+	mobileStart: number;
+	mobileEnd: number;
+	mobileY: number;
 }
 
 export interface MonthComponentInfo {
