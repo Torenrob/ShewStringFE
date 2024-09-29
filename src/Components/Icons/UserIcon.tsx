@@ -1,6 +1,5 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import React, { Key, useContext } from "react";
-import "./UserIcon.css";
 import { UserContext } from "../../Services/Auth/UserAuth";
 
 export default function UserIcon() {
@@ -15,7 +14,7 @@ export default function UserIcon() {
 	return (
 		<Dropdown placement="bottom-start" showArrow triggerScaleOnOpen={false} className="bg-[#0a0a0a] border-[#45596b] border-1 shadow-lg shadow-[#0a0a0a7e] rounded-none">
 			<DropdownTrigger>
-				<svg viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<svg viewBox="0 0 23 23" width="2.5rem" height="2.5rem" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path
 						fillRule="evenodd"
 						clipRule="evenodd"

@@ -182,10 +182,17 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	return (
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={{ backgroundColor: "rgba(0, 0, 0,.8)", zIndex: 2, width: "100%" }}>
 			<div className="grid h-full">
-				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute pt-2 lg:pt-0 justify-self-center md:justify-self-start z-10">
+				<Button
+					onClick={closeDrawer}
+					data-hover={cancelHover}
+					radius="full"
+					size="sm"
+					isIconOnly
+					variant="light"
+					className="absolute z-10 pt-2 left-[50%] -translate-x-[50%] md:left-0 md:translate-x-0 md:pt-0 md:justify-self-start">
 					<ArrowDownIcon />
 				</Button>
-				<form className="grid grid-cols-2 grid-rows-4 lg:grid-col-4 lg:grid-rows-2 lg:gap-3 transactionForm" onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
+				<form className="grid grid-cols-2 gap-1 grid-rows-4 lg:grid-col-4 lg:grid-rows-2 lg:gap-3 transactionForm" onSubmit={(e) => SubmitTransaction(e, containerInfo.editingExisting)}>
 					<div className="absolute w-[5vw] text-red-600 font-semibold text-sm h-full pb-6 grid content-end">
 						{errorMessage && (
 							<span className="text-right">
@@ -196,7 +203,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							</span>
 						)}
 					</div>
-					<div className="grid grid-cols-2 gap-x-3 grid-rows-2 lg:col-start-1 lg:row-start-1 lg:col-span-3 lg:flex lg:gap-3">
+					<div className="grid grid-cols-2 gap-3 grid-rows-2 lg:col-start-1 lg:row-start-1 lg:col-span-3 lg:flex lg:gap-3">
 						<Input
 							required
 							radius="none"
@@ -251,7 +258,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							radius="none"
 							size="sm"
 							isInvalid={validateAmount}
-							className="text-slate-500 mb-2 self-center lg:col-start-2 lg:row-start-2 "
+							className="text-slate-500 self-center lg:col-start-2 lg:row-start-2 "
 							type="number"
 							label="Amount"
 							name="amount"
@@ -266,7 +273,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						/>
 						<div className="flex gap-3 relative -translate-y-1 lg:-translate-y-1.5">
 							<div className="flex flex-col">
-								<label htmlFor="debitBtn" className="text-xs mb-0.5 text-slate-300 font-semibold text-center">
+								<label htmlFor="debitBtn" className="text-xs text-slate-300 font-semibold text-center">
 									Debit
 								</label>
 								<Button isIconOnly radius="none" size="sm" name="debitBtn" onClick={transactionTypeClick} color={transactionType ? "danger" : "default"}>
@@ -274,7 +281,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 								</Button>
 							</div>
 							<div className="flex flex-col">
-								<label htmlFor="creditBtn" className="text-xs mb-0.5 text-slate-300 font-semibold relative -translate-x-0.5">
+								<label htmlFor="creditBtn" className="text-xs text-slate-300 font-semibold relative -translate-x-0.5">
 									Credit
 								</label>
 								<Button isIconOnly radius="none" size="sm" name="creditBtn" onClick={transactionTypeClick} color={transactionType ? "default" : "primary"}>

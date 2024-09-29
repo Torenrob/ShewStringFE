@@ -35,15 +35,17 @@ export const UserProvider = ({ children }: Props) => {
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([AddAccountTabHolder]);
 
 	useEffect(() => {
-		const user = Cookies.get("user");
-		const token = Cookies.get("token");
+		const userHold = Cookies.get("user");
+		const tokenHold = Cookies.get("token");
 		setTimeout(() => {
-			if (user && token) {
-				axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-				const userObj: UserProfile = JSON.parse(user);
+			if (userHold && tokenHold) {
+				axios.defaults.headers.common["Authorization"] = "Bearer " + tokenHold;
+				const userObj: UserProfile | null = userHold ? JSON.parse(userHold) : null;
 				setUser(userObj);
-				setToken(token);
-				getAcctsOnRefresh(userObj.id);
+				setToken(tokenHold);
+				if (userObj) {
+					getAcctsOnRefresh(userObj.id);
+				}
 				navigate("/main");
 			} else {
 				navigate("/");
@@ -76,6 +78,7 @@ export const UserProvider = ({ children }: Props) => {
 					Cookies.set("user", JSON.stringify(res.data));
 					setToken(res?.data.token);
 					setUser(res?.data);
+					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
 					navigate("/main");
 				}
 			})
@@ -102,6 +105,7 @@ export const UserProvider = ({ children }: Props) => {
 					Cookies.set("user", JSON.stringify(userObj), { expires: new Date(new Date().getTime() + 60000 * 30) });
 					setToken(res?.data.token);
 					setUser(userObj);
+					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
 					navigate("/main");
 				}
 			})
