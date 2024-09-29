@@ -46,6 +46,7 @@ export interface RegisterUserInfo {
 export interface UserProfile {
 	id: string;
 	userName: string;
+	categories: string[];
 	email: string;
 	firstName: string;
 	lastName: string;
@@ -55,6 +56,7 @@ export interface UserProfile {
 export interface UserProfile_BankAccts {
 	id: string;
 	bankAccounts: BankAccountAPIData[];
+	categories: string[];
 	userName: string;
 	email: string;
 	firstName: string;

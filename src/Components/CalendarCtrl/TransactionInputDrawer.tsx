@@ -31,9 +31,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [transactionType, setTransactionType] = useState<boolean>(true);
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
-	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
 
 	const { user, updBankAccts } = useContext(UserContext);
+	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
@@ -298,10 +298,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						name="category"
 						onChange={updateExistingTransDispaly}
 						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
-						<SelectItem key="None">None</SelectItem>
-						<SelectItem key="income">Income</SelectItem>
-						<SelectItem key="groceries">Groceries</SelectItem>
-						<SelectItem key="bills">Bills</SelectItem>
+						{user!.categories.map((cat) => {
+							return <SelectItem key={cat}>{cat}</SelectItem>;
+						})}
 					</Select>
 					<Textarea
 						radius="none"

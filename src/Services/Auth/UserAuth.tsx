@@ -97,6 +97,7 @@ export const UserProvider = ({ children }: Props) => {
 					const userObj: UserProfile = {
 						id: res.data.id,
 						userName: res.data.userName,
+						categories: res.data.categories,
 						email: res.data.email,
 						firstName: res.data.firstName,
 						lastName: res.data.lastName,
