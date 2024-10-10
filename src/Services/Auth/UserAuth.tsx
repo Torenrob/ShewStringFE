@@ -4,7 +4,7 @@ import React from "react";
 import axios from "axios";
 import { BankAccountAPIData, RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
 import { userLoginAPI, userRegisterAPI } from "../API/UserAPI";
-import Cookies from "js-cookie";
+import Cookies from "../../../node_modules/@types/js-cookie";
 import { getUserBankAccountsAPI } from "../API/BankAccountAPI";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 

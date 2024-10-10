@@ -30,7 +30,7 @@ import { getDragScrollYOffset, getMonthName, getRandomNum } from "../../Utilitie
 import Calendar from "./Calendar/Calendar";
 import { small } from "framer-motion/client";
 import { UserContext } from "../../Services/Auth/UserAuth";
-import Cookie from "js-cookie";
+import Cookie from "../../../node_modules/@types/js-cookie";
 
 export type MonthRange = {
 	startMonth: string;
