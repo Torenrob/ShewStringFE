@@ -1,11 +1,10 @@
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { FormEvent, FormEventHandler, useContext, useRef } from "react";
+import React, { FormEvent, useContext, useRef } from "react";
 import CheckIcon from "../Icons/CheckIcon";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import { createBankAccountAPI } from "../../Services/API/BankAccountAPI";
+import { createBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { json } from "react-router-dom";
 import { UserContext } from "../../Services/Auth/UserAuth";
 
 export default function AddAccountModal({
@@ -16,7 +15,7 @@ export default function AddAccountModal({
 	addNewAcct: (newAcct: BankAccountAPIData, bankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => void;
 }) {
 	const formRef = useRef<HTMLFormElement>(null);
-	const { user, updBankAccts } = useContext(UserContext);
+	const { user, updBankAccounts } = useContext(UserContext);
 
 	async function submitNewAcct(f: FormEvent<HTMLFormElement>) {
 		f.preventDefault();
@@ -25,7 +24,7 @@ export default function AddAccountModal({
 
 		try {
 			const newAcct: BankAccountAPIData = await createBankAccountAPI(addAcctObj);
-			addNewAcct(newAcct, updBankAccts);
+			addNewAcct(newAcct, updBankAccounts);
 			closeModal();
 		} catch (err) {
 			ErrorHandler(err);
@@ -40,7 +39,7 @@ export default function AddAccountModal({
 					<Button
 						isIconOnly
 						className="absolute bg-transparent h-4 right-0 mt-1 md:-mt-1"
-						onClick={(e) => {
+						onClick={() => {
 							formRef.current?.reset();
 							closeModal();
 						}}>

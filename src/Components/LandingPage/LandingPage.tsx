@@ -1,14 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, {useEffect, useState} from "react";
 import CalendarIcon from "../Icons/CalendarIcon";
 import { Button } from "@nextui-org/react";
 import Login from "../LoginPage/Login";
 import SignUp from "../SignUp/SignUp";
-import { useLoaderData, useNavigate } from "react-router-dom";
-import { UserContext } from "../../Services/Auth/UserAuth";
 
 export default function LandingPage() {
 	const [showLogin, setShowLogin] = useState(false);
 	const [showSignUp, setShowSignUp] = useState(false);
+
+	useEffect(() => {
+
+	}, []);
 
 	function loginShowSwitch() {
 		setShowLogin((p) => !p);

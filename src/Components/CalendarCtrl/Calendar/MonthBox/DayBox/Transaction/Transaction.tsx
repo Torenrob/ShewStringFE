@@ -32,19 +32,15 @@ export default function Transaction({
 
 	function shouldMarqueePlay(): boolean {
 		const transactionTitle = transactionInfo?.title ? transactionInfo.title : "";
-		if (transactionTitle.length > 32) {
-			return true;
-		} else {
-			return false;
-		}
+		return transactionTitle.length > 32;
 	}
 
-	function marqueeOn(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+	function marqueeOn() {
 		if (!shouldMarqueePlay()) return;
 		setMarqueePlay(true);
 	}
 
-	function marqueeOff(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+	function marqueeOff() {
 		if (!shouldMarqueePlay()) return;
 		setMarqueePlay(false);
 	}
@@ -56,7 +52,7 @@ export default function Transaction({
 
 	const btnRef = useRef<HTMLDivElement>(null);
 
-	function handleStartDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+	function handleStartDrag() {
 		closeDrawer();
 		btnRef.current?.setAttribute("id", "draggedTransaction");
 		dragObject.current.globalDragOn = true;
@@ -64,7 +60,7 @@ export default function Transaction({
 		setDragActive(true);
 	}
 
-	function handleEndDrag(e: PointerEvent | MouseEvent | TouchEvent) {
+	function handleEndDrag() {
 		setMouseOver(false);
 		dragObject.current.globalDragOn = false;
 		if (!btnRef.current?.style) return;
@@ -90,7 +86,7 @@ export default function Transaction({
 		<div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} className="transWrap">
 			<motion.div
 				ref={btnRef}
-				onDragStart={(e) => handleStartDrag(e)}
+				onDragStart={() => handleStartDrag()}
 				onDragEnd={handleEndDrag}
 				drag
 				dragSnapToOrigin
@@ -99,7 +95,7 @@ export default function Transaction({
 				whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 				id={`transaction${transactionInfo.id}`}>
 				<Button
-					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
+					onClick={() => onClick(transactionInfo, updateTransactionBanner)}
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					variant={dragActive ? "solid" : "ghost"}
@@ -108,7 +104,7 @@ export default function Transaction({
 					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
 					<span>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
-						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
+						{transactionInfo?.amount.toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}
 					</span>
 					{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
@@ -117,7 +113,7 @@ export default function Transaction({
 			</motion.div>
 			{!dragActive && (
 				<Button
-					onClick={(e) => onClick(transactionInfo, updateTransactionBanner)}
+					onClick={() => onClick(transactionInfo, updateTransactionBanner)}
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					style={{ display: !mouseOver ? "flex" : "none" }}
@@ -127,7 +123,7 @@ export default function Transaction({
 					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
 					<span>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
-						{Number.parseFloat(transactionInfo?.amount.toString() as string).toFixed(2)}
+						{transactionInfo?.amount.toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}
 					</span>
 					{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}

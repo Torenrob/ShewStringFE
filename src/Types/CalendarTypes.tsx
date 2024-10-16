@@ -20,8 +20,3 @@ export interface DateComponentInfo {
 	monthName: string;
 	year: number;
 }
-
-export interface CalendarRenderInfo {
-	monthComponents: MonthComponentInfo[];
-	calendarLoading: boolean;
-}

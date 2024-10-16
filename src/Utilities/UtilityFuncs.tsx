@@ -1,7 +1,6 @@
-import { ErrorHandler } from "../Helpers/ErrorHandler";
-import { getAllBankAccountsAPI } from "../Services/API/BankAccountAPI";
-import { BankAccountAPIData, TransactionAPIData } from "../Types/APIDataTypes";
+import { TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
+import Cookies from "js-cookie";
 
 export function getDayOfWeek(num: number): string {
 	switch (num) {
@@ -163,22 +162,23 @@ export function highlightEditedTransactionSwitch(transID?: string) {
 	}
 }
 
-export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>, dontRun?: string): Map<string, number> {
-	const dailyBalanceMap = new Map();
+export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>): Map<string, number> {
+	const dailyBalanceMap: Map<string,number> = new Map();
 	let balanceKeeper: number = 0;
 
-	const sortedTransMap = Array.from(allTransactions);
+	//Resorts all transactions when new transactions are added
+	const sortedTransMap = Array.from(allTransactions.entries());
 	sortedTransMap.sort((a, b) => {
 		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
 	});
 
 	sortedTransMap.forEach((day) => {
-		balanceKeeper = day[1].reduce((balAcc, trans): number => {
-			return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
-		}, balanceKeeper);
+			balanceKeeper = day[1].reduce((balAcc: number, trans:TransactionAPIData): number => {
+				return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
+			}, balanceKeeper);
 
 		dailyBalanceMap.delete(day[0]);
-		dailyBalanceMap.set(day[0], balanceKeeper.toFixed(2));
+		dailyBalanceMap.set(day[0], Number.parseFloat(balanceKeeper.toFixed(2)));
 	});
 
 	return dailyBalanceMap;
@@ -289,8 +289,17 @@ export function getRandomNum(): number {
 }
 
 export function checkForUser(): boolean {
-	if (localStorage.getItem("token")) {
-		return true;
-	}
-	return false;
+	return !!Cookies.get("token");
+
+}
+
+export function createMonthObject(monthObject: LocalMonth, index: number, prevYtrans: number,
+						mobileProps: {mobileEnd: number, mobileStart:number,mobileY: number}) {
+	monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
+
+	monthObject.mobileEnd = mobileProps.mobileEnd;
+	monthObject.mobileStart = mobileProps.mobileStart;
+	monthObject.mobileY = mobileProps.mobileY;
+
+	return monthObject;
 }

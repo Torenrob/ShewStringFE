@@ -1,17 +1,16 @@
-import { Button, DateInput, Input, Select, SelectItem, SharedSelection, Textarea } from "@nextui-org/react";
-import { ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState } from "react";
-import { BankAccountAPIData, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
+import {Button, DateInput, Input, Select, SelectItem, Textarea} from "@nextui-org/react";
+import React, {ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState} from "react";
+import {BankAccountAPIData, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
 import ArrowDownIcon from "../Icons/ArrowDownIcon";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
-import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../Services/API/TransactionAPI";
+import {deleteTransactionAPI, postTransactionAPI, updateTransactionAPI} from "../../Services/ApiCalls/TransactionAPI";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import DebitIcon from "../Icons/DebitIcon";
-import { UpdateTransactionContainerInfo } from "./CalendarCtrl";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs";
-import { CalendarContext } from "./CalendarCtrl";
+import {CalendarContext, UpdateTransactionContainerInfo} from "./CalendarCtrl";
+import {ErrorHandler} from "../../Helpers/ErrorHandler";
+import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs";
 import CreditIcon from "../Icons/CreditIcon";
-import { UserContext } from "../../Services/Auth/UserAuth";
+import {UserContext} from "../../Services/Auth/UserAuth";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -32,8 +31,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [submittingTransaction, setSubmittingTransaction] = useState<boolean>(false);
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
-	const { user, updBankAccts } = useContext(UserContext);
-	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "" });
+	const { user, updBankAccounts } = useContext(UserContext);
+	const [containerInfo, setContainerInfo] =
+		useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "", bankAccountId: currentAcct.id.toString()! });
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
@@ -51,7 +51,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap, setStateDailyBalanceMap } = useContext(CalendarContext);
 
-	function cancelHover(event: MouseEvent) {}
+	function cancelHover() {}
 
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
@@ -62,7 +62,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		if (containerInfo.editingExisting) {
 			const updatedTrans = mkUpdTransAPIData(containerInfo.transactionObj!, postTransactionData);
 			editTransactionIsSameDate = updatedTrans.date === containerInfo.transactionObj!.date;
-			response = await updateTransactionAPI(updatedTrans);
+			response = await updateTransactionAPI(updatedTrans, user!.id);
 		} else {
 			response = await postTransactionAPI(postTransactionData);
 		}
@@ -99,13 +99,13 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					if (responseData.bankAccountId === currentAcct.id) {
 						addTransToDate.current!(responseData);
 					} else {
-						updAcctTrans(responseData, updBankAccts);
+						updAcctTrans(responseData, updBankAccounts);
 					}
 				}
 				if (responseData.bankAccountId === currentAcct.id) {
-					const dailyBalwChgChk = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, oldContTransObj as TransactionAPIData);
-					dailyBalancesMap.current = dailyBalwChgChk[0];
-					dailyBalwChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
+					const dailyBalChgChk = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, responseData, oldContTransObj as TransactionAPIData);
+					dailyBalancesMap.current = dailyBalChgChk[0];
+					dailyBalChgChk[1] ? updateDailyBalanceStates(setStateDailyBalanceMap.current, dailyBalancesMap.current) : null;
 				}
 				const form: HTMLFormElement = document.querySelector(".transactionForm") as HTMLFormElement;
 				form.reset();
@@ -124,8 +124,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		if (containerInfo?.amount?.startsWith("0") && containerInfo.amount.length > 2) {
 			if (!containerInfo?.amount?.match(/^0\d?\./g)) return true;
 		}
-		if (Number(containerInfo?.amount) < 0) return true;
-		return false;
+		return Number(containerInfo?.amount) < 0;
+		
 	}, [containerInfo?.amount]);
 
 	function transactionTypeClick(event: React.MouseEvent<HTMLButtonElement>) {
@@ -148,16 +148,13 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 			ErrorHandler("Transaction Delete API Failed");
 		}
 	}
-
-	function sel(e: SharedSelection) {}
-
-	function updateExistingTransDispaly(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) {
+	function updateExistingTransDisplay(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) {
 		switch (e.target.name) {
 			case "title":
 				setContainerInfo({ ...containerInfo, title: e.target.value });
 				break;
 			case "account":
-				setContainerInfo({ ...containerInfo, bankAccountId: Number(e.target.value) });
+				setContainerInfo({ ...containerInfo, bankAccountId: e.target.value });
 				break;
 			case "category":
 				setContainerInfo({ ...containerInfo, category: e.target.value });
@@ -184,7 +181,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 			<div className="grid h-full">
 				<Button
 					onClick={closeDrawer}
-					data-hover={cancelHover}
 					radius="full"
 					size="sm"
 					isIconOnly
@@ -215,7 +211,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							isClearable
 							id="TransactionDrawerTitle"
 							value={containerInfo?.title ? containerInfo.title : ""}
-							onChange={updateExistingTransDispaly}
+							onChange={updateExistingTransDisplay}
 						/>
 						<DateInput
 							className="row-start-2 lg:col-start-2 lg:row-start-1 lg:basis-1/6"
@@ -233,9 +229,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							size="sm"
 							label="Account"
 							name="account"
-							onChange={updateExistingTransDispaly}
+							onChange={updateExistingTransDisplay}
 							className="text-slate-500 basis-2/6 lg:row-start-1">
-							{bankAccounts.slice(0, bankAccounts.length - 1).map((account, i) => (
+							{bankAccounts.slice(0, bankAccounts.length - 1).map((account) => (
 								<SelectItem key={account.id}>{account.title}</SelectItem>
 							))}
 						</Select>
@@ -243,7 +239,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					<div className="flex gap-2 lg:col-start-1 lg:row-start-2 lg:col-span-2 lg:gap-3">
 						<Button
 							isIconOnly
-							disabled={validateAmount || errorMessage ? true : false}
+							disabled={validateAmount || errorMessage}
 							size="md"
 							isLoading={submittingTransaction}
 							radius="none"
@@ -296,9 +292,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						size="sm"
 						label="Category"
 						name="category"
-						onChange={updateExistingTransDispaly}
+						onChange={updateExistingTransDisplay}
 						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
-						{user!.categories.map((cat) => {
+						{user!.categories.map((cat, index) => {
 							return <SelectItem key={cat}>{cat}</SelectItem>;
 						})}
 					</Select>
@@ -307,7 +303,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						className="lg:col-start-4 lg:row-start-1 lg:row-span-2 mt-1"
 						label="Description"
 						name="description"
-						onChange={updateExistingTransDispaly}
+						onChange={updateExistingTransDisplay}
 						value={containerInfo?.description ? containerInfo.description : undefined}
 					/>
 					{containerInfo.editingExisting && (
@@ -319,7 +315,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						</div>
 					)}
 				</form>
-				<Button onClick={closeDrawer} data-hover={cancelHover} radius="full" size="sm" isIconOnly variant="light" className="absolute hidden md:flex md:justify-self-end">
+				<Button onClick={closeDrawer} radius="full" size="sm" isIconOnly variant="light" className="absolute hidden md:flex md:justify-self-end">
 					<ArrowDownIcon />
 				</Button>
 			</div>
@@ -330,7 +326,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 export default TransactionInputDrawer;
 
 function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string, curAcct: BankAccountAPIData): PostTransactionAPIData {
-	const transactionData: PostTransactionAPIData = {
+	return {
 		userId: userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
 		title: targetData.title.value,
@@ -341,19 +337,13 @@ function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transacti
 		category: targetData.category.value,
 		description: targetData.description.value,
 	};
-
-	return transactionData;
 }
 
 function mkUpdTransAPIData(curTransInfo: TransactionAPIData, newTransInfo: PostTransactionAPIData): TransactionAPIData {
-	const updatedTrans: TransactionAPIData = {
+	return {
 		...newTransInfo,
 		transactionType: newTransInfo.transactionType === 0 ? "Debit" : "Credit",
-		time: curTransInfo.time,
 		id: curTransInfo.id,
-		createdOn: curTransInfo.createdOn,
 		repeatGroupId: curTransInfo.repeatGroupId,
 	};
-
-	return updatedTrans;
 }

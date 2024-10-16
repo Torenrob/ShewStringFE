@@ -1,4 +1,4 @@
-import { Ref, ReactNode, useContext, useState, MouseEvent, useRef, useEffect, useCallback } from "react";
+import { ReactNode, useContext, useState, MouseEvent, useRef, useEffect, useCallback } from "react";
 import { DateComponentInfo } from "../../../../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
 import Transaction from "./Transaction/Transaction";
@@ -7,9 +7,10 @@ import { TransactionAPIData } from "../../../../../Types/APIDataTypes";
 import AddTransactionIcon from "../../../../Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
-import { updateTransactionAPI } from "../../../../../Services/API/TransactionAPI";
+import { updateTransactionAPI } from "../../../../../Services/ApiCalls/TransactionAPI";
 import { calcDailyBalances, getDayOfWeek, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../Utilities/UtilityFuncs";
 import { ErrorHandler } from "../../../../../Helpers/ErrorHandler";
+import {UserContext} from "../../../../../Services/Auth/UserAuth.tsx";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 
@@ -24,19 +25,18 @@ export default function DayBox({
 	transactions: Map<string, TransactionAPIData[]>;
 	dayGridSpot: number;
 }): ReactNode {
-	const [forceState, setForceState] = useState<number>(getRandomNum());
+	const [, setForceState] = useState<number>(getRandomNum());
 
 	//Constants
 	const updatePaginationDragState = useCallback((dragOn: boolean) => {
 		setPaginationDragState(dragOn);
 	}, []);
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
-
-	const gridStyle = {
-		gridColumnStart: 1,
-	};
-
-	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap, dateTransactionsMap } = useContext(CalendarContext);
+	const {user} = useContext(UserContext)
+	const { openDrawer, dragObject,
+		addTransToDate, editTransOnDatesFuncsMap,
+		dailyBalancesMap, setStateDailyBalanceMap,
+		dateTransactionsMap } = useContext(CalendarContext);
 	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
@@ -102,7 +102,7 @@ export default function DayBox({
 	useEffect(() => {
 		const updatedTransactions = transactionsPaginated();
 		dateTransactionsMap.current = transactions;
-		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!, dateString);
+		dailyBalancesMap.current = calcDailyBalances(dateTransactionsMap.current!);
 		setTodaysTransactions(updatedTransactions);
 		setDailyBalance(getTodaysBalance(dailyBalancesMap.current, dateString));
 	}, [transactions, transactionsPaginated, dailyBalancesMap, dateString, dateTransactionsMap]);
@@ -145,7 +145,7 @@ export default function DayBox({
 			id: trans.id,
 			date: parseDate(dateString),
 			amount: trans.amount.toFixed(2).toString(),
-			bankAccountId: trans.bankAccountId,
+			bankAccountId: trans.bankAccountId.toString(),
 			category: trans.category,
 			description: trans.description,
 			title: trans.title,
@@ -187,7 +187,7 @@ export default function DayBox({
 		if (dropContainerDate !== transaction.date) {
 			dragObject.current.removeTransactionFromDate(transaction);
 			try {
-				const updatedTransaction = await updateTransactionAPI(transaction, dropContainerDate);
+				const updatedTransaction = await updateTransactionAPI(transaction, user!.id,dropContainerDate);
 				addTransToDate.current!(updatedTransaction?.data);
 				const updBalanceMap = updateDailyBalances(transactions, dailyBalancesMap.current, updatedTransaction?.data, transaction);
 				updateDailyBalanceStates(setStateDailyBalanceMap.current, updBalanceMap[0]);
@@ -275,7 +275,6 @@ export default function DayBox({
 			radius="none"
 			shadow="none"
 			id={dateString}
-			style={{}}
 			className={`dayBox mobCol${dayGridSpot} ${mkMobileMnthStrBrdr(dayGridSpot, date)} col${dateObj.dayOfWeek} outline outline-1 ${mkMnthStrBdr(dateObj.dayOfWeek, date)} outline-slate-500`}>
 			<CardBody
 				onMouseEnter={toggleAddTransactionBtn}

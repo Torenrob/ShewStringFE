@@ -1,16 +1,14 @@
-import axios, { AxiosResponse } from "axios";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
-import { string } from "yup";
+import axios, {AxiosResponse} from "axios";
+import {ErrorHandler} from "../../Helpers/ErrorHandler";
+import {BankAccountAPIData} from "../../Types/APIDataTypes";
 
-const api = import.meta.env.VITE_API_URL + "/bankaccounts";
+const api = import.meta.env.VITE_API_URL + "/bankAccounts";
 
 export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => {
 	try {
 		const resp: AxiosResponse<BankAccountAPIData[]> = await axios.get(api);
 		resp.data.map((bA) => {
-			const transMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(bA.transactions));
-			bA.transactions = transMap;
+			bA.transactions = new Map(Object.entries(bA.transactions));
 			return bA;
 		});
 		return resp.data;
@@ -22,10 +20,9 @@ export const getAllBankAccountsAPI = async (): Promise<BankAccountAPIData[]> => 
 
 export const getUserBankAccountsAPI = async (userId: string): Promise<BankAccountAPIData[]> => {
 	try {
-		const resp: AxiosResponse<BankAccountAPIData[]> = await axios.get(api + "/user/" + userId);
+		const resp: AxiosResponse<BankAccountAPIData[]> = await axios.get(api + `/${userId}`);
 		resp.data.map((bA) => {
-			const transMap: Map<string, TransactionAPIData[]> = new Map(Object.entries(bA.transactions));
-			bA.transactions = transMap;
+			bA.transactions = new Map(Object.entries(bA.transactions));
 			return bA;
 		});
 		return resp.data;

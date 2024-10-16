@@ -1,4 +1,4 @@
-import { ReactNode, useState, MouseEvent, ChangeEventHandler, ChangeEvent, useContext } from "react";
+import { ReactNode, useState, ChangeEvent, useContext } from "react";
 import { Form } from "react-router-dom";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
@@ -6,7 +6,8 @@ import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 import * as Yup from "yup";
 import { UserContext } from "../../Services/Auth/UserAuth";
-import { useForm } from "react-hook-form";
+// @ts-expect-error - useForm is importing correctly
+import { useForm } from "../../../node_modules/react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import { RegisterUserInfo } from "../../Types/APIDataTypes";
@@ -35,13 +36,12 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
 	} = useForm<SignUpFormsInputs>({ resolver: yupResolver(validation) });
 
 	function handleSignUp(form: SignUpFormsInputs) {
 		const registerUserInfo: RegisterUserInfo = {
 			email: form.email,
-			userName: form.username,
+			username: form.username,
 			password: form.password,
 			firstName: form.firstname,
 			lastName: form.lastname,
@@ -58,11 +58,11 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 	};
 
 	function toggleCreateVisibility(): void {
-		setCreateIsVisible(createIsVisible ? false : true);
+		setCreateIsVisible(!createIsVisible);
 	}
 
 	function toggleConfirmVisibility(): void {
-		setConfirmIsVisible(confirmIsVisible ? false : true);
+		setConfirmIsVisible(!confirmIsVisible);
 	}
 
 	function closeSignUp() {
@@ -76,7 +76,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 
 	return (
 		<div id="signUpBackground" className="w-[100vw] absolute h-[100vh] bg-[#0000009a]">
-			<Form className="signUpCard" id="sign-up" action="/register" method="post" onSubmit={handleSubmit(handleSignUp)}>
+			<Form className="signUpCard" id="sign-up" method="post" onSubmit={handleSubmit(handleSignUp)}>
 				<Card className="w-fit p-2">
 					<CardBody className="w-auto gap-y-2 grid overflow-hidden">
 						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onClick={closeSignUp}>

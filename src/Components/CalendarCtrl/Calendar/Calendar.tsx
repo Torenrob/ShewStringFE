@@ -1,19 +1,23 @@
-import { ReactNode, useState, useRef, useCallback, MutableRefObject, useEffect, Ref, Fragment, useContext } from "react";
+import {MutableRefObject, ReactNode, Ref, useCallback, useContext, useEffect, useRef, useState} from "react";
 import MonthBox from "./MonthBox/MonthBox";
-import { calcDailyBalances, focusToday, getMonthName, setMobileProps, setYtrans } from "../../../Utilities/UtilityFuncs";
-import { LocalMonth, MonthComponentInfo } from "../../../Types/CalendarTypes";
-import { TransactionAPIData } from "../../../Types/APIDataTypes";
-import { getAllTransactionsAPI } from "../../../Services/API/TransactionAPI";
-import { ErrorHandler } from "../../../Helpers/ErrorHandler";
-import { CalendarContext, MonthRange } from "../CalendarCtrl";
-import { style } from "framer-motion/client";
+import {
+	calcDailyBalances,
+	createMonthObject,
+	focusToday,
+	getMonthName,
+	setMobileProps,
+	setYtrans
+} from "../../../Utilities/UtilityFuncs";
+import {LocalMonth, MonthComponentInfo} from "../../../Types/CalendarTypes";
+import {TransactionAPIData} from "../../../Types/APIDataTypes";
+import {CalendarContext, MonthRange} from "../CalendarCtrl";
 
 //Break Down Current UTC Date into Local Date Object for Current User Calendar(U.S.)
 function _getCurrMonth(): LocalMonth {
 	const locString: string = new Date()?.toLocaleDateString();
 	const monthNumber: number = Number(locString?.match(/^([^/]+)/)![0]);
 	const yearNumber: number = Number(locString?.match(/\/(\d{4})$/)![1]);
-	const monthObject: LocalMonth = {
+	return {
 		month: monthNumber,
 		monthName: getMonthName(monthNumber),
 		year: yearNumber,
@@ -22,8 +26,6 @@ function _getCurrMonth(): LocalMonth {
 		mobileStart: 0,
 		mobileY: 0,
 	};
-
-	return monthObject;
 }
 
 //Calculate Month Comp arr on initialization
@@ -57,13 +59,8 @@ function calcInitMonth({
 		monthObject.monthName = getMonthName(monthObject?.month);
 		monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
 
-		const mobileProps = setMobileProps(index, prevMobileY, prevMobileEnd, monthObject);
-
-		monthObject.mobileEnd = mobileProps.mobileEnd;
-		monthObject.mobileStart = mobileProps.mobileStart;
-		monthObject.mobileY = mobileProps.mobileY;
-
-		return monthObject;
+		return createMonthObject(monthObject, index, prevYtrans,
+			setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
 	} else {
 		if (monthDiff > 12) {
 			monthObject.month = monthDiff % 12 === 0 ? 12 : monthDiff % 12;
@@ -71,24 +68,16 @@ function calcInitMonth({
 			monthObject.year = monthObject.year + yearDiff;
 			monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
 
-			const mobileProps = setMobileProps(index, prevMobileY, prevMobileEnd, monthObject);
-
-			monthObject.mobileEnd = mobileProps.mobileEnd;
-			monthObject.mobileStart = mobileProps.mobileStart;
-			monthObject.mobileY = mobileProps.mobileY;
-			return monthObject;
+			return createMonthObject(monthObject, index, prevYtrans,
+				setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
 		} else {
 			monthObject.month = 12 + monthDiff == 0 ? 12 : monthDiff > -12 ? 12 + monthDiff : 12 + (monthDiff % 12);
 			monthObject.monthName = getMonthName(monthObject?.month);
 			monthObject.year = monthObject.year + yearDiff;
 			monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
 
-			const mobileProps = setMobileProps(index, prevMobileY, prevMobileEnd, monthObject);
-
-			monthObject.mobileEnd = mobileProps.mobileEnd;
-			monthObject.mobileStart = mobileProps.mobileStart;
-			monthObject.mobileY = mobileProps.mobileY;
-			return monthObject;
+			return createMonthObject(monthObject, index, prevYtrans,
+				setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
 		}
 	}
 }
@@ -108,12 +97,10 @@ function mkMonthCompInfo(monthInfo: Date, prevYTrans: number, index: number, pre
 		mobileY: mobileY,
 	};
 
-	const monthComponentInfo: MonthComponentInfo = {
+	return {
 		monthObj: monthObj,
 		key: `${monthObj?.monthName}${monthObj?.year}`,
 	};
-
-	return monthComponentInfo;
 }
 
 function calcInputMonths(startDate: Date, endDate: Date): MonthComponentInfo[] {
@@ -131,7 +118,7 @@ function calcInputMonths(startDate: Date, endDate: Date): MonthComponentInfo[] {
 	let prevMobileY: number = 0;
 	let prevMobileEnd: number = 0;
 
-	const mArr = [...Array(numOfMnths)].map((_, i) => {
+	return [...Array(numOfMnths)].map((_, i) => {
 		const newMonth = returnMonthYr(startMonth + i, startYear);
 		const monthComp = mkMonthCompInfo(newMonth, prevYTrans, i + 1, prevMobileY, prevMobileEnd);
 		prevYTrans = monthComp.monthObj.styleYtransition;
@@ -139,8 +126,6 @@ function calcInputMonths(startDate: Date, endDate: Date): MonthComponentInfo[] {
 		prevMobileEnd = monthComp.monthObj.mobileEnd;
 		return monthComp;
 	});
-
-	return mArr;
 }
 
 function returnMonthYr(compMonthNum: number, year: number): Date {
@@ -185,7 +170,7 @@ export default function Calendar({
 			});
 			setMonthComps(monthArr);
 		} else {
-			setMonthComps((p) => calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1")));
+			setMonthComps(() => calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1")));
 		}
 	}, [dailyBalancesMap, dateTransactionsMap, transactions, monthRange]);
 
@@ -200,7 +185,7 @@ export default function Calendar({
 	monthObserver.current = new IntersectionObserver(
 		async (entries: IntersectionObserverEntry[]) => {
 			const monthLabels: string[] = [];
-			entries.forEach((entry, i) => {
+			entries.forEach((entry) => {
 				const target = entry?.target;
 				target.classList?.toggle("focusMonth", entry?.isIntersecting);
 				if (target.classList.contains("focusMonth")) {
@@ -216,7 +201,7 @@ export default function Calendar({
 
 	const monthRef: Ref<HTMLDivElement> = useCallback(async (node: HTMLDivElement) => {
 		try {
-			await monthObserver?.current?.observe(node);
+			monthObserver?.current?.observe(node);
 		} catch {
 			return;
 		}
@@ -248,7 +233,7 @@ export default function Calendar({
 	return (
 		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3">
 			<div className="calMonthsContainer" style={{ maxHeight: `${calcCalendarHeight() - 1.25}vh` }}>
-				{monthComps.map((monthBoxObj, index) => {
+				{monthComps.map((monthBoxObj) => {
 					return (
 						<MonthBox
 							transactions={transactions}

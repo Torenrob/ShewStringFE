@@ -12,7 +12,7 @@ export default function UserPanel() {
 				<Button isIconOnly className="bg-transparent" size="sm">
 					<UserIcon />
 				</Button>
-				<div className="flex items-center">{user?.userName}</div>
+				<div className="flex items-center">{user?.username}</div>
 			</div>
 
 			<div className="relative top-[35%] hidden lg:block">

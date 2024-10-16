@@ -1,10 +1,11 @@
-import { ReactNode, useState, MouseEvent, useContext } from "react";
+import { ReactNode, useState, useContext } from "react";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
 import * as Yup from "yup";
 import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 import { yupResolver } from "@hookform/resolvers/yup";
+// @ts-expect-error - useForm is importing correctly
 import { useForm } from "react-hook-form";
 import { UserContext } from "../../Services/Auth/UserAuth";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
@@ -25,7 +26,6 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
 	} = useForm<LoginFormsInputs>({ resolver: yupResolver(validation) });
 
 	function handleLogin(form: LoginFormsInputs) {
@@ -37,7 +37,7 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 	}
 
 	function toggleVisibility() {
-		setIsVisible(isVisible ? false : true);
+		setIsVisible(!isVisible);
 	}
 
 	function closeLogin() {

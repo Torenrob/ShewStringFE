@@ -1,36 +1,26 @@
 import React, {
-	act,
-	ChangeEvent,
 	createContext,
 	FormEvent,
-	FormEventHandler,
 	Key,
 	MutableRefObject,
-	RefObject,
-	UIEventHandler,
-	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
-import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
-import { getAllBankAccountsAPI } from "../../Services/API/BankAccountAPI";
-import { Button, DateRangePicker, DateValue, Input, Tab, Tabs, useTabs } from "@nextui-org/react";
+import {BankAccountAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
+import {Button, DateValue, Tab, Tabs} from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon";
 import CheckIcon from "../Icons/CheckIcon";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import AddAccountModal from "./AddAccountModal";
 import SettingsIcon from "../Icons/SettingsIcon";
 import DelAccountModal from "./DelAccountModal";
-import TransactionInputDrawer, { TransactionInputDrawerRef } from "./TransactionInputDrawer";
-import { editTransOnDateFuncs } from "./Calendar/MonthBox/DayBox/DayBox";
-import { getDragScrollYOffset, getMonthName, getRandomNum } from "../../Utilities/UtilityFuncs";
+import TransactionInputDrawer, {TransactionInputDrawerRef} from "./TransactionInputDrawer";
+import {editTransOnDateFuncs} from "./Calendar/MonthBox/DayBox/DayBox";
+import {getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
 import Calendar from "./Calendar/Calendar";
-import { small } from "framer-motion/client";
-import { UserContext } from "../../Services/Auth/UserAuth";
-import Cookie from "../../../node_modules/@types/js-cookie";
+import {UserContext} from "../../Services/Auth/UserAuth";
 
 export type MonthRange = {
 	startMonth: string;
@@ -54,7 +44,7 @@ export type UpdateTransactionContainerInfo = {
 	transactionType?: "Debit" | "Credit";
 	category?: string;
 	description?: string | null;
-	bankAccountId?: number;
+	bankAccountId?: string;
 	editingExisting: boolean;
 	transactionObj?: TransactionAPIData;
 	deleteTransactionFromDate?: (trans: TransactionAPIData) => void;
@@ -80,8 +70,7 @@ export default function CalendarCtrl() {
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().getFullYear()}`);
-	const [isMobile, setIsMobile] = useState(window.innerWidth < 481);
-	const [isReady, setIsReady] = useState<boolean>(false);
+	const [, setIsReady] = useState<boolean>(false);
 
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
@@ -106,7 +95,7 @@ export default function CalendarCtrl() {
 		dropping: null,
 		paginationDragState: [],
 		containerDropped: () => {},
-		removeTransactionFromDate: (transaction: TransactionAPIData) => {},
+		removeTransactionFromDate: () => {},
 		dragItemY: 0,
 	});
 
@@ -163,7 +152,7 @@ export default function CalendarCtrl() {
 			setAddAcctModalOpen(true);
 			return;
 		}
-		setSelectedAcct((p) => e.toString());
+		setSelectedAcct(() => e.toString());
 	}
 
 	function openAddAcctModal() {
@@ -181,7 +170,7 @@ export default function CalendarCtrl() {
 	}
 
 	function cntlMonthLabel(curMonths: string[]) {
-		setMonthLabel((p) => {
+		setMonthLabel(() => {
 			if (curMonths.length === 1) {
 				return convertMonthLabel(curMonths[0]);
 			} else {
@@ -227,7 +216,7 @@ export default function CalendarCtrl() {
 	function submitMonthRange(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const form = e.currentTarget;
-		setMonthRange((p): MonthRange => {
+		setMonthRange((): MonthRange => {
 			//@ts-expect-error - ts says value prop does not exist
 			return { startMonth: form[0].value, endMonth: form[1].value };
 		});
@@ -242,10 +231,11 @@ export default function CalendarCtrl() {
 		const endYear = todayDateObj.getFullYear();
 		startMonth = startMonth >= 0 ? startMonth : 12 - startMonth;
 		endMonth = endMonth <= 11 ? endMonth : endMonth - 12;
-		const arr = [`${startYear}-${startMonth.toString().padStart(2, "0")}`, `${endYear}-${endMonth.toString().padStart(2, "0")}`];
-		return arr;
+		return [`${startYear}-${startMonth.toString().padStart(2, "0")}`, `${endYear}-${endMonth.toString().padStart(2, "0")}`];
 	}
 
+
+	// noinspection JSUnusedLocalSymbols
 	function scrollDrag(direction: string) {
 		if (!dragObject.current?.globalDragOn) {
 			return;

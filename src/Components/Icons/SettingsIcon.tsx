@@ -1,11 +1,9 @@
-import React, { LegacyRef, MutableRefObject, useRef, MouseEvent, useState, Key } from "react";
+import React, { useRef, useState, Key } from "react";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
-import AddAccountModal from "../CalendarCtrl/AddAccountModal";
 
 export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { openAcctModal: () => void; openDelAcctModal: () => void }) {
 	const [hover, setHover] = useState<boolean>(false);
-	const svgRef: LegacyRef<SVGSVGElement> = useRef<SVGSVGElement>(null);
-
+	useRef<SVGSVGElement>(null);
 	function hoverSwitch() {
 		if (hover) {
 			setHover(false);
@@ -26,8 +24,8 @@ export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { open
 		<Dropdown closeOnSelect={true} showArrow triggerScaleOnOpen={false} className="bg-[#0a0a0a] text-[#6EC4A7] border-[#45596b] border-1 shadow-lg shadow-[#0a0a0a7e] rounded-none">
 			<DropdownTrigger>
 				<svg
-					onMouseEnter={(e) => hoverSwitch()}
-					onMouseLeave={(e) => hoverSwitch()}
+					onMouseEnter={() => hoverSwitch()}
+					onMouseLeave={() => hoverSwitch()}
 					fill={hover ? "#6EC4A7" : "#ffffff"}
 					className="acctOptIcon"
 					width="13px"

@@ -1,13 +1,14 @@
-import { Button, Input, Select, SelectItem } from "@nextui-org/react";
-import React, { FormEvent, FormEventHandler, useContext, useRef } from "react";
+import { Button, Select, SelectItem } from "@nextui-org/react";
+import React, {ChangeEvent, FormEvent, useContext, useRef, useState} from "react";
 import CheckIcon from "../Icons/CheckIcon";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import { createBankAccountAPI, deleteBankAccountAPI } from "../../Services/API/BankAccountAPI";
+import { deleteBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { UserContext } from "../../Services/Auth/UserAuth";
+import {number} from "yup";
 
-export default function AddAccountModal({
+export default function DelAccountModal({
 	closeModal,
 	deleteAcct,
 	bankAccounts,
@@ -17,15 +18,19 @@ export default function AddAccountModal({
 	bankAccounts: BankAccountAPIData[];
 }) {
 	const formRef = useRef<HTMLFormElement>(null);
-	const { updBankAccts } = useContext(UserContext);
+	const { updBankAccounts } = useContext(UserContext);
+	const [value, setValue] = useState<string>(bankAccounts[0].id.toString())
+
+	const handleSelection = (e: ChangeEvent<HTMLSelectElement>) => {
+		setValue(e.target.value);
+	}
 
 	async function delAcct(f: FormEvent<HTMLFormElement>) {
 		f.preventDefault();
-		//@ts-expect-error - ts saying that value property not present
-		const acct2Del: BankAccountAPIData = bankAccounts.find((bA) => bA.id.toString() === f.currentTarget[0].value)!;
+		const acct2Del: BankAccountAPIData = bankAccounts.find((bA) => bA.id.toString() === value)!;
 		try {
-			const delResult: string = await deleteBankAccountAPI(acct2Del);
-			deleteAcct(acct2Del, updBankAccts);
+			await deleteBankAccountAPI(acct2Del);
+			deleteAcct(acct2Del, updBankAccounts);
 			closeModal();
 		} catch (err) {
 			ErrorHandler(err);
@@ -40,7 +45,7 @@ export default function AddAccountModal({
 					<Button
 						isIconOnly
 						className="bg-transparent absolute h-4 right-0 mt-1 md:-mt-1"
-						onClick={(e) => {
+						onClick={() => {
 							formRef.current?.reset();
 							closeModal();
 						}}>
@@ -48,9 +53,9 @@ export default function AddAccountModal({
 					</Button>
 				</h2>
 				<div className="flex gap-4">
-					<Select radius="none" label="Account" name="account" size="sm" className="addAcctInputs text-black">
+					<Select radius="none" selectedKeys={[value]} label="Account" name="account" size="sm" onChange={handleSelection} className="addAcctInputs text-black">
 						{bankAccounts.map((bA) => {
-							return <SelectItem key={bA.id}>{bA.title}</SelectItem>;
+							return <SelectItem value={bA.id} key={bA.id}>{bA.title}</SelectItem>;
 						})}
 					</Select>
 					<Button className="self-center bg-[#6EC4A7]" radius="none" isIconOnly size="sm" type="submit">
