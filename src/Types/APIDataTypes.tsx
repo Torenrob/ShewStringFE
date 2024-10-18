@@ -14,7 +14,7 @@ export interface TransactionAPIData {
 	date: string;
 	category: string;
 	description: string | null;
-	bankAccountId: number;
+	bankAccountId?: number;
 	repeatGroupId: number | null;
 }
 

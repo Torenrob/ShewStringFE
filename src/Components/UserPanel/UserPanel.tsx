@@ -16,7 +16,7 @@ export default function UserPanel() {
 			</div>
 
 			<div className="relative top-[35%] hidden lg:block">
-				This application is still under construction. Please feel free to test the current functionality of the budget calendar. Use your mouse wheel to scroll up and down the calendar.
+
 			</div>
 		</div>
 	);

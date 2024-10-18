@@ -1,5 +1,13 @@
-import {Button, DateInput, Input, Select, SelectItem, Textarea} from "@nextui-org/react";
-import React, {ChangeEvent, forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useState} from "react";
+import {
+	Button,
+	DateInput,
+	Input,
+	Select,
+	SelectItem,
+	SharedSelection,
+	Textarea
+} from "@nextui-org/react";
+import React, {ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState} from "react";
 import {BankAccountAPIData, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
 import ArrowDownIcon from "../Icons/ArrowDownIcon";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
@@ -11,6 +19,8 @@ import {ErrorHandler} from "../../Helpers/ErrorHandler";
 import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs";
 import CreditIcon from "../Icons/CreditIcon";
 import {UserContext} from "../../Services/Auth/UserAuth";
+import {AxiosResponse} from "axios";
+import {parseDate} from "@internationalized/date";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -50,8 +60,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	}));
 
 	const { addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, dateTransactionsMap, setStateDailyBalanceMap } = useContext(CalendarContext);
-
-	function cancelHover() {}
 
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
@@ -138,8 +146,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	}
 
 	async function deleteTransaction() {
-		const resp = await deleteTransactionAPI(containerInfo.id!);
-		if (resp?.statusText === "OK") {
+		const resp: AxiosResponse<string> | null = await deleteTransactionAPI(containerInfo.id!);
+		if (resp?.status === 200) {
 			containerInfo.deleteTransactionFromDate!(containerInfo.transactionObj!);
 			const updBalanceMap = updateDailyBalances(dateTransactionsMap.current!, dailyBalancesMap.current, undefined, containerInfo.transactionObj);
 			updateDailyBalanceStates(setStateDailyBalanceMap.current, updBalanceMap[0]);
@@ -148,6 +156,11 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 			ErrorHandler("Transaction Delete API Failed");
 		}
 	}
+
+	function handleAccountSelectChange(e: SharedSelection) {
+		updateExistingTransDisplay({target: {name: "account", value: e.currentKey}} as ChangeEvent<HTMLInputElement>)
+	}
+
 	function updateExistingTransDisplay(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) {
 		switch (e.target.name) {
 			case "title":
@@ -219,22 +232,23 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							label="Date"
 							name="date"
 							size="sm"
-							value={containerInfo?.date}
+							value={containerInfo?.date ?? parseDate(new Date().toISOString().split("T")[0])}
 							onChange={(e) => setContainerInfo({ ...containerInfo, date: e })}
 						/>
-						<Select
+						{currentAcct.id != 0 && <Select
 							required
-							placeholder={`${currentAcct.title}`}
+							// placeholder={`${currentAcct.title}`}
 							radius="none"
 							size="sm"
+							selectedKeys={[`${currentAcct.id}`]}
 							label="Account"
 							name="account"
-							onChange={updateExistingTransDisplay}
+							onSelectionChange={handleAccountSelectChange}
 							className="text-slate-500 basis-2/6 lg:row-start-1">
 							{bankAccounts.slice(0, bankAccounts.length - 1).map((account) => (
 								<SelectItem key={account.id}>{account.title}</SelectItem>
 							))}
-						</Select>
+						</Select>}
 					</div>
 					<div className="flex gap-2 lg:col-start-1 lg:row-start-2 lg:col-span-2 lg:gap-3">
 						<Button
@@ -254,7 +268,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							radius="none"
 							size="sm"
 							isInvalid={validateAmount}
-							className="text-slate-500 self-center lg:col-start-2 lg:row-start-2 "
+							className="text-slate-500 self-center lg:col-start-2 lg:row-start-2 lg:relative lg:-top-2"
 							type="number"
 							label="Amount"
 							name="amount"
@@ -294,7 +308,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						name="category"
 						onChange={updateExistingTransDisplay}
 						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
-						{user!.categories.map((cat, index) => {
+						{user!.categories.map((cat) => {
 							return <SelectItem key={cat}>{cat}</SelectItem>;
 						})}
 					</Select>
@@ -307,7 +321,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						value={containerInfo?.description ? containerInfo.description : undefined}
 					/>
 					{containerInfo.editingExisting && (
-						<div className="delTransBtn absolute lg:flex-col">
+						<div className="delTransBtn absolute lg:flex-col lg:translate-y-2">
 							<Button color="danger" radius="none" isIconOnly onClick={deleteTransaction}>
 								<InvalidSubmitIcon white={true} />
 							</Button>

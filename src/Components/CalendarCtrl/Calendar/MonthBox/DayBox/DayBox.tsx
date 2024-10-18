@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useState, MouseEvent, useRef, useEffect, useCallback } from "react";
+import { ReactNode, useContext, useState, MouseEvent, useEffect, useCallback } from "react";
 import { DateComponentInfo } from "../../../../../Types/CalendarTypes";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
 import Transaction from "./Transaction/Transaction";
@@ -37,7 +37,6 @@ export default function DayBox({
 		addTransToDate, editTransOnDatesFuncsMap,
 		dailyBalancesMap, setStateDailyBalanceMap,
 		dateTransactionsMap } = useContext(CalendarContext);
-	const firstRender = useRef<boolean>(true);
 
 	const transactionsPaginated = useCallback(
 		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] => {
@@ -72,7 +71,16 @@ export default function DayBox({
 	//CallBack Hooks
 	const addTransactionToList = useCallback(
 		(transaction: TransactionAPIData) => {
+			//When DND between dif months, sometimes infinite rerender of transactions
+			//Double-checking that list is new
+			let isNewTransList: boolean = true;
 			setTodaysTransactions((p) => {
+				const lastArray = p[p.length - 1];
+				//Double-checking that transaction added in DND is not a rerender
+				if (lastArray[lastArray.length - 1] == transaction) {
+					isNewTransList = false;
+					return p;
+				}
 				if (!p) {
 					p = [[transaction]];
 				} else if (p[p.length - 1].length < 5) {
@@ -82,7 +90,10 @@ export default function DayBox({
 				}
 				return p;
 			});
-			setForceState(getRandomNum());
+			if (isNewTransList){
+				//State doesn't update transaction list view on DND in some scenarios
+				setForceState(getRandomNum());
+			}
 		},
 		[setForceState, setTodaysTransactions]
 	);
@@ -107,14 +118,6 @@ export default function DayBox({
 		setDailyBalance(getTodaysBalance(dailyBalancesMap.current, dateString));
 	}, [transactions, transactionsPaginated, dailyBalancesMap, dateString, dateTransactionsMap]);
 
-	useEffect(() => {
-		if (firstRender.current) {
-			firstRender.current = false;
-			return;
-		}
-		addTransToDate.current = addTransactionToList;
-	}, [addTransToDate, addTransactionToList]);
-
 	//Collect state funcs in calendar context with no duplicates
 	if (editTransOnDatesFuncsMap.current.get(dateString)) {
 		editTransOnDatesFuncsMap.current.delete(dateString);
@@ -134,7 +137,7 @@ export default function DayBox({
 
 	function clickAddTransaction() {
 		highlightEditedTransactionSwitch();
-		openDrawer({ date: parseDate(dateString), editingExisting: false });
+		openDrawer({ date: parseDate(dateString), editingExisting: false, amount: "0.00" });
 		addTransToDate.current = addTransactionToList;
 	}
 
@@ -145,7 +148,9 @@ export default function DayBox({
 			id: trans.id,
 			date: parseDate(dateString),
 			amount: trans.amount.toFixed(2).toString(),
-			bankAccountId: trans.bankAccountId.toString(),
+			//Had to remove BankAccountId from Entity in BE due to JPA not handling cyclic relationship
+			//Optional BankAccountId here because I'm hoping to add it back
+			bankAccountId: trans.bankAccountId?.toString(),
 			category: trans.category,
 			description: trans.description,
 			title: trans.title,

@@ -40,7 +40,7 @@ export type UpdateTransactionContainerInfo = {
 	id?: number;
 	date?: DateValue;
 	title?: string | null;
-	amount?: string;
+	amount: string;
 	transactionType?: "Debit" | "Credit";
 	category?: string;
 	description?: string | null;

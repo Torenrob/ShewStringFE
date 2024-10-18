@@ -48,6 +48,7 @@ export default function Transaction({
 	const marqueeStyle: CSSProperties = {
 		marginRight: "3px",
 		position: "relative",
+		paddingTop: "2.5%"
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
@@ -99,13 +100,14 @@ export default function Transaction({
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					variant={dragActive ? "solid" : "ghost"}
+					color={"secondary"}
 					radius="none"
 					size="sm"
-					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span>
-						${transactionInfo?.transactionType === "Credit" ? "" : "("}
-						{transactionInfo?.amount.toFixed(2)}
-						{transactionInfo?.transactionType === "Debit" && ")"}
+					className={`transaction align-middle flex content-center border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
+					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} pt-[2.25%]`}>
+						${transactionInfo.transactionType === "Credit" ? "" : "("}
+						{transactionInfo.amount.toFixed(2)}
+						{transactionInfo.transactionType === "Debit" && ")"}
 					</span>
 					{marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} speed={25} play={true}></Marquee>}
 					{!marqueePlay && <Marquee children={transactionInfo?.title} style={marqueeStyle} play={false}></Marquee>}
@@ -120,8 +122,8 @@ export default function Transaction({
 					variant={dragActive ? "solid" : "ghost"}
 					radius="none"
 					size="sm"
-					className={`transaction flex content-between border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span>
+					className={`transaction flex border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
+					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} pt-[2.25%]`}>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
 						{transactionInfo?.amount.toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}
