@@ -248,6 +248,12 @@ export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: numbe
 		return new Date(a[0]) < new Date(b[0]) ? -1 : 1;
 	});
 
+	//If Account has only one transaction and that transaction gets deleted
+	if (dailyBalMap.size == 0) {
+		sortedBalStateMap.forEach(entry => entry[1](0));
+		return;
+	}
+
 	sortedBalStateMap.forEach((entry, i) => {
 		if (i == 0) {
 			if (new Date(dailyBalArr[0][0]).toDateString() === new Date(entry[0]).toDateString() || new Date(dailyBalArr[0][0]) < new Date(entry[0])) {

@@ -1,7 +1,7 @@
 import {createContext, useCallback, useEffect, useMemo, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
-import axios, {AxiosInterceptorOptions, AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 import { BankAccountAPIData, RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
 import { userLoginAPI, userRegisterAPI } from "../ApiCalls/UserAPI";
 import Cookies from "js-cookie";
@@ -76,6 +76,7 @@ export const UserProvider = ({ children }: Props) => {
 				if (res) {
 					Cookies.set("token", res?.data.token);
 					Cookies.set("user", JSON.stringify(res.data));
+					getAccounts(res.data.id);
 					setToken(res?.data.token);
 					setUser(res?.data);
 					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
