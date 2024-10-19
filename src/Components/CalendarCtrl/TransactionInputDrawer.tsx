@@ -50,7 +50,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 			const { date: newDate, ...transactionContainerInfo } = arg;
 
 			if (Object.keys(transactionContainerInfo).length === 0) {
-				setContainerInfo({ date: arg.date, amount: "0.00", title: "", editingExisting: false });
+				setContainerInfo({ date: arg.date, amount: "0.00", title: "", editingExisting: false, description:"" });
 				return;
 			} else {
 				setContainerInfo(arg);
@@ -318,7 +318,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						label="Description"
 						name="description"
 						onChange={updateExistingTransDisplay}
-						value={containerInfo?.description ? containerInfo.description : undefined}
+						value={containerInfo?.description ? containerInfo.description : ""}
 					/>
 					{containerInfo.editingExisting && (
 						<div className="delTransBtn absolute lg:flex-col lg:translate-y-2">
@@ -340,6 +340,8 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 export default TransactionInputDrawer;
 
 function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string, curAcct: BankAccountAPIData): PostTransactionAPIData {
+	console.log(targetData.description.value);
+
 	return {
 		userId: userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does

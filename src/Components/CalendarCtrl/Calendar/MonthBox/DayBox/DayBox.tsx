@@ -8,7 +8,15 @@ import AddTransactionIcon from "../../../../Icons/AddTransactionIcon";
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "./CustomPaginator";
 import { updateTransactionAPI } from "../../../../../Services/ApiCalls/TransactionAPI";
-import { calcDailyBalances, getDayOfWeek, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../../../../Utilities/UtilityFuncs";
+import {
+	calcDailyBalances,
+	closeDrawer,
+	getDayOfWeek,
+	getRandomNum,
+	highlightEditedTransactionSwitch,
+	updateDailyBalances,
+	updateDailyBalanceStates
+} from "../../../../../Utilities/UtilityFuncs";
 import { ErrorHandler } from "../../../../../Helpers/ErrorHandler";
 import {UserContext} from "../../../../../Services/Auth/UserAuth.tsx";
 
@@ -137,7 +145,7 @@ export default function DayBox({
 
 	function clickAddTransaction() {
 		highlightEditedTransactionSwitch();
-		openDrawer({ date: parseDate(dateString), editingExisting: false, amount: "0.00" });
+		openDrawer({ date: parseDate(dateString), editingExisting: false, amount: "0.00", description: ""});
 		addTransToDate.current = addTransactionToList;
 	}
 
@@ -275,6 +283,10 @@ export default function DayBox({
 		return "mobileTopBorder";
 	}
 
+	function clickOnDay(){
+		closeDrawer();
+	}
+
 	return (
 		<Card
 			radius="none"
@@ -282,6 +294,7 @@ export default function DayBox({
 			id={dateString}
 			className={`dayBox mobCol${dayGridSpot} ${mkMobileMnthStrBrdr(dayGridSpot, date)} col${dateObj.dayOfWeek} outline outline-1 ${mkMnthStrBdr(dateObj.dayOfWeek, date)} outline-slate-500`}>
 			<CardBody
+				onClick={clickOnDay}
 				onMouseEnter={toggleAddTransactionBtn}
 				onMouseLeave={toggleAddTransactionBtn}
 				className="px-1 py-0 overflow-x-hidden overflow-y-hidden"
