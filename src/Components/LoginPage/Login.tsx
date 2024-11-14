@@ -5,7 +5,6 @@ import * as Yup from "yup";
 import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
 import { yupResolver } from "@hookform/resolvers/yup";
-// @ts-expect-error - useForm is importing correctly
 import { useForm } from "react-hook-form";
 import { UserContext } from "../../Services/Auth/UserAuth";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";

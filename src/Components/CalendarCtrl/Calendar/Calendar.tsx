@@ -253,22 +253,22 @@ export default function Calendar({
 function calcMnthHt(monStDayOfWk: number, lengthOfMnth: number): number {
 	if (monStDayOfWk === 0) {
 		if (lengthOfMnth === 28) {
-			return 15 * 4;
+			return 15.17 * 4;
 		} else {
-			return 15 * 5;
+			return 15.17 * 5;
 		}
 	} else if (monStDayOfWk === 1 || (monStDayOfWk > 1 && monStDayOfWk < 4) || monStDayOfWk === 4) {
-		return 15 * 5;
+		return 15.17 * 5;
 	} else if (monStDayOfWk === 5) {
 		if (lengthOfMnth <= 30) {
-			return 15 * 5;
+			return 15.17 * 5;
 		} else {
-			return 15 * 6;
+			return 15.17 * 6;
 		}
 	} else {
 		if (lengthOfMnth <= 29) {
-			return 15 * 5;
+			return 15.17 * 5;
 		}
-		return 15 * 6;
+		return 15.17 * 6;
 	}
 }

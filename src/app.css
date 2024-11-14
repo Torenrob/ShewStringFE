@@ -35,13 +35,9 @@
 	background-color: #0a0a0a;
 }
 
-.calTitleGrid {
-	grid-template-columns: repeat(auto-fit);
-}
-
 .dayBox {
-	min-height: 15vh;
-	max-height: 15vh;
+	min-height: 15.17vh;
+	max-height: 15.17vh;
 	outline-color: #45596b6c;
 	cursor: default;
 	pointer-events: auto;
@@ -244,9 +240,9 @@ div > .weekdayLabel {
 }
 
 .tabCont {
-	width: calc(100vw - 560px);
-	min-width: calc(100vw - 560px);
-	max-width: calc(100vw - 560px);
+	width: calc(100vw - 590px);
+	min-width: calc(100vw - 590px);
+	max-width: calc(100vw - 590px);
 	overflow-x: auto;
 	background-color: #0a0a0a;
 }
@@ -308,8 +304,7 @@ input[type="month"]:focus {
 .submitDatesBtn {
 	position: relative;
 	background-color: #0a0a0a;
-	width: 26px;
-	height: 24px;
+	max-height: 2.5vh;
 	margin-left: 14px;
 }
 
@@ -341,16 +336,18 @@ input[type="month"]:focus {
 }
 
 .calCtrlWrap {
-	max-height: 96.7vh;
+	max-height: 100vh;
+	padding-right: 0.5rem;
+	padding-bottom: 0.5rem;
 	grid-template-rows: 1fr 14fr;
-	border-bottom-left-radius: 7px;
-	border-bottom-right-radius: 7px;
 }
 
 .calWrap {
 	overflow-y: scroll;
 	scroll-snap-type: y mandatory;
 	scrollbar-width: none;
+	border-bottom-left-radius: 7px;
+	border-bottom-right-radius: 7px;
 	-ms-overflow-style: none;
 }
 

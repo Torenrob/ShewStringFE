@@ -6,7 +6,6 @@ import { deleteBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI";
 import { BankAccountAPIData } from "../../Types/APIDataTypes";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
 import { UserContext } from "../../Services/Auth/UserAuth";
-import {number} from "yup";
 
 export default function DelAccountModal({
 	closeModal,

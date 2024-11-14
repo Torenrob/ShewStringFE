@@ -272,7 +272,7 @@ export default function CalendarCtrl() {
 
 	return (
 		<div className="relative calCtrlWrap overflow-clip grid">
-			<div className="w-full">
+			<div className="w-full pt-2">
 				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-0.5 h-fit">
 					<div id="calCntrlAcctsLabel" className="flex lg:justify-center md:ml-80">
 						<span>Accounts</span>
@@ -285,7 +285,7 @@ export default function CalendarCtrl() {
 						<span>Month Range</span>
 					</div>
 				</div>
-				<div className="flex calCtrlCont">
+				<div className="flex calCtrlCont pt-2">
 					<div onWheel={tabScroll} className="tabCont" ref={acctScrollCont}>
 						<Tabs
 							ref={tabsRef}

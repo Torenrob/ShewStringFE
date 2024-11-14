@@ -120,7 +120,7 @@ export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMont
 	if (firstDay === 0) {
 		return prevYtrans;
 	} else {
-		return prevYtrans + 15;
+		return prevYtrans + 15.17;
 	}
 }
 
@@ -133,7 +133,7 @@ export function setMobileProps(index: number, prevMobileY: number, prevMobileEnd
 
 	const mS = prevMobileEnd == 1 ? 2 : 1;
 
-	return { mobileStart: mS, mobileEnd: lengthOfMnth % 2 == 0 ? (mS == 1 ? 2 : 1) : mS, mobileY: mS == 1 ? prevMobileY : prevMobileY + 15 };
+	return { mobileStart: mS, mobileEnd: lengthOfMnth % 2 == 0 ? (mS == 1 ? 2 : 1) : mS, mobileY: mS == 1 ? prevMobileY : prevMobileY + 15.17 };
 }
 
 export function closeDrawer() {
