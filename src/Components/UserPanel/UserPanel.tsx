@@ -8,7 +8,7 @@ export default function UserPanel() {
 	const { user } = useContext(UserContext);
 
 	return (
-		<div className="text-white text-center pl-[0.375rem] pt-[0.65rem] pb-[0.65rem] flex-col h-full">
+		<div className="text-white text-center pl-[0.375rem] pt-[0.65rem] pb-[0.65rem] flex-col h-full max-w-[17%] min-w-[17%] w-[17%]">
 			<div className="pt-2 h-full rounded-lg">
 				<div className="flex justify-center gap-1 ">
 					<CalendarIcon size={91} landing={false} />

@@ -74,7 +74,7 @@ export default function CalendarCtrl() {
 
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
-		if (tabsRef.current === null) {
+		if (tabsRef.current === null || tabContRef.current === null) {
 			setIsReady(true);
 			return;
 		}
@@ -83,7 +83,11 @@ export default function CalendarCtrl() {
 			return;
 		}
 		const numAccts = bankAccounts.length;
-		const updWidth = numAccts * 128 - (numAccts - 1) * 17;
+		let updWidth = numAccts * 128 - (numAccts - 1) * 13;
+
+		if (updWidth >= Number(tabContRef.current.clientWidth)) {
+			updWidth = Number(tabContRef.current.clientWidth);
+		}
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
 		setIsReady(true);
 	}, [bankAccounts]);
@@ -120,6 +124,7 @@ export default function CalendarCtrl() {
 	}
 
 	const tabsRef = useRef<HTMLDivElement>(null);
+	const tabContRef = useRef<HTMLDivElement>(null);
 	const acctScrollCont = useRef<HTMLDivElement>(null);
 
 	//Function for updating acct transactions when submitting trans for a different account than currently chosen
@@ -184,12 +189,11 @@ export default function CalendarCtrl() {
 	}
 
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
-		e.preventDefault();
 		//@ts-expect-error - deltaY is on nativeEvent
 		if (e.nativeEvent.deltaY > 0) {
-			acctScrollCont.current!.scrollLeft += 40;
+			tabsRef.current!.scrollLeft += 40;
 		} else {
-			acctScrollCont.current!.scrollLeft -= 40;
+			tabsRef.current!.scrollLeft -= 40;
 		}
 	}
 
@@ -276,59 +280,57 @@ export default function CalendarCtrl() {
 
 	return (
 		<div className="relative calCtrlWrap overflow-clip grid">
-			<div className="w-full flex-col">
-				<div className="flex w-full justify-between">
-					<div className="flex-col grow">
+			<div className="flex-col">
+				<div className="flex justify-between max-w-full">
+					<div ref={tabContRef} className="flex-col w-[76%]">
 						<div
 							className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
 							<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
 								<span>Accounts</span>
 								<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal}/>
 							</div>
-							<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%]">
+							<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%] w-44">
 								<span>{monthLabel}</span>
 							</div>
 						</div>
-						<div className="flex calCtrlCont">
-							<div onWheel={tabScroll} className="tabCont grow" ref={acctScrollCont}>
-								<Tabs
-									ref={tabsRef}
-									variant="underlined"
-									color="primary"
-									onSelectionChange={acctTabCntrlr}
-									selectedKey={selectedAcct}
-									motionProps={{
-										transition: {duration: 0.9},
-									}}
-									className="pt-0.5"
-									classNames={{
-										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
-										cursor: "w-full",
-										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-										tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
-									}}>
-									{bankAccounts.map((bA, i) => {
-										return (
-											<Tab
-												style={{
-													position: "relative",
-													transform: `translateX(-${i * 13}px)`,
-													zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
-												}}
-												className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
-												title={bA.title}
-												key={bA.id}></Tab>
-										);
-									})}
-								</Tabs>
-							</div>
+						<div onWheel={tabScroll} className="tabCont pt-[0.1rem]" ref={acctScrollCont}>
+							<Tabs
+								ref={tabsRef}
+								variant="underlined"
+								color="primary"
+								onSelectionChange={acctTabCntrlr}
+								selectedKey={selectedAcct}
+								motionProps={{
+									transition: {duration: 0.9},
+								}}
+								className="pt-0.5"
+								classNames={{
+									tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
+									cursor: "w-full",
+									tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+									tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+								}}>
+								{bankAccounts.map((bA, i) => {
+									return (
+										<Tab
+											style={{
+												position: "relative",
+												transform: `translateX(-${i * 13}px)`,
+												zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+											}}
+											className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+											title={bA.title}
+											key={bA.id}></Tab>
+									);
+								})}
+							</Tabs>
 						</div>
 					</div>
-					<div className="flex-col">
+					<div className="flex-col w-[24%]">
 						<div className="hidden md:flex justify-center relative text-white">
 							<span>Month Range</span>
 						</div>
-						<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-0.5 bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
+						<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-[0.2rem] bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
 							<input
 							name="startMonth"
 								defaultValue={defaultMonthRange()[0]}

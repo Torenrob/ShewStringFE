@@ -13,8 +13,8 @@ export default function MainPage() {
 	return (
 		<div className="box-border mainPage">
 			<UserPanel />
-			<div className="pl-[0.375rem] pb-[0.375rem] pt-[0.55rem] pr-[0.375rem]">
-				<div className="rightPanelCal rounded-lg">
+			<div className="pl-[0.375rem] pb-[0.375rem] pt-[0.55rem] pr-[0.375rem] max-w-[83%] min-w-[83%] w-[83%]">
+				<div className="rightPanelCal rounded-lg max-w-full">
 					<CalendarCtrl />
 				</div>
 			</div>

@@ -212,14 +212,14 @@ div > .weekdayLabel {
 	background: #2c2c2c !important;
 }
 
-.acctTabs::before {
-	position: absolute;
-	top: 0;
-	content: "";
-	width: .5rem;
-	height: .5rem;
-	background-color: white;
-}
+/*.acctTabs::before {*/
+/*	position: absolute;*/
+/*	top: 0;*/
+/*	content: "";*/
+/*	width: .5rem;*/
+/*	height: .5rem;*/
+/*	background-color: white;*/
+/*}*/
 
 .selTab {
 	background: #6ec4a7 !important;
@@ -235,15 +235,7 @@ div > .weekdayLabel {
 }
 
 .tabCont::-webkit-scrollbar {
-	height: 3.5px;
-}
-
-.tabCont::-webkit-scrollbar-track {
-	background: black;
-}
-
-.tabCont::-webkit-scrollbar-thumb {
-	background-color: white;
+	display: none;
 }
 
 .mnthStartBrdr1stNotSun {
@@ -317,7 +309,7 @@ input[type="month"]:focus {
 }
 
 .calCtrlWrap {
-	max-height: 96.6vh;
+	max-height: 96.2vh;
 	grid-template-rows: 1fr 14fr;
 }
 
@@ -441,19 +433,6 @@ input[type="month"]:focus {
 		grid-template-columns: 1fr;
 		grid-template-rows: 1fr 0.5fr 0.5fr 1fr;
 		padding: 11% 10%;
-	}
-
-	.tabCont {
-		height: auto;
-		width: 100vw;
-		max-width: 100vw;
-		min-width: 100vw;
-	}
-
-	.calCtrlCont {
-		max-width: 99vw;
-		display: flex;
-		flex-direction: column;
 	}
 
 	.drawerClosed {
