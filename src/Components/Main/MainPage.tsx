@@ -13,7 +13,11 @@ export default function MainPage() {
 	return (
 		<div className="box-border mainPage">
 			<UserPanel />
-			<CalendarCtrl />
+			<div className="pl-[0.375rem] pb-[0.375rem] pt-[0.55rem] pr-[0.375rem]">
+				<div className="rightPanelCal rounded-lg">
+					<CalendarCtrl />
+				</div>
+			</div>
 		</div>
 	);
 }

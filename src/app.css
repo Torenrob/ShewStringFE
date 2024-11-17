@@ -32,12 +32,12 @@
 #calendar {
 	position: relative;
 	z-index: 1;
-	background-color: #0a0a0a;
+	background-color: #EBEBEB;
 }
 
 .dayBox {
-	min-height: 15.17vh;
-	max-height: 15.17vh;
+	min-height: 14.9vh;
+	max-height: 14.9vh;
 	outline-color: #45596b6c;
 	cursor: default;
 	pointer-events: auto;
@@ -207,44 +207,31 @@ div > .weekdayLabel {
 
 .acctTabs {
 	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-	background: #0a0a0a !important;
+	border-top-left-radius: 0.125rem;
+	border-top-right-radius: 0.125rem;
+	background: #2c2c2c !important;
+}
+
+.acctTabs::before {
+	position: absolute;
+	top: 0;
+	content: "";
+	width: .5rem;
+	height: .5rem;
+	background-color: white;
 }
 
 .selTab {
 	background: #6ec4a7 !important;
 }
 
-.acctTabs::before {
-	content: "";
-	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-	width: 128px;
-	height: 24px;
-	position: absolute;
-	z-index: -1;
-	background-color: #6ec4a7;
-}
-
-.acctTabs::after {
-	content: "";
-	clip-path: polygon(10% 0%, 90% 0%, 99% 100%, 1% 100%);
-	width: 124px;
-	height: 22px;
-	position: absolute;
-	transform: translateY(1px);
-	z-index: 1;
-	background-color: inherit;
-}
-
 .calCtrlCont {
-	background-color: var(--60color);
+	background-color: #1a1a1a;
 }
 
 .tabCont {
-	width: calc(100vw - 590px);
-	min-width: calc(100vw - 590px);
-	max-width: calc(100vw - 590px);
 	overflow-x: auto;
-	background-color: #0a0a0a;
+	background-color: #1a1a1a;
 }
 
 .tabCont::-webkit-scrollbar {
@@ -287,12 +274,6 @@ div > .weekdayLabel {
 	clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
-.mnthPicker {
-	height: 22px;
-	width: 126px;
-	padding-top: 6px;
-}
-
 input[type="month"]::-webkit-calendar-picker-indicator {
 	filter: invert(0%) sepia(48%) saturate(656%) hue-rotate(55deg) brightness(110%) contrast(92%);
 }
@@ -332,13 +313,11 @@ input[type="month"]:focus {
 }
 
 .acctOptIcon {
-	transform: translateY(2.25px) translateX(5px);
+	transform: translateY(2px) translateX(5px);
 }
 
 .calCtrlWrap {
-	max-height: 100vh;
-	padding-right: 0.5rem;
-	padding-bottom: 0.5rem;
+	max-height: 96.6vh;
 	grid-template-rows: 1fr 14fr;
 }
 
@@ -346,17 +325,13 @@ input[type="month"]:focus {
 	overflow-y: scroll;
 	scroll-snap-type: y mandatory;
 	scrollbar-width: none;
-	border-bottom-left-radius: 7px;
-	border-bottom-right-radius: 7px;
+	border-bottom-left-radius: 0.5rem;
+	border-bottom-right-radius: 0.5rem;
 	-ms-overflow-style: none;
 }
 
 .calWrap::-webkit-scrollbar {
 	display: none;
-}
-
-.userPanel {
-	background-color: #0a0a0a;
 }
 
 .delTransBtn {
@@ -466,10 +441,6 @@ input[type="month"]:focus {
 		grid-template-columns: 1fr;
 		grid-template-rows: 1fr 0.5fr 0.5fr 1fr;
 		padding: 11% 10%;
-	}
-
-	.calCtrlWrap {
-		max-height: 95.5vh;
 	}
 
 	.tabCont {

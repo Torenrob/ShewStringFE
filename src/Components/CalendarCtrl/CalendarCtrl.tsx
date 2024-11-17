@@ -270,79 +270,92 @@ export default function CalendarCtrl() {
 		}
 	}
 
+	const firstTabSelected: boolean = useMemo(() => {
+		return selectedAcct === bankAccounts[0].id.toString();
+	}, [selectedAcct, bankAccounts])
+
 	return (
 		<div className="relative calCtrlWrap overflow-clip grid">
-			<div className="w-full pt-2">
-				<div className="flex relative text-sm text-white bg-[#0A0A0A] py-0.5 h-fit">
-					<div id="calCntrlAcctsLabel" className="flex lg:justify-center md:ml-80">
-						<span>Accounts</span>
-						<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
+			<div className="w-full flex-col">
+				<div className="flex w-full justify-between">
+					<div className="flex-col grow">
+						<div
+							className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
+							<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
+								<span>Accounts</span>
+								<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal}/>
+							</div>
+							<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%]">
+								<span>{monthLabel}</span>
+							</div>
+						</div>
+						<div className="flex calCtrlCont">
+							<div onWheel={tabScroll} className="tabCont grow" ref={acctScrollCont}>
+								<Tabs
+									ref={tabsRef}
+									variant="underlined"
+									color="primary"
+									onSelectionChange={acctTabCntrlr}
+									selectedKey={selectedAcct}
+									motionProps={{
+										transition: {duration: 0.9},
+									}}
+									className="pt-0.5"
+									classNames={{
+										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
+										cursor: "w-full",
+										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+										tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+									}}>
+									{bankAccounts.map((bA, i) => {
+										return (
+											<Tab
+												style={{
+													position: "relative",
+													transform: `translateX(-${i * 13}px)`,
+													zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+												}}
+												className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+												title={bA.title}
+												key={bA.id}></Tab>
+										);
+									})}
+								</Tabs>
+							</div>
+						</div>
 					</div>
-					<div className="calCntrlMonthLabel lg:ml-[410px] font-bold lg:w-72">
-						<span>{monthLabel}</span>
-					</div>
-					<div className="hidden md:flex justify-center relative md:left-[255px] md:w-[336px]">
-						<span>Month Range</span>
-					</div>
-				</div>
-				<div className="flex calCtrlCont pt-2">
-					<div onWheel={tabScroll} className="tabCont" ref={acctScrollCont}>
-						<Tabs
-							ref={tabsRef}
-							variant="underlined"
-							color="primary"
-							onSelectionChange={acctTabCntrlr}
-							selectedKey={selectedAcct}
-							motionProps={{
-								transition: { duration: 0.9 },
-							}}
-							className="border-b-1 border-b-[#6ec4a7]"
-							classNames={{
-								tabList: "rounded-none p-0 gap-0 bg-[#0A0A0A]",
-								cursor: "w-full bg-[#6EC4A7]",
-								tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-								tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
-							}}>
-							{bankAccounts.map((bA, i) => {
-								return (
-									<Tab
-										style={{
-											position: "relative",
-											transform: `translateX(-${i * 17}px)`,
-											zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
-										}}
-										className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
-										title={bA.title}
-										key={bA.id}></Tab>
-								);
-							})}
-						</Tabs>
-					</div>
-					<form id="monthRangeForm" className="flex pl-2 bg-[#6EC4A7] mnthPickBox" onSubmit={submitMonthRange}>
-						<input
+					<div className="flex-col">
+						<div className="hidden md:flex justify-center relative text-white">
+							<span>Month Range</span>
+						</div>
+						<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-0.5 bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
+							<input
 							name="startMonth"
-							defaultValue={defaultMonthRange()[0]}
-							// value={startMonth ? startMonth : defaultMonthRange()[0]}
-							// onChange={updStartMnth}
-							id="start"
-							type="month"
-							className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
-						/>
-						<SpanIcon />
-						<input
-							name="endMonth"
-							defaultValue={defaultMonthRange()[1]}
-							// onChange={updEndMnth}
-							id="endMonth"
-							type="month"
-							className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
-						/>
-						<Button type="submit" form="monthRangeForm" isIconOnly className="submitDatesBtn self-center" radius="none" size="sm">
-							<CheckIcon />
-						</Button>
-					</form>
+								defaultValue={defaultMonthRange()[0]}
+								// value={startMonth ? startMonth : defaultMonthRange()[0]}
+								// onChange={updStartMnth}
+								id="start"
+								type="month"
+								className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
+							/>
+							<SpanIcon/>
+							<input
+								name="endMonth"
+								defaultValue={defaultMonthRange()[1]}
+								// onChange={updEndMnth}
+								id="endMonth"
+								type="month"
+								className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
+							/>
+							<Button type="submit" form="monthRangeForm" isIconOnly
+									className="submitDatesBtn self-center" radius="none" size="sm">
+								<CheckIcon/>
+							</Button>
+						</form>
+					</div>
 				</div>
-				<div className="grid grid-cols-7 text-xs font-semibold weekdayLabel">
+				<div
+					className={`grid grid-cols-7 text-xs font-semibold weekdayLabel ${firstTabSelected ? "" : "rounded-tl-md"}`}>
 					<div>Sunday</div>
 					<div>Monday</div>
 					<div>Tuesday</div>

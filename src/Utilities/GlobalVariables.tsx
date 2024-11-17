@@ -1,0 +1,1 @@
+export const dayBoxHeight = 14.9;

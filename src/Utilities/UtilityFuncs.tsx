@@ -1,6 +1,7 @@
 import { TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
 import Cookies from "js-cookie";
+import {dayBoxHeight} from "./GlobalVariables.tsx";
 
 export function getDayOfWeek(num: number): string {
 	switch (num) {
@@ -120,7 +121,7 @@ export function setYtrans(index: number, prevYtrans: number, monthObj: LocalMont
 	if (firstDay === 0) {
 		return prevYtrans;
 	} else {
-		return prevYtrans + 15.17;
+		return prevYtrans + dayBoxHeight;
 	}
 }
 
@@ -133,7 +134,7 @@ export function setMobileProps(index: number, prevMobileY: number, prevMobileEnd
 
 	const mS = prevMobileEnd == 1 ? 2 : 1;
 
-	return { mobileStart: mS, mobileEnd: lengthOfMnth % 2 == 0 ? (mS == 1 ? 2 : 1) : mS, mobileY: mS == 1 ? prevMobileY : prevMobileY + 15.17 };
+	return { mobileStart: mS, mobileEnd: lengthOfMnth % 2 == 0 ? (mS == 1 ? 2 : 1) : mS, mobileY: mS == 1 ? prevMobileY : prevMobileY + dayBoxHeight };
 }
 
 export function closeDrawer() {

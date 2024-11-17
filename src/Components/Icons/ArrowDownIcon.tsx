@@ -1,4 +1,4 @@
-export default function ArrowDownIcon(props: { position?: string; top?: string }): Element {
+export default function ArrowDownIcon(props: { position?: string; top?: string }): JSX.Element {
 	return (
 		<svg className={`absolute ${props.position} ${props.top}`} width="40px" height="40px" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path
@@ -6,5 +6,5 @@ export default function ArrowDownIcon(props: { position?: string; top?: string }
 				fill="#FFFFFFFF"
 			/>
 		</svg>
-	);
+	)
 }

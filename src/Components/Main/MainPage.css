@@ -1,9 +1,14 @@
 .mainPage {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr 5fr;
 	height: 100vh;
 	background-color: #0a0a0a;
 	/*padding: 0.5% 0.5% 0 0.5%;*/
+}
+
+.rightPanelCal {
+	padding: 0.5rem 0.5rem 0.7rem 0.5rem;
+	background-color: #1a1a1a;
 }
 
 @media (max-width: 560px) {
