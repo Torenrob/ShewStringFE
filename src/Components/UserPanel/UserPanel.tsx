@@ -20,7 +20,6 @@ export default function UserPanel() {
 					</Button>
 					<div className="flex items-center">{user?.username}</div>
 				</div>
-
 				<div className="relative top-[35%] hidden lg:block">
 
 				</div>

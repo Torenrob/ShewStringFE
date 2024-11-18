@@ -206,10 +206,11 @@ div > .weekdayLabel {
 }
 
 .acctTabs {
+	color: black;
 	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
 	border-top-left-radius: 0.125rem;
 	border-top-right-radius: 0.125rem;
-	background: #2c2c2c !important;
+	background: #14775b !important;
 }
 
 /*.acctTabs::before {*/
@@ -277,7 +278,6 @@ input[type="month"]:focus {
 .submitDatesBtn {
 	position: relative;
 	background-color: #0a0a0a;
-	max-height: 2.5vh;
 	margin-left: 14px;
 }
 

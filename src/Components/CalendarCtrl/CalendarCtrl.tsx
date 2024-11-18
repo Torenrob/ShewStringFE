@@ -308,7 +308,7 @@ export default function CalendarCtrl() {
 									tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
 									cursor: "w-full",
 									tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-									tabContent: "group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+									tabContent: " text-[#FGFGFG] group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
 								}}>
 								{bankAccounts.map((bA, i) => {
 									return (
@@ -350,7 +350,7 @@ export default function CalendarCtrl() {
 								className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
 							/>
 							<Button type="submit" form="monthRangeForm" isIconOnly
-									className="submitDatesBtn self-center" radius="none" size="sm">
+									className="submitDatesBtn self-center h-full" radius="none" size="sm">
 								<CheckIcon/>
 							</Button>
 						</form>
