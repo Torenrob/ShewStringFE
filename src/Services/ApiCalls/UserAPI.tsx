@@ -17,6 +17,7 @@ export const userLoginAPI = async (username: string, password: string) => {
 
 export const userRegisterAPI = async (registerUser: RegisterUserInfo): Promise<AxiosResponse<UserProfile> | void> => {
 	try {
+		console.log(api)
 		return await axios.post<UserProfile>(api + "/register", registerUser);
 	} catch (err) {
 		ErrorHandler(err);

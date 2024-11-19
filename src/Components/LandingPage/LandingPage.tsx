@@ -31,7 +31,7 @@ export default function LandingPage() {
 				</Button>
 			</div>
 			<div className="landingPageTitle flex text-[2.75rem] md:text-[6.5rem] xl:text-[12rem]">
-				<CalendarIcon size={91} landing={true}/>
+				<CalendarIcon size={91} landingPage={true}/>
 				<div className="align-middle">ShewString</div>
 				<div className="landingTagLine absolute whitespace-nowrap text-[0.65rem]  text-[#6EC4A7] bottom-[0.05rem] right-6 md:text-[1.5rem] md:bottom-2 md:right-14 xl:text-[2.5rem] xl:bottom-4 xl:right-28">
 					Your Finances, Organized and On Time

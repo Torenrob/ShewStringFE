@@ -1,1 +1,1 @@
-export const dayBoxHeight = 14.9;
+export const dayBoxHeight = 15;

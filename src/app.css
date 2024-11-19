@@ -36,8 +36,8 @@
 }
 
 .dayBox {
-	min-height: 14.9vh;
-	max-height: 14.9vh;
+	min-height: 15vh;
+	max-height: 15vh;
 	outline-color: #45596b6c;
 	cursor: default;
 	pointer-events: auto;
@@ -213,6 +213,11 @@ div > .weekdayLabel {
 	background: #14775b !important;
 }
 
+.acctTabs:last-of-type {
+	background-color: #1a1a1a !important;
+	color: var(--30color) !important;
+}
+
 /*.acctTabs::before {*/
 /*	position: absolute;*/
 /*	top: 0;*/
@@ -287,7 +292,7 @@ input[type="month"]:focus {
 }
 
 .addAcctModal {
-	color: white;
+	color: #d6d6d6;
 	position: absolute;
 	z-index: 50;
 	top: 50%;
@@ -309,7 +314,7 @@ input[type="month"]:focus {
 }
 
 .calCtrlWrap {
-	max-height: 96.2vh;
+	max-height: 97vh;
 	grid-template-rows: 1fr 14fr;
 }
 

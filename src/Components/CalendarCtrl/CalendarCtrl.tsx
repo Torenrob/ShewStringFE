@@ -70,6 +70,7 @@ export default function CalendarCtrl() {
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().getFullYear()}`);
+	const [tabShouldScroll, setTabShouldScroll] = useState<boolean>(false);
 	const [, setIsReady] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -85,7 +86,8 @@ export default function CalendarCtrl() {
 		const numAccts = bankAccounts.length;
 		let updWidth = numAccts * 128 - (numAccts - 1) * 13;
 
-		if (updWidth >= Number(tabContRef.current.clientWidth)) {
+		if (updWidth > Number(tabContRef.current.clientWidth)) {
+			setTabShouldScroll(true);
 			updWidth = Number(tabContRef.current.clientWidth);
 		}
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
@@ -189,6 +191,7 @@ export default function CalendarCtrl() {
 	}
 
 	function tabScroll(e: React.UIEvent<HTMLDivElement, UIEvent>) {
+		if (!tabShouldScroll) return;
 		//@ts-expect-error - deltaY is on nativeEvent
 		if (e.nativeEvent.deltaY > 0) {
 			tabsRef.current!.scrollLeft += 40;
@@ -274,15 +277,11 @@ export default function CalendarCtrl() {
 		}
 	}
 
-	const firstTabSelected: boolean = useMemo(() => {
-		return selectedAcct === bankAccounts[0].id.toString();
-	}, [selectedAcct, bankAccounts])
-
 	return (
 		<div className="relative calCtrlWrap overflow-clip grid">
 			<div className="flex-col">
 				<div className="flex justify-between max-w-full">
-					<div ref={tabContRef} className="flex-col w-[76%]">
+					<div ref={tabContRef} className="flex-col w-[76.7%]">
 						<div
 							className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
 							<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
@@ -308,7 +307,7 @@ export default function CalendarCtrl() {
 									tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
 									cursor: "w-full",
 									tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-									tabContent: " text-[#FGFGFG] group-data-[hover=true]:text-[white] group-data-[selected=true]:text-[#0a0a0a] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+									tabContent: " text-[#d6d6d6] group-data-[hover=true]:text-[#1a1a1a] group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
 								}}>
 								{bankAccounts.map((bA, i) => {
 									return (
@@ -318,7 +317,7 @@ export default function CalendarCtrl() {
 												transform: `translateX(-${i * 13}px)`,
 												zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
 											}}
-											className={`${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+											className={`data-[hover=true]:!bg-[#54a18d] data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
 											title={bA.title}
 											key={bA.id}></Tab>
 									);
@@ -326,7 +325,7 @@ export default function CalendarCtrl() {
 							</Tabs>
 						</div>
 					</div>
-					<div className="flex-col w-[24%]">
+					<div className="flex-col w-[23.3%]">
 						<div className="hidden md:flex justify-center relative text-white">
 							<span>Month Range</span>
 						</div>
@@ -357,7 +356,7 @@ export default function CalendarCtrl() {
 					</div>
 				</div>
 				<div
-					className={`grid grid-cols-7 text-xs font-semibold weekdayLabel ${firstTabSelected ? "" : "rounded-tl-md"}`}>
+					className={`grid grid-cols-7 text-xs font-semibold weekdayLabel rounded-tl-sm`}>
 					<div>Sunday</div>
 					<div>Monday</div>
 					<div>Tuesday</div>

@@ -159,7 +159,7 @@ export default function DayBox({
 			//Had to remove BankAccountId from Entity in BE due to JPA not handling cyclic relationship
 			//Optional BankAccountId here because I'm hoping to add it back
 			bankAccountId: trans.bankAccountId?.toString(),
-			category: trans.category,
+			category: trans.category.title,
 			description: trans.description,
 			title: trans.title,
 			editingExisting: true,

@@ -1,10 +1,11 @@
 import React from "react";
+import {bool} from "yup";
 
-export default function CalendarIcon(props: {size: number; landing: boolean}) {
+export default function CalendarIcon(props: {size: number; landingPage: boolean; userPanel?: boolean}) {
 	return (
 		<div>
 			<svg
-				className={`${props.landing ? "w-[2.75rem] h-[2.75rem] relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-55%] md:w-[6.5rem] md:h-[6.55rem] xl:w-[12rem] xl:h-[12rem]" : "w-[2rem] h-[2rem]"}`}
+				className={`${props.landingPage ? "w-[2.75rem] h-[2.75rem] relative top-[50%] left-[50%] translate-x-[-50%] translate-y-[-55%] md:w-[6.5rem] md:h-[6.55rem] xl:w-[12rem] xl:h-[12rem]" : props.userPanel ? "relative w-[1.375rem] h-[1.375rem]" : "w-[2rem] h-[2rem]"}`}
 				viewBox={`0 0 ${props.size} ${props.size}`}
 				enableBackground="new 0 0 91 91"
 				id="Layer_1"

@@ -12,7 +12,7 @@ export interface TransactionAPIData {
 	transactionType: "Debit" | "Credit";
 	amount: number;
 	date: string;
-	category: string;
+	category: Category;
 	description: string | null;
 	bankAccountId?: number;
 	repeatGroupId: number | null;
@@ -24,7 +24,7 @@ export interface PostTransactionAPIData {
 	transactionType: 0 | 1;
 	amount: number;
 	date: string;
-	category: string;
+	category: Category;
 	description: string | null;
 	bankAccountId: number;
 }
@@ -44,7 +44,7 @@ export interface RegisterUserInfo {
 export interface UserProfile {
 	id: string;
 	username: string;
-	categories: string[];
+	categories: Category[];
 	email: string;
 	firstName: string;
 	lastName: string;
@@ -54,10 +54,16 @@ export interface UserProfile {
 export interface UserProfile_BankAccounts {
 	id: string;
 	bankAccounts: BankAccountAPIData[];
-	categories: string[];
+	categories: Category[];
 	username: string;
 	email: string;
 	firstName: string;
 	lastName: string;
 	token: string;
+}
+
+export interface Category {
+	id: number;
+	title: string;
+	budgetLimit: number;
 }

@@ -8,7 +8,7 @@ import {
 	Textarea
 } from "@nextui-org/react";
 import React, {ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState} from "react";
-import {BankAccountAPIData, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
+import {BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
 import ArrowDownIcon from "../Icons/ArrowDownIcon";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
 import {deleteTransactionAPI, postTransactionAPI, updateTransactionAPI} from "../../Services/ApiCalls/TransactionAPI";
@@ -64,7 +64,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	async function SubmitTransaction(event: React.FormEvent<HTMLFormElement>, editingExisting: boolean) {
 		setSubmittingTransaction(true);
 		event.preventDefault();
-		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType, user!.id, currentAcct);
+		const postTransactionData = mkPostTransAPIData(event.currentTarget, transactionType, user!.id, currentAcct, user!.categories!);
 		let response;
 		let editTransactionIsSameDate: boolean;
 		if (containerInfo.editingExisting) {
@@ -309,7 +309,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						onChange={updateExistingTransDisplay}
 						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
 						{user!.categories.map((cat) => {
-							return <SelectItem key={cat}>{cat}</SelectItem>;
+							return <SelectItem value={cat.id} key={cat.id}>{cat.title}</SelectItem>;
 						})}
 					</Select>
 					<Textarea
@@ -339,9 +339,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 export default TransactionInputDrawer;
 
-function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string, curAcct: BankAccountAPIData): PostTransactionAPIData {
-	console.log(targetData.description.value);
-
+function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transactionType: boolean, userId: string, curAcct: BankAccountAPIData, categoryList: Category[]): PostTransactionAPIData {
 	return {
 		userId: userId,
 		// @ts-expect-error - TS complains about title not having a value due to it being a string, but it does
@@ -350,7 +348,7 @@ function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transacti
 		bankAccountId: targetData.account.value ? targetData.account.value : curAcct.id,
 		date: targetData.date.value,
 		amount: targetData.amount.value,
-		category: targetData.category.value,
+		category: getCategory(categoryList,targetData.category.value)!,
 		description: targetData.description.value,
 	};
 }
@@ -362,4 +360,8 @@ function mkUpdTransAPIData(curTransInfo: TransactionAPIData, newTransInfo: PostT
 		id: curTransInfo.id,
 		repeatGroupId: curTransInfo.repeatGroupId,
 	};
+}
+
+function getCategory(categories: Category[], selectedCategory: number) {
+	return categories.find(e => e.id === selectedCategory);
 }
