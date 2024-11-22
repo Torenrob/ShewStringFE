@@ -30,57 +30,45 @@ function _getCurrMonth(): LocalMonth {
 }
 
 //Calculate Month Comp arr on initialization
-function calcInitMonth({
-	index,
-	currentMonth,
-	prevYtrans,
-	prevMobileY,
-	prevMobileEnd,
-}: {
-	index: number;
-	currentMonth: LocalMonth;
+function calcInitMonth({index,currentMonth,prevYtrans,prevMobileY,prevMobileEnd,}: {index: number;currentMonth: LocalMonth;
 	prevYtrans: number;
 	prevMobileY: number;
 	prevMobileEnd: number;
 }): LocalMonth {
-	if (index == 7) {
-		currentMonth.styleYtransition = setYtrans(index, prevYtrans, currentMonth);
-		const mobileProps = setMobileProps(index, prevMobileY, prevMobileEnd, currentMonth);
-		currentMonth.mobileEnd = mobileProps.mobileEnd;
-		currentMonth.mobileStart = mobileProps.mobileStart;
-		currentMonth.mobileY = mobileProps.mobileY;
-		return currentMonth;
+	if (index === 7) {
+		return applyIndexSeven(currentMonth, index, prevYtrans, prevMobileY, prevMobileEnd);
 	}
-	const monthObject: LocalMonth = currentMonth;
-	const monthDiff: number = monthObject?.month + (index - 7);
-	const yearDiff: number = monthDiff % 12 === 0 ? Math.floor(monthDiff / 12) - 1 : Math.floor(monthDiff / 12);
 
-	if (monthDiff <= 12 && monthDiff >= 1) {
-		monthObject.month = monthDiff;
-		monthObject.monthName = getMonthName(monthObject?.month);
-		monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
+	const monthDiff = currentMonth.month + (index - 7);
+	const yearDiff = Math.floor((monthDiff - 1) / 12);
 
-		return createMonthObject(monthObject, index, prevYtrans,
-			setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
-	} else {
-		if (monthDiff > 12) {
-			monthObject.month = monthDiff % 12 === 0 ? 12 : monthDiff % 12;
-			monthObject.monthName = getMonthName(monthObject?.month);
-			monthObject.year = monthObject.year + yearDiff;
-			monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
-
-			return createMonthObject(monthObject, index, prevYtrans,
-				setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
-		} else {
-			monthObject.month = 12 + monthDiff == 0 ? 12 : monthDiff > -12 ? 12 + monthDiff : 12 + (monthDiff % 12);
-			monthObject.monthName = getMonthName(monthObject?.month);
-			monthObject.year = monthObject.year + yearDiff;
-			monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
-
-			return createMonthObject(monthObject, index, prevYtrans,
-				setMobileProps(index, prevMobileY,prevMobileEnd, monthObject));
-		}
+	if (monthDiff >= 1 && monthDiff <= 12) {
+		return updateMonthObject(currentMonth, index, prevYtrans, prevMobileY, prevMobileEnd, monthDiff, 0);
 	}
+
+	const adjustedMonth = monthDiff > 12 ? monthDiff % 12 || 12 : 12 + (monthDiff % 12);
+	return updateMonthObject(currentMonth, index, prevYtrans, prevMobileY, prevMobileEnd, adjustedMonth, yearDiff);
+}
+
+function applyIndexSeven(currentMonth: LocalMonth,index: number,prevYtrans: number, prevMobileY: number,prevMobileEnd: number
+): LocalMonth {
+	currentMonth.styleYtransition = setYtrans(index, prevYtrans, currentMonth);
+	const { mobileY, mobileStart, mobileEnd } = setMobileProps(index, prevMobileY, prevMobileEnd, currentMonth);
+	return { ...currentMonth, mobileY, mobileStart, mobileEnd };
+}
+
+function updateMonthObject(currentMonth: LocalMonth,index: number,prevYtrans: number,prevMobileY: number,prevMobileEnd: number,
+	month: number,
+	yearDiff: number
+): LocalMonth {
+	const updatedMonth = { ...currentMonth };
+	updatedMonth.month = month;
+	updatedMonth.monthName = getMonthName(month);
+	updatedMonth.year += yearDiff;
+	updatedMonth.styleYtransition = setYtrans(index, prevYtrans, updatedMonth);
+
+	const mobileProps = setMobileProps(index, prevMobileY, prevMobileEnd, updatedMonth);
+	return createMonthObject(updatedMonth, index, prevYtrans, mobileProps);
 }
 
 function mkMonthCompInfo(monthInfo: Date, prevYTrans: number, index: number, prevMobileY: number, prevMobileEnd: number): MonthComponentInfo {

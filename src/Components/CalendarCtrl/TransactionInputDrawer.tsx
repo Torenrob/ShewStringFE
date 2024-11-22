@@ -16,7 +16,7 @@ import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
 import DebitIcon from "../Icons/DebitIcon";
 import {CalendarContext, UpdateTransactionContainerInfo} from "./CalendarCtrl";
 import {ErrorHandler} from "../../Helpers/ErrorHandler";
-import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs";
+import {closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs";
 import CreditIcon from "../Icons/CreditIcon";
 import {UserContext} from "../../Services/Auth/UserAuth";
 import {AxiosResponse} from "axios";
@@ -43,17 +43,17 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 
 	const { user, updBankAccounts } = useContext(UserContext);
 	const [containerInfo, setContainerInfo] =
-		useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "", bankAccountId: currentAcct.id.toString()! });
+		useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "", category: user!.categories[0], bankAccountId: currentAcct.id.toString()! });
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
 			const { date: newDate, ...transactionContainerInfo } = arg;
 
 			if (Object.keys(transactionContainerInfo).length === 0) {
-				setContainerInfo({ date: arg.date, amount: "0.00", title: "", editingExisting: false, description:"" });
+				setContainerInfo({ ...containerInfo, date: arg.date, amount: "0.00", title: "", editingExisting: false, description:"" });
 				return;
 			} else {
-				setContainerInfo(arg);
+				setContainerInfo({...arg, category: containerInfo.category});
 				setTransactionType(arg.transactionObj ? arg.transactionObj?.transactionType === "Debit" : true);
 			}
 		},
@@ -158,6 +158,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	}
 
 	function handleAccountSelectChange(e: SharedSelection) {
+		console.log(e.currentKey);
 		updateExistingTransDisplay({target: {name: "account", value: e.currentKey}} as ChangeEvent<HTMLInputElement>)
 	}
 
@@ -170,7 +171,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 				setContainerInfo({ ...containerInfo, bankAccountId: e.target.value });
 				break;
 			case "category":
-				setContainerInfo({ ...containerInfo, category: e.target.value });
+				setContainerInfo({ ...containerInfo, category: user?.categories.find(x => x.id.toString() == e.target.value) });
 				break;
 			case "description":
 				setContainerInfo({ ...containerInfo, description: e.target.value });
@@ -240,7 +241,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							// placeholder={`${currentAcct.title}`}
 							radius="none"
 							size="sm"
-							selectedKeys={[`${currentAcct.id}`]}
+							defaultSelectedKeys={[`${currentAcct.id}`]}
 							label="Account"
 							name="account"
 							onSelectionChange={handleAccountSelectChange}
@@ -301,7 +302,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						</div>
 					</div>
 					<Select
-						selectedKeys={containerInfo?.category ? [`${containerInfo.category}`] : ["None"]}
+						defaultSelectedKeys={[`${containerInfo.category!.id}`]}
 						radius="none"
 						size="sm"
 						label="Category"

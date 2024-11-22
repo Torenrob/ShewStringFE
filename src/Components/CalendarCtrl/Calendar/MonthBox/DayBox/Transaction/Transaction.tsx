@@ -48,7 +48,9 @@ export default function Transaction({
 	const marqueeStyle: CSSProperties = {
 		marginRight: "3px",
 		position: "relative",
-		paddingTop: "2.5%"
+		paddingTop: "1%",
+		paddingBottom: "1%",
+		fontSize: "0.7rem"
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
@@ -103,8 +105,8 @@ export default function Transaction({
 					color={"secondary"}
 					radius="none"
 					size="sm"
-					className={`transaction align-middle flex content-center border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} pt-[2.25%]`}>
+					className={`transaction align-middle flex content-center border-0 mb-0.5 h-4 w-auto rounded-[0.25rem] transClass${transactionInfo.id}`}>
+					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} pt-[0.25%] pl-[0.25%] text-[0.7rem]`}>
 						${transactionInfo.transactionType === "Credit" ? "" : "("}
 						{transactionInfo.amount.toFixed(2)}
 						{transactionInfo.transactionType === "Debit" && ")"}
@@ -122,8 +124,8 @@ export default function Transaction({
 					variant={dragActive ? "solid" : "ghost"}
 					radius="none"
 					size="sm"
-					className={`transaction flex border-0 mb-0.5 h-4 w-auto transClass${transactionInfo.id}`}>
-					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} pt-[2.25%]`}>
+					className={`transaction flex border-0 mb-0.5 h-4 w-auto rounded-[0.25rem]  transClass${transactionInfo.id}`}>
+					<span className={`${transactionInfo.transactionType == "Debit" ? "text-red-600" : "text-green-600"} font-extrabold pt-[0.25%] pl-[0.25%] text-[0.7rem]`}>
 						${transactionInfo?.transactionType === "Credit" ? "" : "("}
 						{transactionInfo?.amount.toFixed(2)}
 						{transactionInfo?.transactionType === "Debit" && ")"}

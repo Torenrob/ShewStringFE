@@ -9,7 +9,7 @@ import React, {
 	useRef,
 	useState,
 } from "react";
-import {BankAccountAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
+import {BankAccountAPIData, Category, TransactionAPIData} from "../../Types/APIDataTypes";
 import {Button, DateValue, Tab, Tabs} from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon";
 import CheckIcon from "../Icons/CheckIcon";
@@ -42,7 +42,7 @@ export type UpdateTransactionContainerInfo = {
 	title?: string | null;
 	amount: string;
 	transactionType?: "Debit" | "Credit";
-	category?: string;
+	category?: Category;
 	description?: string | null;
 	bankAccountId?: string;
 	editingExisting: boolean;
@@ -331,7 +331,7 @@ export default function CalendarCtrl() {
 						</div>
 						<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-[0.2rem] bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
 							<input
-							name="startMonth"
+								name="startMonth"
 								defaultValue={defaultMonthRange()[0]}
 								// value={startMonth ? startMonth : defaultMonthRange()[0]}
 								// onChange={updStartMnth}

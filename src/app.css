@@ -4,10 +4,15 @@
 	--10color: white;
 	--60colorTransparent: #0a0a0ab7;
 	--monthBorderSize: 2px;
-	--color: #ab59b3e7;
+}
+
+@font-face {
+	font-family: 'Nunito';
+	src: url("./assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
 }
 
 #root {
+	/*font-family: Nunito, sans-serif;*/
 	scroll-behavior: smooth;
 }
 
@@ -36,8 +41,8 @@
 }
 
 .dayBox {
-	min-height: 15vh;
-	max-height: 15vh;
+	min-height: 14.9vh;
+	max-height: 14.9vh;
 	outline-color: #45596b6c;
 	cursor: default;
 	pointer-events: auto;
@@ -208,8 +213,6 @@ div > .weekdayLabel {
 .acctTabs {
 	color: black;
 	clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-	border-top-left-radius: 0.125rem;
-	border-top-right-radius: 0.125rem;
 	background: #14775b !important;
 }
 
@@ -217,15 +220,6 @@ div > .weekdayLabel {
 	background-color: #1a1a1a !important;
 	color: var(--30color) !important;
 }
-
-/*.acctTabs::before {*/
-/*	position: absolute;*/
-/*	top: 0;*/
-/*	content: "";*/
-/*	width: .5rem;*/
-/*	height: .5rem;*/
-/*	background-color: white;*/
-/*}*/
 
 .selTab {
 	background: #6ec4a7 !important;
@@ -314,7 +308,7 @@ input[type="month"]:focus {
 }
 
 .calCtrlWrap {
-	max-height: 97vh;
+	max-height: 96.5vh;
 	grid-template-rows: 1fr 14fr;
 }
 
@@ -322,8 +316,8 @@ input[type="month"]:focus {
 	overflow-y: scroll;
 	scroll-snap-type: y mandatory;
 	scrollbar-width: none;
-	border-bottom-left-radius: 0.5rem;
-	border-bottom-right-radius: 0.5rem;
+	border-bottom-left-radius: 0.275rem;
+	border-bottom-right-radius: 0.275rem;
 	-ms-overflow-style: none;
 }
 
