@@ -1,18 +1,24 @@
 import "./UserPanel.css"
-import React, {MouseEventHandler, useContext} from "react";
-import UserIcon from "../Icons/UserIcon";
-import {Button, Divider} from "@nextui-org/react";
-import { UserContext } from "../../Services/Auth/UserAuth";
-import CalendarIcon from "../Icons/CalendarIcon.tsx";
-import BudgetIcon from "../Icons/BudgetIcon.tsx";
-import {useLinkClickHandler} from "react-router-dom";
+import React, {useContext} from "react";
+import UserIcon from "../Icons/UserIcon/UserIcon.tsx";
+import {Button} from "@nextui-org/react";
+import {UserContext} from "../../Services/Auth/UserAuth";
+import CalendarIcon from "../Icons/CalendarIcon/CalendarIcon.tsx";
+import BudgetIcon from "../Icons/BudgetIcon/BudgetIcon.tsx";
+import {NavContext, SelectedNavItem} from "../Main/MainPageExports.tsx";
 
 export default function UserPanel() {
+	const SelectedNavItemRef = useContext(NavContext);
+
 	const { user } = useContext(UserContext);
 
 	function selectNavItem(e: React.MouseEvent) {
 		e.preventDefault()
 		const selectNavItem = e.currentTarget;
+
+		// @ts-expect-error - dataset.navItem is a property of currentTarget
+		SelectedNavItemRef.current = e.currentTarget.dataset.navItem;
+
 		document.getElementById("navItemSelected")?.removeAttribute("id")
 
 		selectNavItem.id = "navItemSelected";
@@ -33,11 +39,11 @@ export default function UserPanel() {
 				</div>
 				<hr className="userPanelDivider mb-4"/>
 				<div className="hidden relative lg:block text-large pl-[5%] pr-[5%] cursor-pointer">
-					<div className="flex gap-3 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems" onClick={selectNavItem}>
+					<div className="flex gap-3 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems" data-nav-item={SelectedNavItem.Calendar} id="navItemSelected" onClick={selectNavItem}>
 						<CalendarIcon size={120} landingPage={false} userPanel={true}/>
 						<span>Calendar</span>
 					</div>
-					<div className="flex gap-3.5 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems" onClick={selectNavItem}>
+					<div className="flex gap-3.5 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems" data-nav-item={SelectedNavItem.Budget}  onClick={selectNavItem}>
 						<BudgetIcon/>
 						<span className="relative right-[2%]">Budget</span>
 					</div>

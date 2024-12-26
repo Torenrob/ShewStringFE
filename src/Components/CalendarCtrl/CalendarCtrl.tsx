@@ -1,67 +1,26 @@
+import "./CalendarCtrl.css";
 import React, {
-	createContext,
 	FormEvent,
 	Key,
-	MutableRefObject,
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
-import {BankAccountAPIData, Category, TransactionAPIData} from "../../Types/APIDataTypes";
-import {Button, DateValue, Tab, Tabs} from "@nextui-org/react";
-import SpanIcon from "../Icons/SpanIcon";
-import CheckIcon from "../Icons/CheckIcon";
-import AddAccountModal from "./AddAccountModal";
-import SettingsIcon from "../Icons/SettingsIcon";
-import DelAccountModal from "./DelAccountModal";
-import TransactionInputDrawer, {TransactionInputDrawerRef} from "./TransactionInputDrawer";
-import {editTransOnDateFuncs} from "./Calendar/MonthBox/DayBox/DayBox";
+import {BankAccountAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
+import {Button, Tab, Tabs} from "@nextui-org/react";
+import SpanIcon from "../Icons/SpanIcon/SpanIcon.tsx";
+import CheckIcon from "../Icons/CheckIcon/CheckIcon.tsx";
+import AddAccountModal from "../AddAccountModal/AddAccountModal.tsx";
+import SettingsIcon from "../Icons/SettingsIcon/SettingsIcon.tsx";
+import DelAccountModal from "../DelAccountModal/DelAccountModal.tsx";
+import TransactionInputDrawer, {TransactionInputDrawerRef} from "../TransactionInputDrawer/TransactionInputDrawer.tsx";
+import {editTransOnDateFuncs} from "../DayBox/DayBox";
 import {getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
-import Calendar from "./Calendar/Calendar";
+import Calendar from "../Calendar/Calendar";
 import {UserContext} from "../../Services/Auth/UserAuth";
-
-export type MonthRange = {
-	startMonth: string;
-	endMonth: string;
-};
-
-export type DragObject = {
-	globalDragOn: boolean;
-	dropping: boolean | null;
-	paginationDragState: { (dragOn: boolean): void }[];
-	containerDropped: () => void;
-	removeTransactionFromDate: (transaction: TransactionAPIData) => void;
-	dragItemY: number;
-};
-
-export type UpdateTransactionContainerInfo = {
-	id?: number;
-	date?: DateValue;
-	title?: string | null;
-	amount: string;
-	transactionType?: "Debit" | "Credit";
-	category?: Category;
-	description?: string | null;
-	bankAccountId?: string;
-	editingExisting: boolean;
-	transactionObj?: TransactionAPIData;
-	deleteTransactionFromDate?: (trans: TransactionAPIData) => void;
-	editTransactionFunc?: (t: TransactionAPIData) => void;
-};
-
-export type CalendarContextType = {
-	openDrawer: (arg: UpdateTransactionContainerInfo) => void;
-	dragObject: MutableRefObject<DragObject>;
-	dailyBalancesMap: MutableRefObject<Map<string, number>>;
-	setStateDailyBalanceMap: MutableRefObject<Map<string, (arg: number) => void>>;
-	dateTransactionsMap: MutableRefObject<Map<string, TransactionAPIData[]> | null>;
-	addTransToDate: MutableRefObject<(transactions: TransactionAPIData) => void> | MutableRefObject<undefined>;
-	editTransOnDatesFuncsMap: MutableRefObject<Map<string, editTransOnDateFuncs>>;
-};
-
-export const CalendarContext = createContext<CalendarContextType>(undefined!);
+import {CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo} from "./CalendarCtrlExports.tsx";
 
 export default function CalendarCtrl() {
 	const { bankAccounts } = useContext(UserContext);

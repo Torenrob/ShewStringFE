@@ -1,4 +1,4 @@
-import { NonNullish } from "./EyeSlashFilledIcon";
+import { NonNullish } from "../EyeSlashFilledIcon/EyeSlashFilledIcon.tsx";
 
 export const EyeFilledIcon = (props: NonNullish) => (
 	<svg aria-hidden="true" fill="none" focusable="false" height="1em" role="presentation" viewBox="0 0 24 24" width="1em" {...props}>

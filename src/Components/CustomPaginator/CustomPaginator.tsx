@@ -1,3 +1,4 @@
+import "./CustomPaginator.css"
 import { PaginationItemType, cn, usePagination } from "@nextui-org/react";
 
 export default function CustomPaginator({ total, currentPage, onChange }: { total: number; currentPage: number; onChange: (page: number) => void }) {

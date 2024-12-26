@@ -1,11 +1,12 @@
+import "./AddAccountModal.css";
 import { Button, Input, Select, SelectItem } from "@nextui-org/react";
 import React, { FormEvent, useContext, useRef } from "react";
-import CheckIcon from "../Icons/CheckIcon";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import { createBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI";
-import { BankAccountAPIData } from "../../Types/APIDataTypes";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { UserContext } from "../../Services/Auth/UserAuth";
+import CheckIcon from "../Icons/CheckIcon/CheckIcon.tsx";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
+import { createBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI.tsx";
+import { BankAccountAPIData } from "../../Types/APIDataTypes.tsx";
+import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
+import { UserContext } from "../../Services/Auth/UserAuth.tsx";
 
 export default function AddAccountModal({
 	closeModal,

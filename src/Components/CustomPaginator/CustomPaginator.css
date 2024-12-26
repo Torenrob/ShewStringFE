@@ -1,0 +1,19 @@
+.paginator {
+    cursor: pointer;
+}
+
+.nextTransactionPage {
+    position: relative;
+    top: 9.375px;
+    border: 0.25rem solid transparent;
+    border-right: 0;
+    border-left: 0.5rem solid lightgray;
+}
+
+.prevTransactionPage {
+    position: relative;
+    top: 9.375px;
+    border: 0.25rem solid transparent;
+    border-left: 0;
+    border-right: 0.5rem solid lightgray;
+}

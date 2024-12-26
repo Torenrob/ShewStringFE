@@ -1,14 +1,15 @@
+import "./SignUp.css"
 import { ReactNode, useState, ChangeEvent, useContext } from "react";
 import { Form } from "react-router-dom";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
-import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
-import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon/EyeSlashFilledIcon.tsx";
+import { EyeFilledIcon } from "../Icons/EyeFilledIcon/EyeFilledIcon.tsx";
 import * as Yup from "yup";
 import { UserContext } from "../../Services/Auth/UserAuth";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
 import { RegisterUserInfo } from "../../Types/APIDataTypes";
 
 type SignUpFormsInputs = {
@@ -124,7 +125,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 								</button>
 							}
 						/>
-						<Button form="sign-up" type="submit" color="primary" className="loginBtn justify-self-center font-bold">
+						<Button form="sign-up" type="submit" color="primary" className="signUpBtn justify-self-center font-bold">
 							Create Account
 						</Button>
 						<Divider />

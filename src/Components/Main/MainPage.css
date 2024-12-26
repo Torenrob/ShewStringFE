@@ -13,6 +13,7 @@
 	background-color: #1a1a1a;
 }
 
+/* Mobile */
 @media (max-width: 560px) {
 	.mainPage {
 		display: flex;

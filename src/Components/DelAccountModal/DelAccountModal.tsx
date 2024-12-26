@@ -1,11 +1,12 @@
+import "./DelAccountModal.css"
 import { Button, Select, SelectItem } from "@nextui-org/react";
 import React, {ChangeEvent, FormEvent, useContext, useRef, useState} from "react";
-import CheckIcon from "../Icons/CheckIcon";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import { deleteBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI";
-import { BankAccountAPIData } from "../../Types/APIDataTypes";
-import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import { UserContext } from "../../Services/Auth/UserAuth";
+import CheckIcon from "../Icons/CheckIcon/CheckIcon.tsx";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
+import { deleteBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI.tsx";
+import { BankAccountAPIData } from "../../Types/APIDataTypes.tsx";
+import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
+import { UserContext } from "../../Services/Auth/UserAuth.tsx";
 
 export default function DelAccountModal({
 	closeModal,
@@ -37,8 +38,8 @@ export default function DelAccountModal({
 	}
 
 	return (
-		<div className="w-full h-full top-0 absolute addAcctCont gap-4">
-			<form className="addAcctModal flex-col" onSubmit={(e) => delAcct(e)} ref={formRef}>
+		<div className="w-full h-full top-0 absolute delAcctCont gap-4">
+			<form className="delAcctModal flex-col" onSubmit={(e) => delAcct(e)} ref={formRef}>
 				<h2 className="text-center mb-1">
 					Delete Account
 					<Button

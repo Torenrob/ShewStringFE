@@ -1,5 +1,6 @@
+import "./LandingPage.css"
 import React, {useEffect, useState} from "react";
-import CalendarIcon from "../Icons/CalendarIcon";
+import CalendarIcon from "../Icons/CalendarIcon/CalendarIcon.tsx";
 import { Button } from "@nextui-org/react";
 import Login from "../LoginPage/Login";
 import SignUp from "../SignUp/SignUp";

@@ -1,6 +1,7 @@
+import "./TransactionInputDrawer.css"
 import {
 	Button,
-	DateInput,
+	DateInput, DateValue,
 	Input,
 	Select,
 	SelectItem,
@@ -8,17 +9,17 @@ import {
 	Textarea
 } from "@nextui-org/react";
 import React, {ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState} from "react";
-import {BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
-import ArrowDownIcon from "../Icons/ArrowDownIcon";
-import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon";
-import {deleteTransactionAPI, postTransactionAPI, updateTransactionAPI} from "../../Services/ApiCalls/TransactionAPI";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
-import DebitIcon from "../Icons/DebitIcon";
-import {CalendarContext, UpdateTransactionContainerInfo} from "./CalendarCtrl";
-import {ErrorHandler} from "../../Helpers/ErrorHandler";
-import {closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs";
-import CreditIcon from "../Icons/CreditIcon";
-import {UserContext} from "../../Services/Auth/UserAuth";
+import {BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes.tsx";
+import ArrowDownIcon from "../Icons/ArrowDownIcon/ArrowDownIcon.tsx";
+import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon/SubmitTransactionIcon.tsx";
+import {deleteTransactionAPI, postTransactionAPI, updateTransactionAPI} from "../../Services/ApiCalls/TransactionAPI.tsx";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
+import DebitIcon from "../Icons/DebitIcon/DebitIcon.tsx";
+import {CalendarContext, UpdateTransactionContainerInfo} from "../CalendarCtrl/CalendarCtrlExports.tsx";
+import {ErrorHandler} from "../../Helpers/ErrorHandler.tsx";
+import {closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs.tsx";
+import CreditIcon from "../Icons/CreditIcon/CreditIcon.tsx";
+import {UserContext} from "../../Services/Auth/UserAuth.tsx";
 import {AxiosResponse} from "axios";
 import {parseDate} from "@internationalized/date";
 
@@ -234,7 +235,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							name="date"
 							size="sm"
 							value={containerInfo?.date ?? parseDate(new Date().toISOString().split("T")[0])}
-							onChange={(e) => setContainerInfo({ ...containerInfo, date: e })}
+							onChange={(e) => setContainerInfo({ ...containerInfo, date: e as DateValue })}
 						/>
 						{currentAcct.id != 0 && <Select
 							required

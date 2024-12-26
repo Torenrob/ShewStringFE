@@ -1,0 +1,12 @@
+.signUpCard {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.signUpBtn {
+    width: 100%;
+    min-width: fit-content;
+}

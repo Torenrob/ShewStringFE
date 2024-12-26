@@ -1,0 +1,53 @@
+.transactionDrawer {
+    height: 15vh;
+    transition: all 400ms;
+    bottom: 0px;
+}
+
+.drawerClosed {
+    transform: translateY(15.5vh);
+}
+
+.transactionForm {
+    grid-template-columns: 0.5fr 0.5fr 0.75fr 1fr;
+    grid-template-rows: min-content;
+    position: relative;
+    padding: 1% 15% 0%;
+}
+
+.invalidAmount {
+    font-size: xx-small;
+}
+
+.delTransBtn {
+    right: 204px;
+    top: 10px;
+    margin-top: 0.25rem;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .transactionDrawer {
+        height: 50vh;
+        width: 100vw;
+    }
+
+    .drawerClosed {
+        transform: translateY(60vh);
+    }
+
+    .transactionForm {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 0.5fr 0.5fr 1fr;
+        padding: 11% 10%;
+    }
+
+    .delTransBtn {
+        transform: translateX(50%);
+        right: 50%;
+        bottom: -93%;
+        height: 20%;
+        margin-top: 0;
+        align-self: center;
+    }
+}

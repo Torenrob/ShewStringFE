@@ -1,13 +1,14 @@
+import "./DayBox.css"
 import { ReactNode, useContext, useState, MouseEvent, useEffect, useCallback } from "react";
-import { DateComponentInfo } from "../../../../../Types/CalendarTypes";
+import { DateComponentInfo } from "../../Types/CalendarTypes.tsx";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
-import Transaction from "./Transaction/Transaction";
-import { CalendarContext } from "../../../CalendarCtrl";
-import { TransactionAPIData } from "../../../../../Types/APIDataTypes";
-import AddTransactionIcon from "../../../../Icons/AddTransactionIcon";
+import Transaction from "../Transaction/Transaction.tsx";
+import { CalendarContext } from "../CalendarCtrl/CalendarCtrlExports.tsx";
+import { TransactionAPIData } from "../../Types/APIDataTypes.tsx";
+import AddTransactionIcon from "../Icons/AddTransactionIcon/AddTransactionIcon.tsx";
 import { parseDate } from "@internationalized/date";
-import CustomPaginator from "./CustomPaginator";
-import { updateTransactionAPI } from "../../../../../Services/ApiCalls/TransactionAPI";
+import CustomPaginator from "../CustomPaginator/CustomPaginator.tsx";
+import { updateTransactionAPI } from "../../Services/ApiCalls/TransactionAPI.tsx";
 import {
 	calcDailyBalances,
 	closeDrawer,
@@ -16,9 +17,9 @@ import {
 	highlightEditedTransactionSwitch,
 	updateDailyBalances,
 	updateDailyBalanceStates
-} from "../../../../../Utilities/UtilityFuncs";
-import { ErrorHandler } from "../../../../../Helpers/ErrorHandler";
-import {UserContext} from "../../../../../Services/Auth/UserAuth.tsx";
+} from "../../Utilities/UtilityFuncs.tsx";
+import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
+import {UserContext} from "../../Services/Auth/UserAuth.tsx";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 

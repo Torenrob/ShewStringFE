@@ -1,0 +1,83 @@
+.calCtrlWrap {
+    max-height: 96.5vh;
+    grid-template-rows: 1fr 14fr;
+}
+
+#calCntrlAcctsLabel {
+    width: 100%;
+    justify-content: center;
+}
+
+.calCntrlMonthLabel {
+    display: none;
+}
+
+.tabCont {
+    overflow-x: auto;
+    background-color: #1a1a1a;
+}
+
+.tabCont::-webkit-scrollbar {
+    display: none;
+}
+
+.acctTabs {
+    color: black;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    background: #14775b !important;
+}
+
+.acctTabs:last-of-type {
+    background-color: #1a1a1a !important;
+    color: var(--30color) !important;
+}
+
+.selTab {
+    background: #6ec4a7 !important;
+}
+
+.submitDatesBtn {
+    position: relative;
+    background-color: #0a0a0a;
+    margin-left: 14px;
+}
+
+.weekdayLabel {
+    max-width: 100vw;
+    background-color: #6ec4a7;
+    color: #0a0a0a;
+    text-align: center;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.329);
+}
+
+div > .weekdayLabel {
+    z-index: 5;
+}
+
+input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(0%) sepia(48%) saturate(656%) hue-rotate(55deg) brightness(110%) contrast(92%);
+}
+
+input[type="month"]:focus {
+    outline: none;
+}
+
+.calWrap {
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+    border-bottom-left-radius: 0.275rem;
+    border-bottom-right-radius: 0.275rem;
+    -ms-overflow-style: none;
+}
+
+.calWrap::-webkit-scrollbar {
+    display: none;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .weekdayLabel {
+        display: none;
+    }
+}

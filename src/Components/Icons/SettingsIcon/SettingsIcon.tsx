@@ -1,3 +1,4 @@
+import "./SettingsIcon.css"
 import React, { useRef, useState, Key } from "react";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 

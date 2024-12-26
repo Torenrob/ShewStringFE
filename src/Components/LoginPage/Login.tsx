@@ -1,13 +1,14 @@
+import "./Login.css"
 import { ReactNode, useState, useContext } from "react";
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { Input, Button } from "@nextui-org/react";
 import * as Yup from "yup";
-import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon";
-import { EyeFilledIcon } from "../Icons/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon/EyeSlashFilledIcon.tsx";
+import { EyeFilledIcon } from "../Icons/EyeFilledIcon/EyeFilledIcon.tsx";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { UserContext } from "../../Services/Auth/UserAuth";
-import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon";
+import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
 
 type LoginFormsInputs = {
 	username: string;

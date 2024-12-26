@@ -1,7 +1,8 @@
+import "./MonthBox.css"
 import {ReactNode, Ref} from "react";
-import DayBox from "./DayBox/DayBox";
-import {TransactionAPIData} from "../../../../Types/APIDataTypes";
-import {DateComponentInfo, LocalMonth} from "../../../../Types/CalendarTypes";
+import DayBox from "../DayBox/DayBox.tsx";
+import {TransactionAPIData} from "../../Types/APIDataTypes.tsx";
+import {DateComponentInfo, LocalMonth} from "../../Types/CalendarTypes.tsx";
 
 export default function MonthBox({
 	monthObj,

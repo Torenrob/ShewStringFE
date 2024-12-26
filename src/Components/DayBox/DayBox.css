@@ -1,0 +1,199 @@
+.dayBox {
+    min-height: 14.9vh;
+    max-height: 14.9vh;
+    outline-color: #45596b6c;
+    cursor: default;
+    pointer-events: auto;
+    position: static;
+    background-color: rgb(235, 235, 235);
+}
+
+.dayBox:nth-of-type(5n),
+.dayBox:nth-of-type(1) {
+    scroll-snap-align: start;
+}
+
+.transactionContainer {
+    max-height: 100%;
+    max-width: 100%;
+    height: 100%;
+}
+
+.transactionContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.transactionContainer::-webkit-scrollbar-thumb {
+    display: none;
+}
+
+.addTransactionBtn {
+    position: absolute;
+    right: 0.25vw;
+    bottom: 0.5vh;
+    transition: all 300ms;
+}
+
+.dragOver {
+    border: solid var(--30color) 2px;
+}
+
+.selectedTransaction {
+    border: solid 2px black;
+    padding-top: 2px;
+}
+
+.mnthStartBrdr1stNotSun {
+    border-top: solid var(--monthBorderSize) var(--30color);
+    border-left: solid var(--monthBorderSize) var(--30color);
+}
+
+.mnthStartBrdrTop {
+    box-sizing: border-box;
+    border-top: solid var(--monthBorderSize) var(--30color);
+}
+
+.mnthEndBrdrLastDayNotSat {
+    border-bottom: solid var(--monthBorderSize) var(--30color);
+    border-right: solid var(--monthBorderSize) var(--30color);
+}
+
+.mnthEndBrdrBottom {
+    border-bottom: solid var(--monthBorderSize) var(--30color);
+}
+
+.the8th::before {
+    content: "";
+    position: absolute;
+    width: var(--monthBorderSize);
+    height: var(--monthBorderSize);
+    background: var(--30color);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.mobCol1 {
+    grid-column-start: auto;
+    grid-column-end: auto;
+}
+
+.mobCol2 {
+    grid-column-start: auto;
+    grid-column-end: auto;
+}
+
+.col1 {
+    grid-column-start: 1 !important;
+    grid-column-end: 2 !important;
+}
+
+.col2 {
+    grid-column-start: 2 !important;
+    grid-column-end: 3 !important;
+}
+
+.col3 {
+    grid-column-start: 3 !important;
+    grid-column-end: 4 !important;
+}
+
+.col4 {
+    grid-column-start: 4 !important;
+    grid-column-end: 5 !important;
+}
+
+.col5 {
+    grid-column-start: 5 !important;
+    grid-column-end: 6 !important;
+}
+
+.col6 {
+    grid-column-start: 6 !important;
+    grid-column-end: 7 !important;
+}
+
+.col7 {
+    grid-column-start: 7 !important;
+    grid-column-end: 8 !important;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .addTransactionBtn {
+        right: 0.75vw;
+        bottom: 1vw;
+    }
+
+    .mnthStartBrdr1stNotSun {
+        border-top: none;
+        border-left: none;
+    }
+
+    .mnthStartBrdrTop {
+        border-top: none;
+    }
+
+    .mnthEndBrdrLastDayNotSat {
+        border-bottom: none;
+        border-right: none;
+    }
+
+    .mnthEndBrdrBottom {
+        border-bottom: none;
+    }
+
+    .the8th::before {
+        display: none;
+    }
+
+    .dayBox:nth-of-type(5n),
+    .dayBox:nth-of-type(1) {
+        scroll-snap-align: none;
+    }
+
+    .dayBox:nth-of-type(2n) {
+        scroll-snap-align: start;
+    }
+
+    .dayBoxMonthLabel {
+        display: none;
+    }
+
+    .mobCol1 {
+        grid-column-start: 1 !important;
+        grid-column-end: 2 !important;
+    }
+
+    .mobCol2 {
+        grid-column-start: 2 !important;
+        grid-column-end: 3 !important;
+    }
+
+    .col1,
+    .col2,
+    .col3,
+    .col4,
+    .col5,
+    .col6,
+    .col7 {
+        grid-column-start: auto;
+        grid-column-end: auto;
+    }
+
+    .mob1st2colborder {
+        border-top: solid var(--monthBorderSize) var(--30color) !important;
+        border-left: solid var(--monthBorderSize) var(--30color) !important;
+    }
+
+    .mobileTopBorder {
+        border-top: solid var(--monthBorderSize) var(--30color) !important;
+    }
+
+    .theMobile3rd::before {
+        content: "";
+        position: absolute;
+        width: var(--monthBorderSize);
+        height: var(--monthBorderSize);
+        background: var(--30color);
+        clip-path: polygon(0 0, 100% 0, 0 100%);
+    }
+}

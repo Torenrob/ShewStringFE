@@ -1,4 +1,6 @@
 .transaction {
+	max-width: 100%;
+	font-weight: 600;
 	font-size: 0.65rem;
 	padding: 0% 2px;
 }
