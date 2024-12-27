@@ -10,7 +10,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--60colorTransparent);
+    background: var(--mainBlackTransparent);
     /* border: solid 1px black; */
     -webkit-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
@@ -31,7 +31,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: var(--60colorTransparent);
+        background: var(--mainBlackTransparent);
         /* border: solid 1px black; */
         -webkit-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
         -moz-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);

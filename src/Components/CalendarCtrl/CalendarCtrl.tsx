@@ -30,16 +30,13 @@ export default function CalendarCtrl() {
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().getFullYear()}`);
 	const [tabShouldScroll, setTabShouldScroll] = useState<boolean>(false);
-	const [, setIsReady] = useState<boolean>(false);
 
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
 		if (tabsRef.current === null || tabContRef.current === null) {
-			setIsReady(true);
 			return;
 		}
 		if (tabsRef.current.clientWidth === 0) {
-			setIsReady(true);
 			return;
 		}
 		const numAccts = bankAccounts.length;
@@ -50,7 +47,6 @@ export default function CalendarCtrl() {
 			updWidth = Number(tabContRef.current.clientWidth);
 		}
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
-		setIsReady(true);
 	}, [bankAccounts]);
 
 	const childref = useRef<TransactionInputDrawerRef>(null!);

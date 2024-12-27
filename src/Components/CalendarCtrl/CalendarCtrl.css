@@ -8,10 +8,6 @@
     justify-content: center;
 }
 
-.calCntrlMonthLabel {
-    display: none;
-}
-
 .tabCont {
     overflow-x: auto;
     background-color: #1a1a1a;
@@ -29,7 +25,7 @@
 
 .acctTabs:last-of-type {
     background-color: #1a1a1a !important;
-    color: var(--30color) !important;
+    color: var(--greenLogo) !important;
 }
 
 .selTab {
@@ -77,6 +73,10 @@ input[type="month"]:focus {
 
 /* Mobile */
 @media (max-width: 560px) {
+    .calCntrlMonthLabel {
+        display: none;
+    }
+
     .weekdayLabel {
         display: none;
     }

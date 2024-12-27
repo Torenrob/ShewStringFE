@@ -76,6 +76,7 @@ export default function DayBox({
 	const [paginationDragState, setPaginationDragState] = useState<boolean>(false);
 	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][]>(transactionsPaginated());
 	const [dailyBalance, setDailyBalance] = useState<number>(getTodaysBalance(dailyBalancesMap.current, dateString));
+	const [wasDraggingTransaction, setWasDraggingTransaction] = useState<boolean>(false);
 
 	//CallBack Hooks
 	const addTransactionToList = useCallback(
@@ -153,21 +154,26 @@ export default function DayBox({
 	function handleClickOnTransaction(trans: TransactionAPIData, updateTransBanner: (t: TransactionAPIData) => void) {
 		highlightEditedTransactionSwitch(trans.id.toString());
 
-		openDrawer({
-			id: trans.id,
-			date: parseDate(dateString),
-			amount: trans.amount.toFixed(2).toString(),
-			//Had to remove BankAccountId from Entity in BE due to JPA not handling cyclic relationship
-			//Optional BankAccountId here because I'm hoping to add it back
-			bankAccountId: trans.bankAccountId?.toString(),
-			category: trans.category,
-			description: trans.description,
-			title: trans.title,
-			editingExisting: true,
-			transactionObj: trans,
-			deleteTransactionFromDate: removeTransactionFromList,
-			editTransactionFunc: updateTransBanner,
-		});
+		//NextUI onPress attribute causing a drag to run click action, using boolean to know if drag or click
+		if (!wasDraggingTransaction) {
+			openDrawer({
+				id: trans.id,
+				date: parseDate(dateString),
+				amount: trans.amount.toFixed(2).toString(),
+				//Had to remove BankAccountId from Entity in BE due to JPA not handling cyclic relationship
+				//Optional BankAccountId here because I'm hoping to add it back
+				bankAccountId: trans.bankAccountId?.toString(),
+				category: trans.category,
+				description: trans.description,
+				title: trans.title,
+				editingExisting: true,
+				transactionObj: trans,
+				deleteTransactionFromDate: removeTransactionFromList,
+				editTransactionFunc: updateTransBanner,
+			});
+		}
+
+		setWasDraggingTransaction(false);
 	}
 
 	function pageChangeHandler(page: number) {
@@ -176,6 +182,7 @@ export default function DayBox({
 
 	function handleDragStart(dragItemY: number) {
 		setDragActive(true);
+		setWasDraggingTransaction(true);
 		dragObject.current.removeTransactionFromDate = removeTransactionFromList;
 		dragObject.current.dragItemY = dragItemY;
 		dragObject.current.paginationDragState.forEach((x) => {
@@ -328,7 +335,7 @@ export default function DayBox({
 						))}
 				</div>
 				{addTransactionBtnVisible && !dragObject.current.globalDragOn && (
-					<Button onClick={clickAddTransaction} variant="flat" isIconOnly radius="full" size="sm" className="absolute addTransactionBtn bg-[#6EC4A7]">
+					<Button onPress={clickAddTransaction} variant="flat" isIconOnly radius="full" size="sm" className="absolute addTransactionBtn bg-[#6EC4A7]">
 						<AddTransactionIcon />
 					</Button>
 				)}

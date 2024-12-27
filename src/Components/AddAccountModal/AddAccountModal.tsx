@@ -40,7 +40,7 @@ export default function AddAccountModal({
 					<Button
 						isIconOnly
 						className="absolute bg-transparent h-4 right-0 mt-1 md:-mt-1"
-						onClick={() => {
+						onPress={() => {
 							formRef.current?.reset();
 							closeModal();
 						}}>

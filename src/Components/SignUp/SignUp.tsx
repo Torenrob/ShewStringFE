@@ -79,7 +79,7 @@ export default function SignUp({ toggleSignUp, toggleLogin }: { toggleSignUp: ()
 			<Form className="signUpCard" id="sign-up" method="post" onSubmit={handleSubmit(handleSignUp)}>
 				<Card className="w-fit p-2">
 					<CardBody className="w-auto gap-y-2 grid overflow-hidden">
-						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onClick={closeSignUp}>
+						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onPress={closeSignUp}>
 							<InvalidSubmitIcon white={false} />
 						</Button>
 						<span className="text-center text-xl">Join ShewString</span>

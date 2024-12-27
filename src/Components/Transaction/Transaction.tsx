@@ -99,7 +99,7 @@ export default function Transaction({
 				whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
 				id={`transaction${transactionInfo.id}`}>
 				<Button
-					onClick={() => onClick(transactionInfo, updateTransactionBanner)}
+					onPress={() => onClick(transactionInfo, updateTransactionBanner)}
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					variant={dragActive ? "solid" : "ghost"}
@@ -118,7 +118,7 @@ export default function Transaction({
 			</motion.div>
 			{!dragActive && (
 				<Button
-					onClick={() => onClick(transactionInfo, updateTransactionBanner)}
+					onPress={() => onClick(transactionInfo, updateTransactionBanner)}
 					onMouseEnter={marqueeOn}
 					onMouseLeave={marqueeOff}
 					style={{ display: !mouseOver ? "flex" : "none" }}

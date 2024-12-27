@@ -8,6 +8,7 @@ import {
 	SharedSelection,
 	Textarea
 } from "@nextui-org/react";
+import {PressEvent} from "@react-types/shared";
 import React, {ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState} from "react";
 import {BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes.tsx";
 import ArrowDownIcon from "../Icons/ArrowDownIcon/ArrowDownIcon.tsx";
@@ -17,7 +18,7 @@ import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx"
 import DebitIcon from "../Icons/DebitIcon/DebitIcon.tsx";
 import {CalendarContext, UpdateTransactionContainerInfo} from "../CalendarCtrl/CalendarCtrlExports.tsx";
 import {ErrorHandler} from "../../Helpers/ErrorHandler.tsx";
-import {closeDrawer, getRandomNum, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs.tsx";
+import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs.tsx";
 import CreditIcon from "../Icons/CreditIcon/CreditIcon.tsx";
 import {UserContext} from "../../Services/Auth/UserAuth.tsx";
 import {AxiosResponse} from "axios";
@@ -137,8 +138,9 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		
 	}, [containerInfo?.amount]);
 
-	function transactionTypeClick(event: React.MouseEvent<HTMLButtonElement>) {
-		const target = event.currentTarget;
+	function transactionTypeClick(event: PressEvent) {
+		const target = event.target;
+		// @ts-expect-error - target does have a name prop
 		if (target.name === "debitBtn") {
 			setTransactionType(true);
 		} else {
@@ -195,7 +197,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 		<div id="calendarDrawer" className="absolute transactionDrawer drawerClosed" style={{ backgroundColor: "rgba(0, 0, 0,.8)", zIndex: 2, width: "100%" }}>
 			<div className="grid h-full">
 				<Button
-					onClick={closeDrawer}
+					onPress={closeDrawer}
 					radius="full"
 					size="sm"
 					isIconOnly
@@ -208,7 +210,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						{errorMessage && (
 							<span className="text-right">
 								Error Submitting Transaction <br /> Try Again
-								<Button className="h-4" radius="none" color="danger" onClick={clearErrorMessage}>
+								<Button className="h-4" radius="none" color="danger" onPress={clearErrorMessage}>
 									Clear
 								</Button>
 							</span>
@@ -288,7 +290,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 								<label htmlFor="debitBtn" className="text-xs text-slate-300 font-semibold text-center">
 									Debit
 								</label>
-								<Button isIconOnly radius="none" size="sm" name="debitBtn" onClick={transactionTypeClick} color={transactionType ? "danger" : "default"}>
+								<Button isIconOnly radius="none" size="sm" name="debitBtn" onPress={transactionTypeClick} color={transactionType ? "danger" : "default"}>
 									<DebitIcon />
 								</Button>
 							</div>
@@ -296,7 +298,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 								<label htmlFor="creditBtn" className="text-xs text-slate-300 font-semibold relative -translate-x-0.5">
 									Credit
 								</label>
-								<Button isIconOnly radius="none" size="sm" name="creditBtn" onClick={transactionTypeClick} color={transactionType ? "default" : "primary"}>
+								<Button isIconOnly radius="none" size="sm" name="creditBtn" onPress={transactionTypeClick} color={transactionType ? "default" : "primary"}>
 									<CreditIcon />
 								</Button>
 							</div>
@@ -324,14 +326,14 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 					/>
 					{containerInfo.editingExisting && (
 						<div className="delTransBtn absolute lg:flex-col lg:translate-y-2">
-							<Button color="danger" radius="none" isIconOnly onClick={deleteTransaction}>
+							<Button color="danger" radius="none" isIconOnly onPress={deleteTransaction}>
 								<InvalidSubmitIcon white={true} />
 							</Button>
 							<div className="text-sm -translate-y-2 lg:translate-y-0 text-white">Delete</div>
 						</div>
 					)}
 				</form>
-				<Button onClick={closeDrawer} radius="full" size="sm" isIconOnly variant="light" className="absolute hidden md:flex md:justify-self-end">
+				<Button onPress={closeDrawer} radius="full" size="sm" isIconOnly variant="light" className="absolute hidden md:flex md:justify-self-end">
 					<ArrowDownIcon />
 				</Button>
 			</div>

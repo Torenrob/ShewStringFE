@@ -1,8 +1,11 @@
 :root {
-	--60color: #0a0a0a;
-	--30color: #6ec4a7;
-	--10color: white;
-	--60colorTransparent: #0a0a0ab7;
+	--mainBlack: #0a0a0a;
+	--mainGray: #1A1A1A;
+	--greenLogo: #6ec4a7;
+	--mainWhite: white;
+	--darkBlueLogo: #45596B;
+	--lightBlueLogo: #647F94;
+	--mainBlackTransparent: #0a0a0ab7;
 	--monthBorderSize: 2px;
 }
 

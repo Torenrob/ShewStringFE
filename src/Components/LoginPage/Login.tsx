@@ -54,7 +54,7 @@ export default function Login({ toggleLogin, toggleSignUp }: { toggleLogin: () =
 			<form className="loginCard" name="login" action="/log-in" method="POST" onSubmit={handleSubmit(handleLogin)}>
 				<Card className="w-fit p-2">
 					<CardBody className="w-auto gap-y-2 grid overflow-hidden">
-						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onClick={closeLogin}>
+						<Button isIconOnly className="bg-transparent absolute -right-2 -top-2" size="sm" onPress={closeLogin}>
 							<InvalidSubmitIcon white={false} />
 						</Button>
 						<span className="text-center text-xl text-[#0a0a0a]">Login to Your Account</span>

@@ -24,10 +24,10 @@ export default function LandingPage() {
 	return (
 		<div className="bg-[#0a0a0a] h-[100vh] w-[100vw] flex flex-col">
 			<div className="flex landingPageBtns justify-end gap-2 pt-2 pr-2 xl:pt-4 xl:pr-4 xl:gap-4">
-				<Button className="font-bold h-6 text-[0.65rem] xl:text-[1rem] xl:h-8" color="primary" size="sm" radius="none" onClick={loginShowSwitch}>
+				<Button className="font-bold h-6 text-[0.65rem] xl:text-[1rem] xl:h-8" color="primary" size="sm" radius="none" onPress={loginShowSwitch}>
 					Login
 				</Button>
-				<Button className="font-bold h-6 text-[0.65rem] xl:text-[1rem] xl:h-8" color="primary" size="sm" radius="none" onClick={signUpShowSwitch}>
+				<Button className="font-bold h-6 text-[0.65rem] xl:text-[1rem] xl:h-8" color="primary" size="sm" radius="none" onPress={signUpShowSwitch}>
 					Create Account
 				</Button>
 			</div>

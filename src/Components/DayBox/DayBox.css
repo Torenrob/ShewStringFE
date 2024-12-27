@@ -35,7 +35,7 @@
 }
 
 .dragOver {
-    border: solid var(--30color) 2px;
+    border: solid var(--darkBlueLogo) 2px;
 }
 
 .selectedTransaction {
@@ -44,22 +44,22 @@
 }
 
 .mnthStartBrdr1stNotSun {
-    border-top: solid var(--monthBorderSize) var(--30color);
-    border-left: solid var(--monthBorderSize) var(--30color);
+    border-top: solid var(--monthBorderSize) var(--greenLogo);
+    border-left: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthStartBrdrTop {
     box-sizing: border-box;
-    border-top: solid var(--monthBorderSize) var(--30color);
+    border-top: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthEndBrdrLastDayNotSat {
-    border-bottom: solid var(--monthBorderSize) var(--30color);
-    border-right: solid var(--monthBorderSize) var(--30color);
+    border-bottom: solid var(--monthBorderSize) var(--greenLogo);
+    border-right: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthEndBrdrBottom {
-    border-bottom: solid var(--monthBorderSize) var(--30color);
+    border-bottom: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .the8th::before {
@@ -67,7 +67,7 @@
     position: absolute;
     width: var(--monthBorderSize);
     height: var(--monthBorderSize);
-    background: var(--30color);
+    background: var(--greenLogo);
     clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
@@ -180,12 +180,12 @@
     }
 
     .mob1st2colborder {
-        border-top: solid var(--monthBorderSize) var(--30color) !important;
-        border-left: solid var(--monthBorderSize) var(--30color) !important;
+        border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
+        border-left: solid var(--monthBorderSize) var(--greenLogo) !important;
     }
 
     .mobileTopBorder {
-        border-top: solid var(--monthBorderSize) var(--30color) !important;
+        border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
     }
 
     .theMobile3rd::before {
@@ -193,7 +193,7 @@
         position: absolute;
         width: var(--monthBorderSize);
         height: var(--monthBorderSize);
-        background: var(--30color);
+        background: var(--greenLogo);
         clip-path: polygon(0 0, 100% 0, 0 100%);
     }
 }

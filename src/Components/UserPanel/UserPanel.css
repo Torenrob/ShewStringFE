@@ -1,6 +1,6 @@
 
 .userPanelDivider {
-    background-color: white;
+    background-color: var(--mainWhite);
     margin-left: 5%;
     margin-right: 5%;
     border: none;
@@ -16,17 +16,32 @@
 }
 
 #navItemSelected {
-    color: #6ec4a7;
+    color: var(--greenLogo);
+    background-color: var(--mainGray);
 }
 
 #navItemSelected:before {
     content: "";
-    background-color: #6ec4a7;
+    background-color: var(--greenLogo);
     height: 1.25rem;
     width: .6rem;
     position: absolute;
     border-top-right-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
     right: 96%;
-    transform: translateY(23%);
+    transform: translateY(23%) translateX(130%);
+}
+
+/*#navItemSelected:after {*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    background-color: var(--mainGray);*/
+/*    height: 2.75rem;*/
+/*    width: 2rem;*/
+/*    transform: translateY(-18%);*/
+/*}*/
+
+
+#navItemSelected:active:before {
+    display: none;
 }
