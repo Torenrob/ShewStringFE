@@ -45,7 +45,7 @@ export default function DayBox({
 	const { openDrawer, dragObject,
 		addTransToDate, editTransOnDatesFuncsMap,
 		dailyBalancesMap, setStateDailyBalanceMap,
-		dateTransactionsMap } = useContext(CalendarContext);
+		dateTransactionsMap, setDaysLoaded } = useContext(CalendarContext);
 
 	const transactionsPaginated = useCallback(
 		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] => {
@@ -119,6 +119,15 @@ export default function DayBox({
 			return transactionsPaginated(res);
 		});
 	};
+
+	useEffect(() => {
+		setDaysLoaded(prev => {
+			if (!prev){
+				return new Set([JSON.stringify(dateObj)]);
+			}
+			return prev.add(JSON.stringify(dateObj));
+		});
+	}, [setDaysLoaded, dateObj]);
 
 	useEffect(() => {
 		const updatedTransactions = transactionsPaginated();

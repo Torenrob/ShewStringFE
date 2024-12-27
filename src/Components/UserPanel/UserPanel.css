@@ -32,15 +32,6 @@
     transform: translateY(23%) translateX(130%);
 }
 
-/*#navItemSelected:after {*/
-/*    content: "";*/
-/*    position: absolute;*/
-/*    background-color: var(--mainGray);*/
-/*    height: 2.75rem;*/
-/*    width: 2rem;*/
-/*    transform: translateY(-18%);*/
-/*}*/
-
 
 #navItemSelected:active:before {
     display: none;

@@ -45,7 +45,7 @@ export default function DelAccountModal({
 					<Button
 						isIconOnly
 						className="bg-transparent absolute h-4 right-0 mt-1 md:-mt-1"
-						onClick={() => {
+						onPress={() => {
 							formRef.current?.reset();
 							closeModal();
 						}}>

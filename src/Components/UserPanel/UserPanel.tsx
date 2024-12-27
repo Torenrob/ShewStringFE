@@ -38,12 +38,12 @@ export default function UserPanel({updateNavItem}:{ updateNavItem:  React.Dispat
 					<div className="flex items-center">{user?.username}</div>
 				</div>
 				<hr className="userPanelDivider mb-4"/>
-				<div className="hidden relative lg:block text-large pl-[5%] pr-[5%] cursor-pointer">
-					<div className="flex gap-3 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems selNavItemRoundCorner" data-nav-item={SelectedNavItem.Calendar} id="navItemSelected" onClick={changeNavItem}>
+				<div className="hidden relative lg:block text-large pl-[5%] cursor-pointer">
+					<div className="flex gap-3 pt-2 pb-2 mb-0.5 hover:bg-[#42586A] pl-7 rounded-l-md navItems selNavItemRoundCorner" data-nav-item={SelectedNavItem.Calendar} id="navItemSelected" onClick={changeNavItem}>
 						<CalendarIcon size={120} landingPage={false} userPanel={true}/>
 						<span>Calendar</span>
 					</div>
-					<div className="flex gap-3.5 pt-2 pb-2 hover:bg-[#42586A] pl-7 rounded-md navItems" data-nav-item={SelectedNavItem.Budget}  onClick={changeNavItem}>
+					<div className="flex gap-3.5 pt-2 pb-2 mb-0.5 hover:bg-[#42586A] pl-7 rounded-l-md navItems" data-nav-item={SelectedNavItem.Budget}  onClick={changeNavItem}>
 						<BudgetIcon/>
 						<span className="relative right-[2%]">Budget</span>
 					</div>

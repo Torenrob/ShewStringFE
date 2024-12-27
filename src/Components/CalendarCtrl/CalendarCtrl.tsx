@@ -9,7 +9,7 @@ import React, {
 	useState,
 } from "react";
 import {BankAccountAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
-import {Button, Tab, Tabs} from "@nextui-org/react";
+import {Button, Spinner, Tab, Tabs} from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon/SpanIcon.tsx";
 import CheckIcon from "../Icons/CheckIcon/CheckIcon.tsx";
 import AddAccountModal from "../AddAccountModal/AddAccountModal.tsx";
@@ -17,10 +17,11 @@ import SettingsIcon from "../Icons/SettingsIcon/SettingsIcon.tsx";
 import DelAccountModal from "../DelAccountModal/DelAccountModal.tsx";
 import TransactionInputDrawer, {TransactionInputDrawerRef} from "../TransactionInputDrawer/TransactionInputDrawer.tsx";
 import {editTransOnDateFuncs} from "../DayBox/DayBox";
-import {getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
+import {focusToday, getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
 import Calendar from "../Calendar/Calendar";
 import {UserContext} from "../../Services/Auth/UserAuth";
 import {CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo} from "./CalendarCtrlExports.tsx";
+import {DateComponentInfo} from "../../Types/CalendarTypes.tsx";
 
 export default function CalendarCtrl() {
 	const { bankAccounts } = useContext(UserContext);
@@ -30,15 +31,32 @@ export default function CalendarCtrl() {
 	const [monthRange, setMonthRange] = useState<MonthRange | null>(null);
 	const [monthLabel, setMonthLabel] = useState<string>(`${new Date().getFullYear()}`);
 	const [tabShouldScroll, setTabShouldScroll] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [daysToLoad, setDaysToLoad] = useState<number | null>(null);
+	const [loadedDays, setLoadedDays] = useState<Set<string> | null>(null);
 
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
+
 		if (tabsRef.current === null || tabContRef.current === null) {
+			console.log('not generating calcntrl');
 			return;
 		}
+
+		if (!daysToLoad || !loadedDays) {
+			return;
+		}
+
+		if (daysToLoad === loadedDays.size) {
+			setLoading(false);
+			focusToday();
+		}
+
+
 		if (tabsRef.current.clientWidth === 0) {
 			return;
 		}
+
 		const numAccts = bankAccounts.length;
 		let updWidth = numAccts * 128 - (numAccts - 1) * 13;
 
@@ -47,7 +65,7 @@ export default function CalendarCtrl() {
 			updWidth = Number(tabContRef.current.clientWidth);
 		}
 		tabsRef.current.style.width = `${updWidth.toString()}px`;
-	}, [bankAccounts]);
+	}, [bankAccounts, setLoading, daysToLoad, loadedDays]);
 
 	const childref = useRef<TransactionInputDrawerRef>(null!);
 
@@ -233,113 +251,118 @@ export default function CalendarCtrl() {
 	}
 
 	return (
-		<div className="relative calCtrlWrap overflow-clip grid">
-			<div className="flex-col">
-				<div className="flex justify-between max-w-full">
-					<div ref={tabContRef} className="flex-col w-[76.7%]">
-						<div
-							className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
-							<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
-								<span>Accounts</span>
-								<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal}/>
+		<>
+			<Spinner className={`${loading ? "" : "hidden"} scale-125`} color="primary" label="Loading..." labelColor="primary" size="lg"/>
+			<div className={`relative calCtrlWrap overflow-clip grid ${loading ? "hidden" : ""}`}>
+				<div className="flex-col">
+					<div className="flex justify-between max-w-full">
+						<div ref={tabContRef} className="flex-col w-[76.7%]">
+							<div
+								className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
+								<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
+									<span>Accounts</span>
+									<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal}/>
+								</div>
+								<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%] w-44">
+									<span>{monthLabel}</span>
+								</div>
 							</div>
-							<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%] w-44">
-								<span>{monthLabel}</span>
+							<div onWheel={tabScroll} className="tabCont pt-[0.1rem]" ref={acctScrollCont}>
+								<Tabs
+									ref={tabsRef}
+									variant="underlined"
+									color="primary"
+									onSelectionChange={acctTabCntrlr}
+									selectedKey={selectedAcct}
+									motionProps={{
+										transition: {duration: 0.9},
+									}}
+									className="pt-0.5"
+									classNames={{
+										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
+										cursor: "w-full",
+										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+										tabContent: " text-[#d6d6d6] group-data-[hover=true]:text-[#1a1a1a] group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+									}}>
+									{bankAccounts.map((bA, i) => {
+										return (
+											<Tab
+												style={{
+													position: "relative",
+													transform: `translateX(-${i * 13}px)`,
+													zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+												}}
+												className={`data-[hover=true]:!bg-[#54a18d] data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+												title={bA.title}
+												key={bA.id}></Tab>
+										);
+									})}
+								</Tabs>
 							</div>
 						</div>
-						<div onWheel={tabScroll} className="tabCont pt-[0.1rem]" ref={acctScrollCont}>
-							<Tabs
-								ref={tabsRef}
-								variant="underlined"
-								color="primary"
-								onSelectionChange={acctTabCntrlr}
-								selectedKey={selectedAcct}
-								motionProps={{
-									transition: {duration: 0.9},
-								}}
-								className="pt-0.5"
-								classNames={{
-									tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
-									cursor: "w-full",
-									tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-									tabContent: " text-[#d6d6d6] group-data-[hover=true]:text-[#1a1a1a] group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
-								}}>
-								{bankAccounts.map((bA, i) => {
-									return (
-										<Tab
-											style={{
-												position: "relative",
-												transform: `translateX(-${i * 13}px)`,
-												zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
-											}}
-											className={`data-[hover=true]:!bg-[#54a18d] data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
-											title={bA.title}
-											key={bA.id}></Tab>
-									);
-								})}
-							</Tabs>
+						<div className="flex-col w-[23.3%]">
+							<div className="hidden md:flex justify-center relative text-white">
+								<span>Month Range</span>
+							</div>
+							<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-[0.2rem] bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
+								<input
+									name="startMonth"
+									defaultValue={defaultMonthRange()[0]}
+									// value={startMonth ? startMonth : defaultMonthRange()[0]}
+									// onChange={updStartMnth}
+									id="start"
+									type="month"
+									className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
+								/>
+								<SpanIcon/>
+								<input
+									name="endMonth"
+									defaultValue={defaultMonthRange()[1]}
+									// onChange={updEndMnth}
+									id="endMonth"
+									type="month"
+									className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
+								/>
+								<Button type="submit" form="monthRangeForm" isIconOnly
+										className="submitDatesBtn self-center h-full" radius="none" size="sm">
+									<CheckIcon/>
+								</Button>
+							</form>
 						</div>
 					</div>
-					<div className="flex-col w-[23.3%]">
-						<div className="hidden md:flex justify-center relative text-white">
-							<span>Month Range</span>
-						</div>
-						<form id="monthRangeForm" className="flex max-w-fit min-w-fit justify-self-end pl-2 mt-[0.2rem] bg-[#6EC4A7] mnthPickBox rounded-t-sm overflow-hidden" onSubmit={submitMonthRange}>
-							<input
-								name="startMonth"
-								defaultValue={defaultMonthRange()[0]}
-								// value={startMonth ? startMonth : defaultMonthRange()[0]}
-								// onChange={updStartMnth}
-								id="start"
-								type="month"
-								className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
-							/>
-							<SpanIcon/>
-							<input
-								name="endMonth"
-								defaultValue={defaultMonthRange()[1]}
-								// onChange={updEndMnth}
-								id="endMonth"
-								type="month"
-								className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
-							/>
-							<Button type="submit" form="monthRangeForm" isIconOnly
-									className="submitDatesBtn self-center h-full" radius="none" size="sm">
-								<CheckIcon/>
-							</Button>
-						</form>
+					<div
+						className={`grid grid-cols-7 text-xs font-semibold weekdayLabel rounded-tl-sm`}>
+						<div>Sunday</div>
+						<div>Monday</div>
+						<div>Tuesday</div>
+						<div>Wednesday</div>
+						<div>Thursday</div>
+						<div>Friday</div>
+						<div>Saturday</div>
 					</div>
 				</div>
-				<div
-					className={`grid grid-cols-7 text-xs font-semibold weekdayLabel rounded-tl-sm`}>
-					<div>Sunday</div>
-					<div>Monday</div>
-					<div>Tuesday</div>
-					<div>Wednesday</div>
-					<div>Thursday</div>
-					<div>Friday</div>
-					<div>Saturday</div>
-				</div>
+				<CalendarContext.Provider
+					value={{
+						openDrawer: openDrawer,
+						dailyBalancesMap: dailyBalancesMap,
+						dateTransactionsMap: dateTransactionsMap,
+						dragObject: dragObject,
+						setStateDailyBalanceMap: setStateDailyBalance,
+						setDaysLoaded: setLoadedDays,
+						setNumberOfDays: setDaysToLoad,
+						addTransToDate: addTransToDate,
+						editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
+					}}>
+					<div id="calWrap" className="calWrap max-h-full">
+						{/* <div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center"></div> */}
+						<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
+						{/* <div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)} style={{ background: "red" }}></div> */}
+					</div>
+					<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
+				</CalendarContext.Provider>
+				{(addAcctModalOpen || selectedAccount.id == 0) && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
+				{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
 			</div>
-			<CalendarContext.Provider
-				value={{
-					openDrawer: openDrawer,
-					dailyBalancesMap: dailyBalancesMap,
-					dateTransactionsMap: dateTransactionsMap,
-					dragObject: dragObject,
-					setStateDailyBalanceMap: setStateDailyBalance,
-					addTransToDate: addTransToDate,
-					editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
-				}}>
-				<div id="calWrap" className="calWrap max-h-full">
-					{/* <div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center"></div> */}
-					<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
-					{/* <div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)} style={{ background: "red" }}></div> */}
-				</div>
-				<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
-			</CalendarContext.Provider>
-			{(addAcctModalOpen || selectedAccount.id == 0) && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
-			{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}
-		</div>
+		</>
 	);
 }

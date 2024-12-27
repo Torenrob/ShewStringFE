@@ -10,10 +10,9 @@ import {TransactionAPIData} from "../../Types/APIDataTypes.tsx";
 import {
 	_getCurrMonth,
 	calcInitMonth,
-	calcInputMonths,
-	CalendarContext,
-	MonthRange
-} from "../CalendarCtrl/CalendarCtrlExports.tsx";
+	calcInputMonths, getTotalNumberOfDays,
+} from "./CalendarExports.tsx";
+import {CalendarContext, MonthRange} from "../CalendarCtrl/CalendarCtrlExports.tsx"
 import {dayBoxHeight} from "../../Utilities/GlobalVariables.tsx";
 
 
@@ -29,9 +28,7 @@ export default function Calendar({
 }): ReactNode {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth >= 1024 ? "lg" : window.innerWidth >= 768 ? "md" : "sm");
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [loadedDays, setLoadedDays] = useState<number>(0);
-	const { dailyBalancesMap, dateTransactionsMap } = useContext(CalendarContext);
+	const { dailyBalancesMap, dateTransactionsMap, setNumberOfDays } = useContext(CalendarContext);
 
 	const getTransactionData = useCallback(() => {
 		dateTransactionsMap.current = transactions;
@@ -52,17 +49,18 @@ export default function Calendar({
 				};
 				return monthBoxObj;
 			});
+			setNumberOfDays(getTotalNumberOfDays(monthArr));
 			setMonthComps(monthArr);
 		} else {
-			setMonthComps(() => calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1")));
+			const monthArr = calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1"))
+			setNumberOfDays(getTotalNumberOfDays(monthArr))
+			setMonthComps(monthArr);
 		}
 	}, [dailyBalancesMap, dateTransactionsMap, transactions, monthRange]);
 
 	useEffect(() => {
 		getTransactionData();
 	}, [getTransactionData]);
-
-	useEffect(() => focusToday(), []);
 
 	//Intersect Observer to highlight current month/year label
 	const monthObserver: MutableRefObject<IntersectionObserver | undefined> = useRef();
