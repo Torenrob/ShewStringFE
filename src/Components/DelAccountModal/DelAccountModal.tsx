@@ -6,7 +6,7 @@ import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx"
 import { deleteBankAccountAPI } from "../../Services/ApiCalls/BankAccountAPI.tsx";
 import { BankAccountAPIData } from "../../Types/APIDataTypes.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
-import { UserContext } from "../../Services/Auth/UserAuth.tsx";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
 
 export default function DelAccountModal({
 	closeModal,

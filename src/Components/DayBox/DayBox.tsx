@@ -19,7 +19,7 @@ import {
 	updateDailyBalanceStates
 } from "../../Utilities/UtilityFuncs.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
-import {UserContext} from "../../Services/Auth/UserAuth.tsx";
+import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 

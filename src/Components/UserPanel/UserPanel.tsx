@@ -2,7 +2,7 @@ import "./UserPanel.css"
 import React, {useContext} from "react";
 import UserIcon from "../Icons/UserIcon/UserIcon.tsx";
 import {Button, Select} from "@nextui-org/react";
-import {UserContext} from "../../Services/Auth/UserAuth";
+import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
 import CalendarIcon from "../Icons/CalendarIcon/CalendarIcon.tsx";
 import BudgetIcon from "../Icons/BudgetIcon/BudgetIcon.tsx";
 import {SelectedNavItem} from "../Main/MainPageExports.tsx";

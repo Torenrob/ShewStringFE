@@ -20,7 +20,7 @@ import {CalendarContext, UpdateTransactionContainerInfo} from "../CalendarCtrl/C
 import {ErrorHandler} from "../../Helpers/ErrorHandler.tsx";
 import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs.tsx";
 import CreditIcon from "../Icons/CreditIcon/CreditIcon.tsx";
-import {UserContext} from "../../Services/Auth/UserAuth.tsx";
+import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
 import {AxiosResponse} from "axios";
 import {parseDate} from "@internationalized/date";
 

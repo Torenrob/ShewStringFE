@@ -7,7 +7,7 @@ import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon/EyeSlashFilledIc
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon/EyeFilledIcon.tsx";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { UserContext } from "../../Services/Auth/UserAuth";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
 
 type LoginFormsInputs = {

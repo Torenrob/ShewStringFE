@@ -7,21 +7,9 @@ import { userLoginAPI, userRegisterAPI } from "../ApiCalls/UserAPI";
 import Cookies from "js-cookie";
 import { getUserBankAccountsAPI } from "../ApiCalls/BankAccountAPI";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-
-type UserContextType = {
-	user: UserProfile | null;
-	bankAccounts: BankAccountAPIData[];
-	updBankAccounts: (newBaArr: BankAccountAPIData[]) => void;
-	token: string | null;
-	registerUser: (arg0: RegisterUserInfo) => void;
-	loginUser: (username: string, password: string) => void;
-	logout: () => void;
-	isLoggedIn: () => boolean;
-};
+import {UserContext, UserContextType} from "./UserAuthExports";
 
 type Props = { children: React.ReactNode };
-
-export const UserContext = createContext<UserContextType>({} as UserContextType);
 
 export const UserProvider = ({ children }: Props) => {
 	const AddAccountTabHolder: BankAccountAPIData = useMemo(() => {

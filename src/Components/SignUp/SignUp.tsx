@@ -6,7 +6,7 @@ import { Input, Button } from "@nextui-org/react";
 import { EyeSlashFilledIcon } from "../Icons/EyeSlashFilledIcon/EyeSlashFilledIcon.tsx";
 import { EyeFilledIcon } from "../Icons/EyeFilledIcon/EyeFilledIcon.tsx";
 import * as Yup from "yup";
-import { UserContext } from "../../Services/Auth/UserAuth";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";

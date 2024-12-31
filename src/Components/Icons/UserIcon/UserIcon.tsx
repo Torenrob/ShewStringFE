@@ -1,6 +1,6 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import React, { Key, useContext } from "react";
-import { UserContext } from "../../../Services/Auth/UserAuth.tsx";
+import { UserContext } from "../../../Services/Auth/UserAuthExports.tsx";
 
 export default function UserIcon() {
 	const { logout } = useContext(UserContext);

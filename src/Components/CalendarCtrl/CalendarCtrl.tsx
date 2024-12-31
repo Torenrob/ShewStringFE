@@ -19,7 +19,7 @@ import TransactionInputDrawer, {TransactionInputDrawerRef} from "../TransactionI
 import {editTransOnDateFuncs} from "../DayBox/DayBox";
 import {focusToday, getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
 import Calendar from "../Calendar/Calendar";
-import {UserContext} from "../../Services/Auth/UserAuth";
+import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
 import {CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo} from "./CalendarCtrlExports.tsx";
 import {DateComponentInfo} from "../../Types/CalendarTypes.tsx";
 
