@@ -1,27 +1,19 @@
 import "./CalendarCtrl.css";
-import React, {
-	FormEvent,
-	Key,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
-import {BankAccountAPIData, TransactionAPIData} from "../../Types/APIDataTypes";
-import {Button, Spinner, Tab, Tabs} from "@nextui-org/react";
+import React, { FormEvent, Key, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
+import { Button, Spinner, Tab, Tabs } from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon/SpanIcon.tsx";
 import CheckIcon from "../Icons/CheckIcon/CheckIcon.tsx";
 import AddAccountModal from "../AddAccountModal/AddAccountModal.tsx";
 import SettingsIcon from "../Icons/SettingsIcon/SettingsIcon.tsx";
 import DelAccountModal from "../DelAccountModal/DelAccountModal.tsx";
-import TransactionInputDrawer, {TransactionInputDrawerRef} from "../TransactionInputDrawer/TransactionInputDrawer.tsx";
-import {editTransOnDateFuncs} from "../DayBox/DayBox";
-import {focusToday, getDragScrollYOffset, getMonthName} from "../../Utilities/UtilityFuncs";
+import TransactionInputDrawer, { TransactionInputDrawerRef } from "../TransactionInputDrawer/TransactionInputDrawer.tsx";
+import { editTransOnDateFuncs } from "../DayBox/DayBox";
+import { focusToday, getDragScrollYOffset, getMonthName } from "../../Utilities/UtilityFuncs";
 import Calendar from "../Calendar/Calendar";
-import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
-import {CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo} from "./CalendarCtrlExports.tsx";
-import {DateComponentInfo} from "../../Types/CalendarTypes.tsx";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
+import { CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo } from "./CalendarCtrlExports.tsx";
+import { DateComponentInfo } from "../../Types/CalendarTypes.tsx";
 
 export default function CalendarCtrl() {
 	const { bankAccounts } = useContext(UserContext);
@@ -39,7 +31,7 @@ export default function CalendarCtrl() {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
 
 		if (tabsRef.current === null || tabContRef.current === null) {
-			console.log('not generating calcntrl');
+			console.log("not generating calcntrl");
 			return;
 		}
 
@@ -51,7 +43,6 @@ export default function CalendarCtrl() {
 			setLoading(false);
 			focusToday();
 		}
-
 
 		if (tabsRef.current.clientWidth === 0) {
 			return;
@@ -204,16 +195,15 @@ export default function CalendarCtrl() {
 
 	function defaultMonthRange(): string[] {
 		const todayDateObj = new Date();
-		const startYear = todayDateObj.getFullYear();
 		let startMonth = todayDateObj.getMonth() - 5;
+		const startYear = startMonth >= 0 ? todayDateObj.getFullYear() : todayDateObj.getFullYear() - 1;
 		let endMonth = todayDateObj.getMonth() + 7;
 		todayDateObj.setMonth(todayDateObj.getMonth() + 7);
 		const endYear = todayDateObj.getFullYear();
-		startMonth = startMonth >= 0 ? startMonth : 12 - startMonth;
+		startMonth = startMonth >= 0 ? startMonth : 12 + startMonth;
 		endMonth = endMonth <= 11 ? endMonth : endMonth - 12;
 		return [`${startYear}-${startMonth.toString().padStart(2, "0")}`, `${endYear}-${endMonth.toString().padStart(2, "0")}`];
 	}
-
 
 	// noinspection JSUnusedLocalSymbols
 	function scrollDrag(direction: string) {
@@ -252,16 +242,15 @@ export default function CalendarCtrl() {
 
 	return (
 		<>
-			<Spinner className={`${loading ? "" : "hidden"} scale-125`} color="primary" label="Loading..." labelColor="primary" size="lg"/>
-			<div className={`relative calCtrlWrap overflow-clip grid ${loading ? "hidden" : ""}`}>
+			<Spinner className={`${loading ? "" : "hidden"} scale-125`} color="primary" label="Loading..." labelColor="primary" size="lg" />
+			<div className={`relative calCtrlWrap overflow-clip grid ${loading ? "hidden" : ""} min-w-full`}>
 				<div className="flex-col">
 					<div className="flex justify-between max-w-full">
-						<div ref={tabContRef} className="flex-col w-[76.7%]">
-							<div
-								className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
+						<div ref={tabContRef} className="flex-col w-[74.75%]">
+							<div className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
 								<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
 									<span>Accounts</span>
-									<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal}/>
+									<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
 								</div>
 								<div className="calCntrlMonthLabel justify-self-center font-bold relative right-[10%] w-44">
 									<span>{monthLabel}</span>
@@ -275,14 +264,14 @@ export default function CalendarCtrl() {
 									onSelectionChange={acctTabCntrlr}
 									selectedKey={selectedAcct}
 									motionProps={{
-										transition: {duration: 0.9},
+										transition: { duration: 0.9 },
 									}}
 									className="pt-0.5"
 									classNames={{
 										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
-										cursor: "w-full",
-										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-										tabContent: " text-[#d6d6d6] group-data-[hover=true]:text-[#1a1a1a] group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5",
+										cursor: "bg-[var(--greenLogo)] w-full",
+										tab: "acctTabs extraTab lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+										tabContent: `acctTabContent group-data-[hover=true]:z-51 group-data-[hover=true]:font-bold group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5`,
 									}}>
 									{bankAccounts.map((bA, i) => {
 										return (
@@ -290,9 +279,11 @@ export default function CalendarCtrl() {
 												style={{
 													position: "relative",
 													transform: `translateX(-${i * 13}px)`,
-													zIndex: `${selectedAcct === bA.id.toString() ? 55 : 49 - i}`,
+													zIndex: `${selectedAcct === bA.id.toString() ? 49 : 48 - i}`,
 												}}
-												className={`data-[hover=true]:!bg-[#54a18d] data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""}`}
+												className={`data-[hover=true]:${bA.id === 0 ? "" : "!z-50"} data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""} ${
+													bA.id === 0 ? "addAcctTab" : ""
+												}`}
 												title={bA.title}
 												key={bA.id}></Tab>
 										);
@@ -300,7 +291,7 @@ export default function CalendarCtrl() {
 								</Tabs>
 							</div>
 						</div>
-						<div className="flex-col w-[23.3%]">
+						<div className="flex-col w-[25.25%]">
 							<div className="hidden md:flex justify-center relative text-white">
 								<span>Month Range</span>
 							</div>
@@ -314,7 +305,7 @@ export default function CalendarCtrl() {
 									type="month"
 									className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
 								/>
-								<SpanIcon/>
+								<SpanIcon />
 								<input
 									name="endMonth"
 									defaultValue={defaultMonthRange()[1]}
@@ -323,15 +314,13 @@ export default function CalendarCtrl() {
 									type="month"
 									className="mnthPicker text-sm border-none bg-[#6EC4A7] shadow-none text-[#0a0a0a]"
 								/>
-								<Button type="submit" form="monthRangeForm" isIconOnly
-										className="submitDatesBtn self-center h-full" radius="none" size="sm">
-									<CheckIcon/>
+								<Button type="submit" form="monthRangeForm" className="submitDatesBtn self-center" size="md" radius="none">
+									Apply
 								</Button>
 							</form>
 						</div>
 					</div>
-					<div
-						className={`grid grid-cols-7 text-xs font-semibold weekdayLabel rounded-tl-sm`}>
+					<div className={`grid grid-cols-7 text-xs font-semibold weekdayLabel rounded-tl-sm`}>
 						<div>Sunday</div>
 						<div>Monday</div>
 						<div>Tuesday</div>
