@@ -1,3 +1,4 @@
+import "./AddCategoryModal.css";
 import { Button, Input } from "@nextui-org/react";
 import { BankAccountAPIData, Budget, CreateBudget, CreateCategory } from "../../Types/APIDataTypes";
 import React, { ChangeEvent, FormEvent, useContext, useState } from "react";
@@ -18,10 +19,6 @@ export default function AddCategoryModal({
 	const { user } = useContext(UserContext);
 	const [categoryInfo, setCategoryInfo] = useState<CreateCategory>({ title: "", amount: 0, color: "#000000", type: type, userId: user!.id, budget: budget });
 
-	function modalPlacement(): string {
-		return type === "Income" ? "17%" : "50%";
-	}
-
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
 		const { name, value } = e.target;
 		setCategoryInfo({ ...categoryInfo, [name]: value });
@@ -36,7 +33,7 @@ export default function AddCategoryModal({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className={`absolute shadow-lg shadow-gray-500 rounded-md flex-col justify-items-center p-3 h-[22%] w-[15%] bg-[var(--mainBlackTransparent)] -translate-x-[15%] z-50 top-[${modalPlacement()}]`}>
+			className={`absolute shadow-lg shadow-gray-500 rounded-md flex-col justify-items-center p-3 h-[22%] w-[15%] bg-[var(--mainBlackTransparent)] -translate-x-[15%] z-50 ${type}`}>
 			<Button
 				onPress={(e) => {
 					closeModal(type);
