@@ -83,8 +83,10 @@ function BudgetBuilder() {
 	}
 
 	function submitNewCategory(category: CreateCategory) {
-		console.log("id" in category.budget);
-		console.log("userId" in category.budget);
+		const isExistingBudget: boolean = "id" in category.budget;
+
+		// if (isExistingBudget) {
+		// }
 	}
 
 	function getCategoryMonthlyAvg(category: Category): number | string {
