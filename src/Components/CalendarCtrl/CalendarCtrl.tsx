@@ -270,8 +270,8 @@ export default function CalendarCtrl() {
 									classNames={{
 										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
 										cursor: "bg-[var(--greenLogo)] w-full",
-										tab: "acctTabs extraTab lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
-										tabContent: `acctTabContent group-data-[hover=true]:z-51 group-data-[hover=true]:font-bold group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5`,
+										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
+										tabContent: `acctTabContent group-data-[hover=true]:z-50 group-data-[hover=true]:font-extrabold group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5`,
 									}}>
 									{bankAccounts.map((bA, i) => {
 										return (
@@ -281,9 +281,7 @@ export default function CalendarCtrl() {
 													transform: `translateX(-${i * 13}px)`,
 													zIndex: `${selectedAcct === bA.id.toString() ? 49 : 48 - i}`,
 												}}
-												className={`data-[hover=true]:${bA.id === 0 ? "" : "!z-50"} data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""} ${
-													bA.id === 0 ? "addAcctTab" : ""
-												}`}
+												className={`data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""} ${bA.id === 0 ? "addAcctTab" : ""}`}
 												title={bA.title}
 												key={bA.id}></Tab>
 										);

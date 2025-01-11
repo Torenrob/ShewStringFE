@@ -1,28 +1,20 @@
-import "./TransactionInputDrawer.css"
-import {
-	Button,
-	DateInput, DateValue,
-	Input,
-	Select,
-	SelectItem,
-	SharedSelection,
-	Textarea
-} from "@nextui-org/react";
-import {PressEvent} from "@react-types/shared";
-import React, {ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState} from "react";
-import {BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData} from "../../Types/APIDataTypes.tsx";
+import "./TransactionInputDrawer.css";
+import { Button, DateInput, DateValue, Input, Select, SelectItem, SharedSelection, Textarea } from "@nextui-org/react";
+import { PressEvent } from "@react-types/shared";
+import React, { ChangeEvent, forwardRef, useContext, useImperativeHandle, useMemo, useState } from "react";
+import { BankAccountAPIData, Category, PostTransactionAPIData, TransactionAPIData } from "../../Types/APIDataTypes.tsx";
 import ArrowDownIcon from "../Icons/ArrowDownIcon/ArrowDownIcon.tsx";
 import SubmitTransactionIcon from "../Icons/SubmitTransactionIcon/SubmitTransactionIcon.tsx";
-import {deleteTransactionAPI, postTransactionAPI, updateTransactionAPI} from "../../Services/ApiCalls/TransactionAPI.tsx";
+import { deleteTransactionAPI, postTransactionAPI, updateTransactionAPI } from "../../Services/ApiCalls/TransactionAPI.tsx";
 import InvalidSubmitIcon from "../Icons/InvalidSubmitIcon/InvalidSubmitIcon.tsx";
 import DebitIcon from "../Icons/DebitIcon/DebitIcon.tsx";
-import {CalendarContext, UpdateTransactionContainerInfo} from "../CalendarCtrl/CalendarCtrlExports.tsx";
-import {ErrorHandler} from "../../Helpers/ErrorHandler.tsx";
-import {closeDrawer, updateDailyBalances, updateDailyBalanceStates} from "../../Utilities/UtilityFuncs.tsx";
+import { CalendarContext, UpdateTransactionContainerInfo } from "../CalendarCtrl/CalendarCtrlExports.tsx";
+import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
+import { closeDrawer, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs.tsx";
 import CreditIcon from "../Icons/CreditIcon/CreditIcon.tsx";
-import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
-import {AxiosResponse} from "axios";
-import {parseDate} from "@internationalized/date";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
+import { AxiosResponse } from "axios";
+import { parseDate } from "@internationalized/date";
 
 export type TransactionInputDrawerRef = {
 	updateContainer: (arg: UpdateTransactionContainerInfo) => void;
@@ -44,18 +36,23 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
 	const { user, updBankAccounts } = useContext(UserContext);
-	const [containerInfo, setContainerInfo] =
-		useState<UpdateTransactionContainerInfo>({ amount: "0.00", editingExisting: false, title: "", category: user!.categories[0], bankAccountId: currentAcct.id.toString()! });
+	const [containerInfo, setContainerInfo] = useState<UpdateTransactionContainerInfo>({
+		amount: "0.00",
+		editingExisting: false,
+		title: "",
+		category: user!.categories[0],
+		bankAccountId: currentAcct.id.toString()!,
+	});
 
 	useImperativeHandle(ref, () => ({
 		updateContainer(arg: UpdateTransactionContainerInfo) {
 			const { date: newDate, ...transactionContainerInfo } = arg;
 
 			if (Object.keys(transactionContainerInfo).length === 0) {
-				setContainerInfo({ ...containerInfo, date: arg.date, amount: "0.00", title: "", editingExisting: false, description:"" });
+				setContainerInfo({ ...containerInfo, date: arg.date, amount: "0.00", title: "", editingExisting: false, description: "" });
 				return;
 			} else {
-				setContainerInfo({...arg, category: containerInfo.category});
+				setContainerInfo({ ...arg, category: containerInfo.category });
 				setTransactionType(arg.transactionObj ? arg.transactionObj?.transactionType === "Debit" : true);
 			}
 		},
@@ -135,7 +132,6 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 			if (!containerInfo?.amount?.match(/^0\d?\./g)) return true;
 		}
 		return Number(containerInfo?.amount) < 0;
-		
 	}, [containerInfo?.amount]);
 
 	function transactionTypeClick(event: PressEvent) {
@@ -161,8 +157,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 	}
 
 	function handleAccountSelectChange(e: SharedSelection) {
-		console.log(e.currentKey);
-		updateExistingTransDisplay({target: {name: "account", value: e.currentKey}} as ChangeEvent<HTMLInputElement>)
+		updateExistingTransDisplay({ target: { name: "account", value: e.currentKey } } as ChangeEvent<HTMLInputElement>);
 	}
 
 	function updateExistingTransDisplay(e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) {
@@ -174,7 +169,7 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 				setContainerInfo({ ...containerInfo, bankAccountId: e.target.value });
 				break;
 			case "category":
-				setContainerInfo({ ...containerInfo, category: user?.categories.find(x => x.id.toString() == e.target.value) });
+				setContainerInfo({ ...containerInfo, category: user?.categories.find((x) => x.id.toString() == e.target.value) });
 				break;
 			case "description":
 				setContainerInfo({ ...containerInfo, description: e.target.value });
@@ -239,20 +234,22 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 							value={containerInfo?.date ?? parseDate(new Date().toISOString().split("T")[0])}
 							onChange={(e) => setContainerInfo({ ...containerInfo, date: e as DateValue })}
 						/>
-						{currentAcct.id != 0 && <Select
-							required
-							// placeholder={`${currentAcct.title}`}
-							radius="none"
-							size="sm"
-							defaultSelectedKeys={[`${currentAcct.id}`]}
-							label="Account"
-							name="account"
-							onSelectionChange={handleAccountSelectChange}
-							className="text-slate-500 basis-2/6 lg:row-start-1">
-							{bankAccounts.slice(0, bankAccounts.length - 1).map((account) => (
-								<SelectItem key={account.id}>{account.title}</SelectItem>
-							))}
-						</Select>}
+						{currentAcct.id != 0 && (
+							<Select
+								required
+								// placeholder={`${currentAcct.title}`}
+								radius="none"
+								size="sm"
+								defaultSelectedKeys={[`${currentAcct.id}`]}
+								label="Account"
+								name="account"
+								onSelectionChange={handleAccountSelectChange}
+								className="text-slate-500 basis-2/6 lg:row-start-1">
+								{bankAccounts.slice(0, bankAccounts.length - 1).map((account) => (
+									<SelectItem key={account.id}>{account.title}</SelectItem>
+								))}
+							</Select>
+						)}
 					</div>
 					<div className="flex gap-2 lg:col-start-1 lg:row-start-2 lg:col-span-2 lg:gap-3">
 						<Button
@@ -313,7 +310,11 @@ export const TransactionInputDrawer = forwardRef<TransactionInputDrawerRef, Tran
 						onChange={updateExistingTransDisplay}
 						className="h-4 text-slate-500 lg:col-start-3 lg:row-start-2 ">
 						{user!.categories.map((cat) => {
-							return <SelectItem value={cat.id} key={cat.id}>{cat.title}</SelectItem>;
+							return (
+								<SelectItem value={cat.id} key={cat.id}>
+									{cat.title}
+								</SelectItem>
+							);
 						})}
 					</Select>
 					<Textarea
@@ -352,7 +353,7 @@ function mkPostTransAPIData(targetData: EventTarget & HTMLFormElement, transacti
 		bankAccountId: targetData.account.value ? targetData.account.value : curAcct.id,
 		date: targetData.date.value,
 		amount: targetData.amount.value,
-		category: getCategory(categoryList,targetData.category.value)!,
+		category: getCategory(categoryList, targetData.category.value)!,
 		description: targetData.description.value,
 	};
 }
@@ -367,5 +368,5 @@ function mkUpdTransAPIData(curTransInfo: TransactionAPIData, newTransInfo: PostT
 }
 
 function getCategory(categories: Category[], selectedCategory: number) {
-	return categories.find(e => e.id === selectedCategory);
+	return categories.find((e) => e.id === selectedCategory);
 }

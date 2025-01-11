@@ -1,19 +1,19 @@
-import {createContext, useCallback, useEffect, useMemo, useState} from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import React from "react";
-import axios, {AxiosResponse} from "axios";
+import axios, { AxiosResponse } from "axios";
 import { BankAccountAPIData, RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
 import { userLoginAPI, userRegisterAPI } from "../ApiCalls/UserAPI";
 import Cookies from "js-cookie";
 import { getUserBankAccountsAPI } from "../ApiCalls/BankAccountAPI";
 import { ErrorHandler } from "../../Helpers/ErrorHandler";
-import {UserContext, UserContextType} from "./UserAuthExports";
+import { UserContext } from "./UserAuthExports";
 
 type Props = { children: React.ReactNode };
 
 export const UserProvider = ({ children }: Props) => {
 	const AddAccountTabHolder: BankAccountAPIData = useMemo(() => {
-		const hold: BankAccountAPIData = { title: "Add Account", repeatGroups: [], accountType: "Saving", id: 0, transactions: new Map() };
+		const hold: BankAccountAPIData = { title: "Add Account", accountType: "Saving", budgets: [], id: 0, transactions: new Map() };
 		return hold;
 	}, []);
 	const navigate = useNavigate();
@@ -22,15 +22,18 @@ export const UserProvider = ({ children }: Props) => {
 	const [isReady, setIsReady] = useState(false);
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([AddAccountTabHolder]);
 
-	const getAccounts = useCallback(async (userId: string) => {
-		await getUserBankAccountsAPI(userId)
-			.then((res) => {
-				setBankAccounts(() => res.concat(AddAccountTabHolder));
-			})
-			.catch((err) => {
-				ErrorHandler(err);
-			});
-	}, [setBankAccounts, AddAccountTabHolder])
+	const getAccounts = useCallback(
+		async (userId: string) => {
+			await getUserBankAccountsAPI(userId)
+				.then((res) => {
+					setBankAccounts(() => res.concat(AddAccountTabHolder));
+				})
+				.catch((err) => {
+					ErrorHandler(err);
+				});
+		},
+		[setBankAccounts, AddAccountTabHolder]
+	);
 
 	useEffect(() => {
 		const userHold = Cookies.get("user");
@@ -81,7 +84,7 @@ export const UserProvider = ({ children }: Props) => {
 			.then((res) => {
 				if (res) {
 					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
-					getAccounts(res.data.id)
+					getAccounts(res.data.id);
 					Cookies.set("token", res?.data.token, { expires: new Date(new Date().getTime() + 60000 * 30) });
 					const userObj: UserProfile = {
 						id: res.data.id,
