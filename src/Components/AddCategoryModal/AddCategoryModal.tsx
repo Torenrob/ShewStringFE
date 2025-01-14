@@ -46,7 +46,7 @@ export default function AddCategoryModal({
 			<Input name="title" onChange={handleChange} value={categoryInfo.title} type="text" className="mb-2" label="Title" size="sm" />
 			<div className="flex gap-3 w-full">
 				<Input
-					name="budgetLimit"
+					name="amount"
 					onChange={handleChange}
 					value={categoryInfo.amount.toString()}
 					type="number"

@@ -1,6 +1,6 @@
-import axios, {AxiosResponse} from "axios";
-import {ErrorHandler} from "../../Helpers/ErrorHandler";
-import {BankAccountAPIData} from "../../Types/APIDataTypes";
+import axios, { AxiosResponse } from "axios";
+import { ErrorHandler } from "../../Helpers/ErrorHandler";
+import { BankAccountAPIData } from "../../Types/APIDataTypes";
 
 const api = import.meta.env.VITE_API_URL + "/bankAccounts";
 

@@ -26,6 +26,7 @@ export const UserProvider = ({ children }: Props) => {
 		async (userId: string) => {
 			await getUserBankAccountsAPI(userId)
 				.then((res) => {
+					console.log(res);
 					setBankAccounts(() => res.concat(AddAccountTabHolder));
 				})
 				.catch((err) => {

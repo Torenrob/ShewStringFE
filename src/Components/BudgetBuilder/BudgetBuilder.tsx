@@ -14,6 +14,8 @@ import AddCategoryModal from "../AddCategoryModal/AddCategoryModal.tsx";
 import BudgetBuilderLineItem from "../BudgetBuilderLineItem/BudgetBuilderLineItem.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
 import { _getCurrMonth } from "../Calendar/CalendarExports.tsx";
+import { createCategoryExistingBudgetAPI, createCategoryNewBudgetAPI } from "../../Services/ApiCalls/BudgetAPI.tsx";
+import { getRandomNum } from "../../Utilities/UtilityFuncs.tsx";
 
 function BudgetBuilder() {
 	const { bankAccounts, user } = useContext(UserContext);
@@ -24,6 +26,7 @@ function BudgetBuilder() {
 	const [selectedBudget, setSelectedBudget] = useState<Budget | CreateBudget>(selectedBankAccount.budgets[0]);
 	const [showAddIncomeCat, setShowAddIncomeCat] = useState<boolean>(false);
 	const [showAddExpenseCat, setShowAddExpenseCat] = useState<boolean>(false);
+	const [forceState, setForceState] = useState(getRandomNum());
 
 	function allTimeBudgetChange(isSelected: boolean) {
 		setAllTimeBudget(isSelected);
@@ -82,16 +85,25 @@ function BudgetBuilder() {
 		}
 	}
 
-	function submitNewCategory(category: CreateCategory) {
+	async function submitNewCategory(category: CreateCategory) {
 		const isExistingBudget: boolean = "id" in category.budget;
 
-		// if (isExistingBudget) {
-		// }
+		const budgetWithCreatedCategory: Budget | null = isExistingBudget ? await createCategoryExistingBudgetAPI(category) : await createCategoryNewBudgetAPI(category);
+
+		console.log(budgetWithCreatedCategory);
+
+		if (budgetWithCreatedCategory) {
+			setSelectedBudget((p) => {
+				const newBudget: Budget = { ...budgetWithCreatedCategory };
+
+				return newBudget;
+			});
+		}
 	}
 
 	function getCategoryMonthlyAvg(category: Category): number | string {
 		const allAcctTrans = [...selectedBankAccount.transactions.values()].flat();
-		console.log(allAcctTrans);
+
 		const categoryAcctTrans = allAcctTrans.filter((x) => x.category?.id === category.id);
 
 		const categoryTransTotal = categoryAcctTrans.reduce((acc, curTrans) => acc + curTrans.amount, 0);
@@ -100,6 +112,8 @@ function BudgetBuilder() {
 
 		return isNaN(categoryAvg) ? "No Data" : categoryAvg;
 	}
+
+	console.log(selectedBudget);
 
 	return (
 		<>
@@ -171,7 +185,7 @@ function BudgetBuilder() {
 							</div>
 							{selectedBudget?.budgetCategories.map((bC, i) => {
 								if (bC.type === "Income") {
-									return <BudgetBuilderLineItem i={i} bC={bC} getCategoryMonthlyAvg={getCategoryMonthlyAvg} />;
+									return <BudgetBuilderLineItem i={i} bC={bC} getCategoryMonthlyAvg={getCategoryMonthlyAvg} key={bC.id} />;
 								}
 							})}
 						</div>

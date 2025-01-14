@@ -27,6 +27,8 @@ export default function CalendarCtrl() {
 	const [daysToLoad, setDaysToLoad] = useState<number | null>(null);
 	const [loadedDays, setLoadedDays] = useState<Set<string> | null>(null);
 
+	console.log(bankAccounts);
+
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
 
