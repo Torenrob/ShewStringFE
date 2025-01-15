@@ -1,7 +1,6 @@
 import { TransactionAPIData } from "../Types/APIDataTypes";
 import { LocalMonth } from "../Types/CalendarTypes";
-import Cookies from "js-cookie";
-import {dayBoxHeight} from "./GlobalVariables.tsx";
+import { dayBoxHeight } from "./GlobalVariables.tsx";
 
 export function getDayOfWeek(num: number): string {
 	switch (num) {
@@ -164,7 +163,7 @@ export function highlightEditedTransactionSwitch(transID?: string) {
 }
 
 export function calcDailyBalances(allTransactions: Map<string, TransactionAPIData[]>): Map<string, number> {
-	const dailyBalanceMap: Map<string,number> = new Map();
+	const dailyBalanceMap: Map<string, number> = new Map();
 	let balanceKeeper: number = 0;
 
 	//Resorts all transactions when new transactions are added
@@ -174,9 +173,9 @@ export function calcDailyBalances(allTransactions: Map<string, TransactionAPIDat
 	});
 
 	sortedTransMap.forEach((day) => {
-			balanceKeeper = day[1].reduce((balAcc: number, trans:TransactionAPIData): number => {
-				return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
-			}, balanceKeeper);
+		balanceKeeper = day[1].reduce((balAcc: number, trans: TransactionAPIData): number => {
+			return parseFloat(balAcc.toFixed(2)) + (trans.transactionType === "Debit" ? -trans.amount : trans.amount);
+		}, balanceKeeper);
 
 		dailyBalanceMap.delete(day[0]);
 		dailyBalanceMap.set(day[0], Number.parseFloat(balanceKeeper.toFixed(2)));
@@ -251,7 +250,7 @@ export function updateDailyBalanceStates(setBalStateMap: Map<string, (arg: numbe
 
 	//If Account has only one transaction and that transaction gets deleted
 	if (dailyBalMap.size == 0) {
-		sortedBalStateMap.forEach(entry => entry[1](0));
+		sortedBalStateMap.forEach((entry) => entry[1](0));
 		return;
 	}
 
@@ -295,13 +294,7 @@ export function getRandomNum(): number {
 	return Math.floor(Math.random() * 10000000);
 }
 
-export function checkForUser(): boolean {
-	return !!Cookies.get("token");
-
-}
-
-export function createMonthObject(monthObject: LocalMonth, index: number, prevYtrans: number,
-						mobileProps: {mobileEnd: number, mobileStart:number,mobileY: number}) {
+export function createMonthObject(monthObject: LocalMonth, index: number, prevYtrans: number, mobileProps: { mobileEnd: number; mobileStart: number; mobileY: number }) {
 	monthObject.styleYtransition = setYtrans(index, prevYtrans, monthObject);
 
 	monthObject.mobileEnd = mobileProps.mobileEnd;

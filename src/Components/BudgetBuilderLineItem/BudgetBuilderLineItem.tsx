@@ -12,7 +12,7 @@ export default function BudgetBuilderLineItem({ i, bC, getCategoryMonthlyAvg }: 
 			</div>
 			<div className="categoryMonthlyAverage">{getCategoryMonthlyAvg(bC)}</div>
 			<div className="categoryHealth text-green-600 font-bold">Good</div>
-			<div className="deleteCategory"></div>
+			<div className="deleteCategory">❌</div>
 		</div>
 	);
 }

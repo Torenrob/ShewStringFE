@@ -2,7 +2,7 @@ import { createContext, useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import axios, { AxiosResponse } from "axios";
-import { BankAccountAPIData, RegisterUserInfo, UserProfile } from "../../Types/APIDataTypes";
+import { BankAccountAPIData, RegisterUserInfo, UserInfo, UserProfile } from "../../Types/APIDataTypes";
 import { userLoginAPI, userRegisterAPI } from "../ApiCalls/UserAPI";
 import Cookies from "js-cookie";
 import { getUserBankAccountsAPI } from "../ApiCalls/BankAccountAPI";
@@ -18,7 +18,7 @@ export const UserProvider = ({ children }: Props) => {
 	}, []);
 	const navigate = useNavigate();
 	const [token, setToken] = useState<string | null>(null);
-	const [user, setUser] = useState<UserProfile | null>(null);
+	const [user, setUser] = useState<UserInfo | null>(null);
 	const [isReady, setIsReady] = useState(false);
 	const [bankAccounts, setBankAccounts] = useState<BankAccountAPIData[]>([AddAccountTabHolder]);
 
@@ -26,7 +26,6 @@ export const UserProvider = ({ children }: Props) => {
 		async (userId: string) => {
 			await getUserBankAccountsAPI(userId)
 				.then((res) => {
-					console.log(res);
 					setBankAccounts(() => res.concat(AddAccountTabHolder));
 				})
 				.catch((err) => {
@@ -42,13 +41,13 @@ export const UserProvider = ({ children }: Props) => {
 		setTimeout(() => {
 			if (userHold && tokenHold) {
 				axios.defaults.headers.common["Authorization"] = "Bearer " + tokenHold;
-				const userObj: UserProfile | null = userHold ? JSON.parse(userHold) : null;
+				const userObj: UserInfo | null = userHold ? JSON.parse(userHold) : null;
 				setUser(userObj);
 				setToken(tokenHold);
 				if (userObj) {
 					getAccounts(userObj.id).then(() => {});
 				}
-				navigate("/main");
+				navigate("/");
 			} else {
 				navigate("/");
 			}
@@ -67,12 +66,13 @@ export const UserProvider = ({ children }: Props) => {
 			.then((res: AxiosResponse<UserProfile> | void) => {
 				if (res) {
 					Cookies.set("token", res?.data.token);
-					Cookies.set("user", JSON.stringify(res.data));
+					const { token, ...userCookieObj } = res.data;
+					Cookies.set("user", JSON.stringify({ userCookieObj }));
 					getAccounts(res.data.id);
 					setToken(res?.data.token);
 					setUser(res?.data);
 					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
-					navigate("/main");
+					navigate("/");
 				}
 			})
 			.catch((err) => {
@@ -87,19 +87,18 @@ export const UserProvider = ({ children }: Props) => {
 					axios.defaults.headers.common["Authorization"] = "Bearer " + res?.data.token;
 					getAccounts(res.data.id);
 					Cookies.set("token", res?.data.token, { expires: new Date(new Date().getTime() + 60000 * 30) });
-					const userObj: UserProfile = {
+					const userObj: UserInfo = {
 						id: res.data.id,
 						username: res.data.username,
 						categories: res.data.categories,
 						email: res.data.email,
 						firstName: res.data.firstName,
 						lastName: res.data.lastName,
-						token: res.data.token,
 					};
 					Cookies.set("user", JSON.stringify(userObj), { expires: new Date(new Date().getTime() + 60000 * 30) });
 					setToken(res?.data.token);
 					setUser(userObj);
-					navigate("/main");
+					navigate("/");
 				}
 			})
 			.catch((err) => {

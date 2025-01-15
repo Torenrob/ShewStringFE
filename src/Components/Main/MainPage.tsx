@@ -10,10 +10,6 @@ export default function MainPage() {
 	const navigate = useNavigate();
 	const [selectedNavItem, setSelectedNavItem] = useState<SelectedNavItem | string>(SelectedNavItem.Calendar);
 
-	if (!useLoaderData()) {
-		navigate("/");
-	}
-
 	return (
 		<div className="box-border mainPage">
 			<UserPanel updateNavItem={setSelectedNavItem} />

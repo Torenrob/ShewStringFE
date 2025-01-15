@@ -14,7 +14,7 @@ import AddCategoryModal from "../AddCategoryModal/AddCategoryModal.tsx";
 import BudgetBuilderLineItem from "../BudgetBuilderLineItem/BudgetBuilderLineItem.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
 import { _getCurrMonth } from "../Calendar/CalendarExports.tsx";
-import { createCategoryExistingBudgetAPI, createCategoryNewBudgetAPI } from "../../Services/ApiCalls/BudgetAPI.tsx";
+import { createCategoryExistingBudgetAPI, createCategoryNewBudgetAPI } from "../../Services/ApiCalls/CategoryAPI.tsx";
 import { getRandomNum } from "../../Utilities/UtilityFuncs.tsx";
 
 function BudgetBuilder() {
@@ -100,6 +100,8 @@ function BudgetBuilder() {
 			});
 		}
 	}
+
+	async function deleteCategory(categoryId: number) {}
 
 	function getCategoryMonthlyAvg(category: Category): number | string {
 		const allAcctTrans = [...selectedBankAccount.transactions.values()].flat();

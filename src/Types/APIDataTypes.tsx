@@ -16,6 +16,15 @@ export interface UserProfile {
 	token: string;
 }
 
+export interface UserInfo {
+	id: string;
+	username: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	categories: Category[];
+}
+
 export interface UserProfile_BankAccounts {
 	id: string;
 	username: string;
