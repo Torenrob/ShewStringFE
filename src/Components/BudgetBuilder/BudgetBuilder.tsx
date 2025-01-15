@@ -14,8 +14,7 @@ import AddCategoryModal from "../AddCategoryModal/AddCategoryModal.tsx";
 import BudgetBuilderLineItem from "../BudgetBuilderLineItem/BudgetBuilderLineItem.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
 import { _getCurrMonth } from "../Calendar/CalendarExports.tsx";
-import { createCategoryExistingBudgetAPI, createCategoryNewBudgetAPI } from "../../Services/ApiCalls/CategoryAPI.tsx";
-import { getRandomNum } from "../../Utilities/UtilityFuncs.tsx";
+import { createCategoryExistingBudgetAPI, createCategoryNewBudgetAPI, deleteCategoryAPI } from "../../Services/ApiCalls/CategoryAPI.tsx";
 
 function BudgetBuilder() {
 	const { bankAccounts, user } = useContext(UserContext);
@@ -26,7 +25,6 @@ function BudgetBuilder() {
 	const [selectedBudget, setSelectedBudget] = useState<Budget | CreateBudget>(selectedBankAccount.budgets[0]);
 	const [showAddIncomeCat, setShowAddIncomeCat] = useState<boolean>(false);
 	const [showAddExpenseCat, setShowAddExpenseCat] = useState<boolean>(false);
-	const [forceState, setForceState] = useState(getRandomNum());
 
 	function allTimeBudgetChange(isSelected: boolean) {
 		setAllTimeBudget(isSelected);
@@ -90,8 +88,6 @@ function BudgetBuilder() {
 
 		const budgetWithCreatedCategory: Budget | null = isExistingBudget ? await createCategoryExistingBudgetAPI(category) : await createCategoryNewBudgetAPI(category);
 
-		console.log(budgetWithCreatedCategory);
-
 		if (budgetWithCreatedCategory) {
 			setSelectedBudget((p) => {
 				const newBudget: Budget = { ...budgetWithCreatedCategory };
@@ -101,7 +97,19 @@ function BudgetBuilder() {
 		}
 	}
 
-	async function deleteCategory(categoryId: number) {}
+	async function deleteCategory(categoryId: number) {
+		const budgetAfterCategoryDelete: Budget | null = await deleteCategoryAPI(categoryId, user!.id);
+
+		console.log(budgetAfterCategoryDelete);
+
+		if (budgetAfterCategoryDelete) {
+			setSelectedBudget((p) => {
+				const newBudget: Budget = { ...budgetAfterCategoryDelete };
+
+				return newBudget;
+			});
+		}
+	}
 
 	function getCategoryMonthlyAvg(category: Category): number | string {
 		const allAcctTrans = [...selectedBankAccount.transactions.values()].flat();
@@ -114,8 +122,6 @@ function BudgetBuilder() {
 
 		return isNaN(categoryAvg) ? "No Data" : categoryAvg;
 	}
-
-	console.log(selectedBudget);
 
 	return (
 		<>
@@ -174,45 +180,75 @@ function BudgetBuilder() {
 						</div>
 						<div className="w-full h-[87.5%] flex"></div>
 					</div>
-					<div className="flex-col w-full h-full">
-						<div className="h-[85%] w-full overflow-y-scroll flex-col budgetCategoryList">
-							<div className="flex w-full text-large categoryListTable h-10">
-								<div></div>
-								<div>Category</div>
-								<div>Amount</div>
-								<div>Color</div>
-								<div>Monthly Avg</div>
-								<div>Health</div>
-								<div>Delete</div>
+					<div className="w-full h-full py-1 pr-1">
+						<div className="flex-col w-full h-full budgetCategoryTable">
+							<div className="h-[85%] w-full flex-col budgetCategoryList">
+								<div className="flex w-full text-large categoryListTableHeaders h-[14%]">
+									<div>#</div>
+									<div>Category</div>
+									<div>Amount</div>
+									<div>Color</div>
+									<div>Monthly Avg</div>
+									<div>Health</div>
+									<div>Delete</div>
+									<div className="!w-[5px]"></div>
+								</div>
+								<div className="w-full flex-col max-h-[86.5%] min-h-[86.5%] overflow-y-auto categoryListScroll pt-1">
+									{selectedBudget?.budgetCategories
+										.filter(({ type }) => type === "Income")
+										.map((bC, i) => {
+											return <BudgetBuilderLineItem i={i} bC={bC} getCategoryMonthlyAvg={getCategoryMonthlyAvg} key={bC.id} deleteCategory={deleteCategory} />;
+										})}
+								</div>
 							</div>
-							{selectedBudget?.budgetCategories.map((bC, i) => {
-								if (bC.type === "Income") {
-									return <BudgetBuilderLineItem i={i} bC={bC} getCategoryMonthlyAvg={getCategoryMonthlyAvg} key={bC.id} />;
-								}
-							})}
+							<div className="h-[15%] w-full p-1 budgetCategoryTableTotal">{/* To do: Enter Income total logic*/}</div>
 						</div>
-						<div className="h-[15%] w-full p-1">{/* To do: Enter Income total logic*/}</div>
 					</div>
 					<div className="absolute h-20 w-20 bg-[var(--mainGray)] rounded-[50%] bottom-0 right-[50%] translate-y-[58%] flex">
 						<MinusIcon />
 					</div>
 				</div>
-				<div className="row-span-4 h-full w-full bg-[var(--mainWhite)] rounded-md relative flex-col" id="budgetExpenses">
-					<div className="flex">
-						<div className="w-40 h-10 bg-[var(--mainGray)] rounded-br-md relative flex">
-							<div className="w-1 h-1 bg-[var(--mainGray)] budgetTitleSection absolute right-0 translate-x-[100%]"></div>
-							<span className="text-white font-semibold text-2xl self-center w-full text-center">Expenses</span>
-							<div className="w-1 h-1 budgetTitleSection bg-[var(--mainGray)] absolute bottom-0 translate-y-[100%]"></div>
+				<div className="row-span-4 h-full w-full bg-[var(--mainWhite)] rounded-md relative  flex" id="budgetExpense">
+					<div className="flex-col h-full">
+						<div className="flex h-10">
+							<div className="w-40 h-full bg-[var(--mainGray)] rounded-br-md relative flex z-50">
+								<div className="w-1 h-1 bg-[var(--mainGray)] budgetTitleSection absolute right-0 translate-x-[100%]"></div>
+								<span className="text-white font-semibold text-2xl self-center w-full text-center">Expense</span>
+								<div className="w-1 h-1 budgetTitleSection bg-[var(--mainGray)] absolute bottom-0 translate-y-[100%]"></div>
+							</div>
+							<div className="h-full">
+								<Button onPress={(e) => addCategory("Expense")} className="border-[var(--mainWhite)] border-4 bg-[var(--greenLogo)] font-semibold" radius="sm">
+									Add Line +
+								</Button>
+							</div>
 						</div>
-						<div className="h-10">
-							<Button onPress={(e) => addCategory("Expense")} className="border-[var(--mainWhite)] border-4 bg-[var(--greenLogo)] font-bold" radius="sm">
-								Add Line +
-							</Button>
+						<div className="w-full h-[87.5%] flex"></div>
+					</div>
+					<div className="w-full h-full py-1 pr-1">
+						<div className="flex-col w-full h-full budgetCategoryTable">
+							<div className="h-[85%] w-full flex-col budgetCategoryList">
+								<div className="flex w-full text-large categoryListTableHeaders h-[14%]">
+									<div>#</div>
+									<div>Category</div>
+									<div>Amount</div>
+									<div>Color</div>
+									<div>Monthly Avg</div>
+									<div>Health</div>
+									<div>Delete</div>
+									<div className="!w-[5px]"></div>
+								</div>
+								<div className="w-full max-h-[86.5%] min-h-[86.5%] overflow-y-auto flex-col categoryListScroll pt-1">
+									{selectedBudget?.budgetCategories
+										.filter(({ type }) => type === "Expense")
+										.map((bC, i) => {
+											return <BudgetBuilderLineItem i={i} bC={bC} getCategoryMonthlyAvg={getCategoryMonthlyAvg} key={bC.id} deleteCategory={deleteCategory} />;
+										})}
+								</div>
+							</div>
+							<div className="h-[15%] w-full p-1 budgetCategoryTableTotal">{/* To do: Enter Expense total logic*/}</div>
 						</div>
 					</div>
-					<div className="h-[76%] p-1 w-full">{/* To do: Enter Expense category logic*/}</div>
-					<div className="h-[11.5%] w-full p-1">{/* To do: Enter Expense total logic*/}</div>
-					<div className="absolute h-20 w-20 bg-[var(--mainGray)] rounded-[50%] bottom-0 right-[50%] translate-y-[58%] flex ">
+					<div className="absolute h-20 w-20 bg-[var(--mainGray)] rounded-[50%] bottom-0 right-[50%] translate-y-[58%] flex">
 						<EqualsIcon />
 					</div>
 				</div>

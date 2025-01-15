@@ -16,10 +16,17 @@ export async function createCategoryNewBudgetAPI(cat: CreateCategory): Promise<B
 
 export async function createCategoryExistingBudgetAPI(cat: CreateCategory): Promise<Budget | null> {
 	try {
-		console.log("ran api");
 		const resp: AxiosResponse<Budget> = await axios.post(api, cat);
-		console.log(resp);
-		console.log(resp.data);
+		return resp.data;
+	} catch (err) {
+		ErrorHandler(err);
+		return null;
+	}
+}
+
+export async function deleteCategoryAPI(categoryId: number, userId: string): Promise<Budget | null> {
+	try {
+		const resp: AxiosResponse<Budget> = await axios.delete(api + "/" + categoryId + "/" + userId);
 		return resp.data;
 	} catch (err) {
 		ErrorHandler(err);

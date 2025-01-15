@@ -33,7 +33,7 @@ export default function AddCategoryModal({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className={`absolute shadow-lg shadow-gray-500 rounded-md flex-col justify-items-center p-3 h-[22%] w-[15%] bg-[var(--mainBlackTransparent)] -translate-x-[15%] z-50 ${type}`}>
+			className={`absolute shadow-lg shadow-black rounded-md flex-col justify-items-center p-3 h-[22%] w-[15%] bg-[var(--mainBlackTransparent)] -translate-x-[15%] z-50 ${type}`}>
 			<Button
 				onPress={(e) => {
 					closeModal(type);
@@ -44,7 +44,7 @@ export default function AddCategoryModal({
 			</Button>
 			<div className="mb-2 text-center text-large text-white">Add {type} Category</div>
 			<Input name="title" onChange={handleChange} value={categoryInfo.title} type="text" className="mb-2" label="Title" size="sm" />
-			<div className="flex gap-3 w-full">
+			<div className="flex gap-1.5 w-full">
 				<Input
 					name="amount"
 					onChange={handleChange}
@@ -59,11 +59,13 @@ export default function AddCategoryModal({
 						</div>
 					}
 				/>
-				<div className="flex-col">
-					<label htmlFor="color" className="text-white">
-						Color
-					</label>
-					<input name="color" onChange={handleChange} value={categoryInfo.color} type="color" className="h-6 w-6 ml-1" />
+				<div className="flex-col w-16">
+					<div className="flex-col bg-gray-600 pl-1.5 rounded-md">
+						<label htmlFor="color" className="text-white font-semibold">
+							Color
+						</label>
+						<input name="color" onChange={handleChange} value={categoryInfo.color} type="color" className="h-5 w-5 ml-2" />
+					</div>
 				</div>
 			</div>
 			<Button type="submit" className="font-bold" color="primary">

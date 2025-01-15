@@ -1,0 +1,27 @@
+.deleteCategory {
+	transform: scale(0.85);
+	border: solid 0.125rem red;
+	background-color: red;
+}
+
+.deleteCategory:active {
+	transform: scale(0.45);
+}
+
+.categoryListTableContent {
+	justify-content: space-around;
+}
+
+.categoryListTableContent > div:not(:first-of-type) {
+	width: 14%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.categoryListTableContent > div:first-of-type {
+	width: 4%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
