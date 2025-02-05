@@ -1,1 +1,1 @@
-export const dayBoxHeight = 14.9;
+export const dayBoxHeightPercent = 14.875;

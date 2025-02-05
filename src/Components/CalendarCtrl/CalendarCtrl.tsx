@@ -1,5 +1,6 @@
 import "./CalendarCtrl.css";
 import React, { FormEvent, Key, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BankAccountAPIData, TransactionAPIData } from "../../Types/APIDataTypes";
 import { Button, Spinner, Tab, Tabs } from "@nextui-org/react";
 import SpanIcon from "../Icons/SpanIcon/SpanIcon.tsx";
@@ -14,9 +15,11 @@ import Calendar from "../Calendar/Calendar";
 import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
 import { CalendarContext, DragObject, MonthRange, UpdateTransactionContainerInfo } from "./CalendarCtrlExports.tsx";
 import { DateComponentInfo } from "../../Types/CalendarTypes.tsx";
+import { getUserCategories } from "../../Services/ApiCalls/CategoryAPI.tsx";
+import { getUserBankAccountsAPI } from "../../Services/ApiCalls/BankAccountAPI.tsx";
 
 export default function CalendarCtrl() {
-	const { bankAccounts } = useContext(UserContext);
+	const { bankAccounts, user } = useContext(UserContext);
 	const [selectedAcct, setSelectedAcct] = useState<string>(bankAccounts[0]?.id.toString() ?? "0");
 	const [addAcctModalOpen, setAddAcctModalOpen] = useState<boolean>(false);
 	const [delAcctModalOpen, setDelAcctModalOpen] = useState<boolean>(false);
@@ -26,6 +29,11 @@ export default function CalendarCtrl() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [daysToLoad, setDaysToLoad] = useState<number | null>(null);
 	const [loadedDays, setLoadedDays] = useState<Set<string> | null>(null);
+	const { data } = useQuery({ queryKey: ["userAcctsCalCntl"], queryFn: getBankAccounts });
+
+	function getBankAccounts() {
+		return getUserBankAccountsAPI(user!.id);
+	}
 
 	useEffect(() => {
 		setSelectedAcct(bankAccounts[0].id.toString() ?? "0");
@@ -241,12 +249,12 @@ export default function CalendarCtrl() {
 
 	return (
 		<>
-			<Spinner className={`${loading ? "" : "hidden"} scale-125`} color="primary" label="Loading..." labelColor="primary" size="lg" />
-			<div className={`relative calCtrlWrap overflow-clip grid ${loading ? "hidden" : ""} min-w-full`}>
-				<div className="flex-col">
-					<div className="flex justify-between max-w-full">
+			<Spinner className={`${loading ? "absolute top-[45%]" : "hidden"} scale-125`} color="primary" label="Loading..." labelColor="primary" size="lg" />
+			<div className={`relative rounded-md overflow-clip grid ${loading ? "invisible" : ""}`} id="calCtrlWrap">
+				<div className="flex-col acctsWeekLabelMonthPickCont content-end">
+					<div className="flex justify-between max-w-full acctsMnthLabelCont">
 						<div ref={tabContRef} className="flex-col w-[74.75%]">
-							<div className="flex justify-around relative text-sm text-white bg-[#1a1a1a] rounded-t-lg pt-0.5 py-0.5 h-fit">
+							<div className="flex justify-around relative text-sm text-white bg-[#2c2c2c] rounded-t-lg pt-0.5 py-0.5 h-fit">
 								<div id="calCntrlAcctsLabel" className="flex relative right-[10%]">
 									<span>Accounts</span>
 									<SettingsIcon openAcctModal={openAddAcctModal} openDelAcctModal={openDelAcctModal} />
@@ -267,7 +275,7 @@ export default function CalendarCtrl() {
 									}}
 									className="pt-0.5"
 									classNames={{
-										tabList: "rounded-none p-0 gap-0 bg-[#1a1a1a]",
+										tabList: "rounded-none p-0 gap-0 bg-[#2c2c2c]",
 										cursor: "bg-[var(--greenLogo)] w-full",
 										tab: "acctTabs lg:min-w-32 lg:max-w-32 px-0 lg:h-6",
 										tabContent: `acctTabContent group-data-[hover=true]:z-50 group-data-[hover=true]:font-extrabold group-data-[selected=true]:text-[black] group-data-[selected=true]:font-bold truncate lg:pl-4 lg:pr-4 lg:pt-0.5`,
@@ -277,7 +285,7 @@ export default function CalendarCtrl() {
 											<Tab
 												style={{
 													position: "relative",
-													transform: `translateX(-${i * 13}px)`,
+													transform: `translateX(-${(i * 13) / 16}rem)`,
 													zIndex: `${selectedAcct === bA.id.toString() ? 49 : 48 - i}`,
 												}}
 												className={`data-[hover=true]:opacity-100 ${selectedAcct === bA.id.toString() ? "selTab" : ""} ${bA.id === 0 ? "addAcctTab" : ""}`}
@@ -288,7 +296,7 @@ export default function CalendarCtrl() {
 								</Tabs>
 							</div>
 						</div>
-						<div className="flex-col w-[25.25%]">
+						<div className="flex-col w-[25.25%] content-end">
 							<div className="hidden md:flex justify-center relative text-white">
 								<span>Month Range</span>
 							</div>
@@ -339,7 +347,7 @@ export default function CalendarCtrl() {
 						addTransToDate: addTransToDate,
 						editTransOnDatesFuncsMap: editTransOnDatesFuncMap,
 					}}>
-					<div id="calWrap" className="calWrap max-h-full">
+					<div id="calChartWrap" className="calChartWrap" style={{ height: "100%", minHeight: "100%" }}>
 						{/* <div id="topCalBound" onMouseOver={(e, direction = "up") => scrollDrag(direction)} className="flex justify-center"></div> */}
 						<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
 						{/* <div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)} style={{ background: "red" }}></div> */}

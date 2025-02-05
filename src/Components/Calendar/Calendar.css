@@ -1,14 +1,27 @@
 #calendar {
-    position: relative;
-    z-index: 1;
-    background-color: #EBEBEB;
+	position: relative;
+	z-index: 1;
+	background-color: #ebebeb;
+	height: 89.25%;
+	max-height: 89.25%;
+	min-height: 89.25%;
+	overflow-y: scroll;
+	scroll-snap-type: y mandatory;
+	scrollbar-width: none;
+	border-bottom-left-radius: 0.275rem;
+	border-bottom-right-radius: 0.275rem;
+	-ms-overflow-style: none;
+}
+
+#calendar::-webkit-scrollbar {
+	display: none;
 }
 
 .calMonthsContainer {
-    pointer-events: none;
+	pointer-events: none;
 }
 
 .focusMonth > div > div {
-    font-weight: bold;
-    background-color: white !important;
+	font-weight: bold;
+	background-color: white !important;
 }

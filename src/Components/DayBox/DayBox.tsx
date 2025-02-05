@@ -1,5 +1,5 @@
-import "./DayBox.css"
-import { ReactNode, useContext, useState, MouseEvent, useEffect, useCallback } from "react";
+import "./DayBox.css";
+import { ReactNode, useContext, useState, MouseEvent, useEffect, useCallback, useMemo } from "react";
 import { DateComponentInfo } from "../../Types/CalendarTypes.tsx";
 import { Button, Card, CardBody, Divider } from "@nextui-org/react";
 import Transaction from "../Transaction/Transaction.tsx";
@@ -9,17 +9,10 @@ import AddTransactionIcon from "../Icons/AddTransactionIcon/AddTransactionIcon.t
 import { parseDate } from "@internationalized/date";
 import CustomPaginator from "../CustomPaginator/CustomPaginator.tsx";
 import { updateTransactionAPI } from "../../Services/ApiCalls/TransactionAPI.tsx";
-import {
-	calcDailyBalances,
-	closeDrawer,
-	getDayOfWeek,
-	getRandomNum,
-	highlightEditedTransactionSwitch,
-	updateDailyBalances,
-	updateDailyBalanceStates
-} from "../../Utilities/UtilityFuncs.tsx";
+import { calcDailyBalances, closeDrawer, getDayOfWeek, getRandomNum, highlightEditedTransactionSwitch, updateDailyBalances, updateDailyBalanceStates } from "../../Utilities/UtilityFuncs.tsx";
 import { ErrorHandler } from "../../Helpers/ErrorHandler.tsx";
-import {UserContext} from "../../Services/Auth/UserAuthExports.tsx";
+import { UserContext } from "../../Services/Auth/UserAuthExports.tsx";
+import { dayBoxHeightPercent } from "../../Utilities/GlobalVariables.tsx";
 
 export type editTransOnDateFuncs = ((t: TransactionAPIData) => void)[];
 
@@ -41,11 +34,8 @@ export default function DayBox({
 		setPaginationDragState(dragOn);
 	}, []);
 	const dateString: string = `${dateObj.year}-${dateObj.month.toString().padStart(2, "0")}-${dateObj.date.toString().padStart(2, "0")}`;
-	const {user} = useContext(UserContext)
-	const { openDrawer, dragObject,
-		addTransToDate, editTransOnDatesFuncsMap,
-		dailyBalancesMap, setStateDailyBalanceMap,
-		dateTransactionsMap, setDaysLoaded } = useContext(CalendarContext);
+	const { user } = useContext(UserContext);
+	const { openDrawer, dragObject, addTransToDate, editTransOnDatesFuncsMap, dailyBalancesMap, setStateDailyBalanceMap, dateTransactionsMap, setDaysLoaded } = useContext(CalendarContext);
 
 	const transactionsPaginated = useCallback(
 		(todayTransArr?: TransactionAPIData[]): TransactionAPIData[][] => {
@@ -77,6 +67,15 @@ export default function DayBox({
 	const [todaysTransactions, setTodaysTransactions] = useState<TransactionAPIData[][]>(transactionsPaginated());
 	const [dailyBalance, setDailyBalance] = useState<number>(getTodaysBalance(dailyBalancesMap.current, dateString));
 	const [wasDraggingTransaction, setWasDraggingTransaction] = useState<boolean>(false);
+	const [calChartWrapHeight, setCalChartWrapHeight] = useState<number>(0);
+
+	useEffect(() => {
+		const calChartWrapElement = document.getElementById("calChartWrap");
+
+		if (calChartWrapElement) {
+			setCalChartWrapHeight(calChartWrapElement.clientHeight);
+		}
+	}, []);
 
 	//CallBack Hooks
 	const addTransactionToList = useCallback(
@@ -100,7 +99,7 @@ export default function DayBox({
 				}
 				return p;
 			});
-			if (isNewTransList){
+			if (isNewTransList) {
 				//State doesn't update transaction list view on DND in some scenarios
 				setForceState(getRandomNum());
 			}
@@ -121,8 +120,8 @@ export default function DayBox({
 	};
 
 	useEffect(() => {
-		setDaysLoaded(prev => {
-			if (!prev){
+		setDaysLoaded((prev) => {
+			if (!prev) {
 				return new Set([JSON.stringify(dateObj)]);
 			}
 			return prev.add(JSON.stringify(dateObj));
@@ -156,7 +155,7 @@ export default function DayBox({
 
 	function clickAddTransaction() {
 		highlightEditedTransactionSwitch();
-		openDrawer({ date: parseDate(dateString), editingExisting: false, amount: "0.00", description: ""});
+		openDrawer({ date: parseDate(dateString), editingExisting: false, amount: "0.00", description: "" });
 		addTransToDate.current = addTransactionToList;
 	}
 
@@ -217,7 +216,7 @@ export default function DayBox({
 		if (dropContainerDate !== transaction.date) {
 			dragObject.current.removeTransactionFromDate(transaction);
 			try {
-				const updatedTransaction = await updateTransactionAPI(transaction, user!.id,dropContainerDate);
+				const updatedTransaction = await updateTransactionAPI(transaction, user!.id, dropContainerDate);
 				addTransToDate.current!(updatedTransaction?.data);
 				const updBalanceMap = updateDailyBalances(transactions, dailyBalancesMap.current, updatedTransaction?.data, transaction);
 				updateDailyBalanceStates(setStateDailyBalanceMap.current, updBalanceMap[0]);
@@ -300,16 +299,21 @@ export default function DayBox({
 		return "mobileTopBorder";
 	}
 
-	function clickOnDay(){
+	function clickOnDay() {
 		closeDrawer();
 	}
+
+	const dayBoxHeight = useMemo(() => {
+		return (calChartWrapHeight * dayBoxHeightPercent) / 100 / 16;
+	}, [calChartWrapHeight]);
 
 	return (
 		<Card
 			radius="none"
 			shadow="none"
 			id={dateString}
-			className={`dayBox mobCol${dayGridSpot} ${mkMobileMnthStrBrdr(dayGridSpot, date)} col${dateObj.dayOfWeek} outline outline-1 ${mkMnthStrBdr(dateObj.dayOfWeek, date)} outline-slate-500`}>
+			className={`dayBox mobCol${dayGridSpot} ${mkMobileMnthStrBrdr(dayGridSpot, date)} col${dateObj.dayOfWeek} outline outline-1 ${mkMnthStrBdr(dateObj.dayOfWeek, date)} outline-slate-500`}
+			style={{ maxHeight: `${dayBoxHeight}rem`, minHeight: `${dayBoxHeight}rem` }}>
 			<CardBody
 				onClick={clickOnDay}
 				onMouseEnter={toggleAddTransactionBtn}

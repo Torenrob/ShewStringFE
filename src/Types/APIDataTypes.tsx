@@ -77,6 +77,13 @@ export interface CreateCategory {
 	type: "Income" | "Expense";
 }
 
+export interface EditCategory {
+	categoryId: number;
+	title: string;
+	amount: number;
+	color: string;
+}
+
 export interface TransactionAPIData {
 	id: number;
 	title: string | null;

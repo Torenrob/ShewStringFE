@@ -1,44 +1,43 @@
 .addAcctCont {
-    background: rgba(0, 0, 0, 0.411);
-    z-index: 105;
+	background: rgba(0, 0, 0, 0.411);
+	z-index: 105;
 }
 
 .addAcctModal {
-    color: #d6d6d6;
-    position: absolute;
-    z-index: 50;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--mainBlackTransparent);
-    /* border: solid 1px black; */
-    -webkit-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-    box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-    width: 23%;
-    height: fit-content;
-    padding: 1.5%;
-    padding-top: 0.9%;
+	color: #d6d6d6;
+	position: absolute;
+	z-index: 50;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: var(--mainBlackTransparent);
+	/* border: solid 1px black; */
+	-webkit-box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+	box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+	width: 23%;
+	height: fit-content;
+	padding: 1.5%;
+	padding-top: 0.9%;
 }
 
 /* Mobile */
 @media (max-width: 560px) {
-    .addAcctModal {
-        color: white;
-        position: absolute;
-        z-index: 50;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: var(--mainBlackTransparent);
-        /* border: solid 1px black; */
-        -webkit-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-        -moz-box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-        box-shadow: 10px 22px 36px -10px rgba(0, 0, 0, 0.75);
-        width: 75%;
-        height: fit-content;
-        padding: 1.5%;
-        padding-top: 0.9%;
-    }
-
+	.addAcctModal {
+		color: white;
+		position: absolute;
+		z-index: 50;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: var(--mainBlackTransparent);
+		/* border: solid 1px black; */
+		-webkit-box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+		-moz-box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+		box-shadow: 0.625rem 1.375rem 2.25rem -0.625rem rgba(0, 0, 0, 0.75);
+		width: 75%;
+		height: fit-content;
+		padding: 1.5%;
+		padding-top: 0.9%;
+	}
 }

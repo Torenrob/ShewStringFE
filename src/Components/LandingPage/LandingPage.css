@@ -1,13 +1,21 @@
 .landingPageBtns,
 .landingTagLine {
-    animation: appear 5s ease-in-out;
+	animation: appear 5s ease-in-out;
 }
 
 .landingPageTitle {
-    animation: zoomIn 2.5s ease-in-out;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-85%);
-    color: #45596b;
+	animation: zoomIn 2.5s ease-in-out;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-85%);
+	color: #45596b;
+}
+
+#constructionNote {
+	position: absolute;
+	top: 45%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	box-shadow: 0 4rem 6rem rgba(0, 0, 0, 0.1);
 }

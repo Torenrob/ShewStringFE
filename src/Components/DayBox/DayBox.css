@@ -1,199 +1,197 @@
 .dayBox {
-    min-height: 14.9vh;
-    max-height: 14.9vh;
-    outline-color: #45596b6c;
-    cursor: default;
-    pointer-events: auto;
-    position: static;
-    background-color: rgb(235, 235, 235);
+	outline-color: #45596b6c;
+	cursor: default;
+	pointer-events: auto;
+	position: static;
+	background-color: rgb(235, 235, 235);
 }
 
 .dayBox:nth-of-type(5n),
 .dayBox:nth-of-type(1) {
-    scroll-snap-align: start;
+	scroll-snap-align: start;
 }
 
 .transactionContainer {
-    max-height: 100%;
-    max-width: 100%;
-    height: 100%;
+	max-height: 100%;
+	max-width: 100%;
+	height: 100%;
 }
 
 .transactionContainer::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 .transactionContainer::-webkit-scrollbar-thumb {
-    display: none;
+	display: none;
 }
 
 .addTransactionBtn {
-    position: absolute;
-    right: 0.25vw;
-    bottom: 0.5vh;
-    transition: all 300ms;
+	position: absolute;
+	right: 0.25vw;
+	bottom: 0.5vh;
+	transition: all 300ms;
 }
 
 .dragOver {
-    border: solid var(--darkBlueLogo) 2px;
+	border: solid var(--darkBlueLogo) 0.125rem;
 }
 
 .selectedTransaction {
-    border: solid 2px black;
-    padding-top: 2px;
+	border: solid 0.125rem black;
+	padding-top: 0.125rem;
 }
 
 .mnthStartBrdr1stNotSun {
-    border-top: solid var(--monthBorderSize) var(--greenLogo);
-    border-left: solid var(--monthBorderSize) var(--greenLogo);
+	border-top: solid var(--monthBorderSize) var(--greenLogo);
+	border-left: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthStartBrdrTop {
-    box-sizing: border-box;
-    border-top: solid var(--monthBorderSize) var(--greenLogo);
+	box-sizing: border-box;
+	border-top: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthEndBrdrLastDayNotSat {
-    border-bottom: solid var(--monthBorderSize) var(--greenLogo);
-    border-right: solid var(--monthBorderSize) var(--greenLogo);
+	border-bottom: solid var(--monthBorderSize) var(--greenLogo);
+	border-right: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .mnthEndBrdrBottom {
-    border-bottom: solid var(--monthBorderSize) var(--greenLogo);
+	border-bottom: solid var(--monthBorderSize) var(--greenLogo);
 }
 
 .the8th::before {
-    content: "";
-    position: absolute;
-    width: var(--monthBorderSize);
-    height: var(--monthBorderSize);
-    background: var(--greenLogo);
-    clip-path: polygon(0 0, 100% 0, 0 100%);
+	content: "";
+	position: absolute;
+	width: var(--monthBorderSize);
+	height: var(--monthBorderSize);
+	background: var(--greenLogo);
+	clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
 .mobCol1 {
-    grid-column-start: auto;
-    grid-column-end: auto;
+	grid-column-start: auto;
+	grid-column-end: auto;
 }
 
 .mobCol2 {
-    grid-column-start: auto;
-    grid-column-end: auto;
+	grid-column-start: auto;
+	grid-column-end: auto;
 }
 
 .col1 {
-    grid-column-start: 1 !important;
-    grid-column-end: 2 !important;
+	grid-column-start: 1 !important;
+	grid-column-end: 2 !important;
 }
 
 .col2 {
-    grid-column-start: 2 !important;
-    grid-column-end: 3 !important;
+	grid-column-start: 2 !important;
+	grid-column-end: 3 !important;
 }
 
 .col3 {
-    grid-column-start: 3 !important;
-    grid-column-end: 4 !important;
+	grid-column-start: 3 !important;
+	grid-column-end: 4 !important;
 }
 
 .col4 {
-    grid-column-start: 4 !important;
-    grid-column-end: 5 !important;
+	grid-column-start: 4 !important;
+	grid-column-end: 5 !important;
 }
 
 .col5 {
-    grid-column-start: 5 !important;
-    grid-column-end: 6 !important;
+	grid-column-start: 5 !important;
+	grid-column-end: 6 !important;
 }
 
 .col6 {
-    grid-column-start: 6 !important;
-    grid-column-end: 7 !important;
+	grid-column-start: 6 !important;
+	grid-column-end: 7 !important;
 }
 
 .col7 {
-    grid-column-start: 7 !important;
-    grid-column-end: 8 !important;
+	grid-column-start: 7 !important;
+	grid-column-end: 8 !important;
 }
 
 /* Mobile */
 @media (max-width: 560px) {
-    .addTransactionBtn {
-        right: 0.75vw;
-        bottom: 1vw;
-    }
+	.addTransactionBtn {
+		right: 0.75vw;
+		bottom: 1vw;
+	}
 
-    .mnthStartBrdr1stNotSun {
-        border-top: none;
-        border-left: none;
-    }
+	.mnthStartBrdr1stNotSun {
+		border-top: none;
+		border-left: none;
+	}
 
-    .mnthStartBrdrTop {
-        border-top: none;
-    }
+	.mnthStartBrdrTop {
+		border-top: none;
+	}
 
-    .mnthEndBrdrLastDayNotSat {
-        border-bottom: none;
-        border-right: none;
-    }
+	.mnthEndBrdrLastDayNotSat {
+		border-bottom: none;
+		border-right: none;
+	}
 
-    .mnthEndBrdrBottom {
-        border-bottom: none;
-    }
+	.mnthEndBrdrBottom {
+		border-bottom: none;
+	}
 
-    .the8th::before {
-        display: none;
-    }
+	.the8th::before {
+		display: none;
+	}
 
-    .dayBox:nth-of-type(5n),
-    .dayBox:nth-of-type(1) {
-        scroll-snap-align: none;
-    }
+	.dayBox:nth-of-type(5n),
+	.dayBox:nth-of-type(1) {
+		scroll-snap-align: none;
+	}
 
-    .dayBox:nth-of-type(2n) {
-        scroll-snap-align: start;
-    }
+	.dayBox:nth-of-type(2n) {
+		scroll-snap-align: start;
+	}
 
-    .dayBoxMonthLabel {
-        display: none;
-    }
+	.dayBoxMonthLabel {
+		display: none;
+	}
 
-    .mobCol1 {
-        grid-column-start: 1 !important;
-        grid-column-end: 2 !important;
-    }
+	.mobCol1 {
+		grid-column-start: 1 !important;
+		grid-column-end: 2 !important;
+	}
 
-    .mobCol2 {
-        grid-column-start: 2 !important;
-        grid-column-end: 3 !important;
-    }
+	.mobCol2 {
+		grid-column-start: 2 !important;
+		grid-column-end: 3 !important;
+	}
 
-    .col1,
-    .col2,
-    .col3,
-    .col4,
-    .col5,
-    .col6,
-    .col7 {
-        grid-column-start: auto;
-        grid-column-end: auto;
-    }
+	.col1,
+	.col2,
+	.col3,
+	.col4,
+	.col5,
+	.col6,
+	.col7 {
+		grid-column-start: auto;
+		grid-column-end: auto;
+	}
 
-    .mob1st2colborder {
-        border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
-        border-left: solid var(--monthBorderSize) var(--greenLogo) !important;
-    }
+	.mob1st2colborder {
+		border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
+		border-left: solid var(--monthBorderSize) var(--greenLogo) !important;
+	}
 
-    .mobileTopBorder {
-        border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
-    }
+	.mobileTopBorder {
+		border-top: solid var(--monthBorderSize) var(--greenLogo) !important;
+	}
 
-    .theMobile3rd::before {
-        content: "";
-        position: absolute;
-        width: var(--monthBorderSize);
-        height: var(--monthBorderSize);
-        background: var(--greenLogo);
-        clip-path: polygon(0 0, 100% 0, 0 100%);
-    }
+	.theMobile3rd::before {
+		content: "";
+		position: absolute;
+		width: var(--monthBorderSize);
+		height: var(--monthBorderSize);
+		background: var(--greenLogo);
+		clip-path: polygon(0 0, 100% 0, 0 100%);
+	}
 }

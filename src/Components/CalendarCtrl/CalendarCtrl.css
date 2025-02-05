@@ -1,5 +1,5 @@
-.calCtrlWrap {
-	max-height: 96.5vh;
+#calCtrlWrap {
+	flex-grow: 1;
 	grid-template-rows: 1fr 14fr;
 }
 
@@ -9,7 +9,7 @@
 
 .tabCont {
 	overflow-x: auto;
-	background-color: #1a1a1a;
+	background-color: #2c2c2c;
 }
 
 .tabCont::-webkit-scrollbar {
@@ -41,8 +41,7 @@
 } */
 
 .acctTabs:last-of-type {
-	background-color: #1a1a1a !important;
-	color: var(--greenLogo) !important;
+	background-color: var(--mainGray) !important;
 }
 
 .acctTabContent {
@@ -70,7 +69,7 @@
 } */
 
 .addAcctTab > .acctTabContent {
-	color: #14775b;
+	color: var(--greenLogo);
 	position: relative;
 }
 
@@ -83,8 +82,8 @@
 	background-color: var(--mainGray);
 	height: 100%;
 	color: var(--mainWhite);
-	margin-left: 2px;
-	margin-right: 2px;
+	margin-left: 0.125rem;
+	margin-right: 0.125rem;
 	border-radius: 0.125rem;
 }
 
@@ -105,19 +104,6 @@ input[type="month"]::-webkit-calendar-picker-indicator {
 
 input[type="month"]:focus {
 	outline: none;
-}
-
-.calWrap {
-	overflow-y: scroll;
-	scroll-snap-type: y mandatory;
-	scrollbar-width: none;
-	border-bottom-left-radius: 0.275rem;
-	border-bottom-right-radius: 0.275rem;
-	-ms-overflow-style: none;
-}
-
-.calWrap::-webkit-scrollbar {
-	display: none;
 }
 
 /* Mobile */

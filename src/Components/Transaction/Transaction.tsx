@@ -1,4 +1,4 @@
-import "./Transaction.css"
+import "./Transaction.css";
 import { CSSProperties, useEffect, useState, useRef, useContext } from "react";
 import { Button } from "@nextui-org/react";
 import Marquee from "react-fast-marquee";
@@ -47,11 +47,11 @@ export default function Transaction({
 	}
 
 	const marqueeStyle: CSSProperties = {
-		marginRight: "3px",
+		marginRight: "0.1875rem",
 		position: "relative",
 		paddingTop: "1%",
 		paddingBottom: "1%",
-		fontSize: "0.7rem"
+		fontSize: "0.7rem",
 	};
 
 	const btnRef = useRef<HTMLDivElement>(null);
@@ -96,7 +96,7 @@ export default function Transaction({
 				dragSnapToOrigin
 				style={{ display: mouseOver || dragActive ? "block" : "none" }}
 				className={`${transactionInfo.date}`}
-				whileDrag={{ position: "absolute", zIndex: 10, width: "200px", pointerEvents: "none", cursor: "grab" }}
+				whileDrag={{ position: "absolute", zIndex: 10, width: "12.5rem", pointerEvents: "none", cursor: "grab" }}
 				id={`transaction${transactionInfo.id}`}>
 				<Button
 					onPress={() => onClick(transactionInfo, updateTransactionBanner)}

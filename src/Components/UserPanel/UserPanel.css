@@ -1,37 +1,36 @@
-
 .userPanelDivider {
-    background-color: var(--mainWhite);
-    margin-left: 5%;
-    margin-right: 5%;
-    border: none;
-    height: 2px;
-    margin-top: 7%;
-    border-radius: 1rem;
-    opacity: 10%;
+	background-color: var(--mainWhite);
+	margin-left: 5%;
+	margin-right: 5%;
+	border: none;
+	height: 0.125rem;
+	margin-top: 7%;
+	border-radius: 1rem;
+	opacity: 10%;
 }
 
 .navItems:active {
-    transform: scale(0.99);
-    background-color: #2a3845;
+	transform: scale(0.99);
+	background-color: #2a3845;
 }
 
 #navItemSelected {
-    color: var(--greenLogo);
-    background-color: var(--mainGray);
+	color: var(--greenLogo);
+	background-color: #2c2c2c;
 }
 
 #navItemSelected:before {
-    content: "";
-    background-color: var(--greenLogo);
-    height: 1.25rem;
-    width: .6rem;
-    position: absolute;
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem;
-    right: 96%;
-    transform: translateY(23%) translateX(130%);
+	content: "";
+	background-color: var(--greenLogo);
+	height: 1.25rem;
+	width: 0.6rem;
+	position: absolute;
+	border-top-right-radius: 0.25rem;
+	border-bottom-right-radius: 0.25rem;
+	right: 96%;
+	transform: translateY(23%) translateX(130%);
 }
 
 #navItemSelected:active:before {
-    display: none;
+	display: none;
 }

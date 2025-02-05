@@ -14,6 +14,11 @@ export async function createCategoryNewBudgetAPI(cat: CreateCategory): Promise<B
 	}
 }
 
+export async function getUserCategories(userId: string) {
+	const resp: AxiosResponse<Category[]> = await axios.get(api + "/user/" + userId);
+	return resp.data;
+}
+
 export async function createCategoryExistingBudgetAPI(cat: CreateCategory): Promise<Budget | null> {
 	try {
 		const resp: AxiosResponse<Budget> = await axios.post(api, cat);

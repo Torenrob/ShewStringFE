@@ -1,22 +1,23 @@
 :root {
 	--mainBlack: #0a0a0a;
-	--mainGray: #1A1A1A;
+	--mainGray: #2c2c2c;
 	--greenLogo: #6ec4a7;
 	--mainWhite: white;
-	--darkBlueLogo: #45596B;
-	--lightBlueLogo: #647F94;
+	--darkBlueLogo: #45596b;
+	--lightBlueLogo: #647f94;
 	--mainBlackTransparent: #0a0a0ab7;
 	--monthBorderSize: 2px;
 }
 
 @font-face {
-	font-family: 'Nunito';
+	font-family: "Nunito";
 	src: url("./assets/fonts/Nunito/Nunito-VariableFont_wght.ttf") format("truetype");
 }
 
 #root {
 	/*font-family: Nunito, sans-serif;*/
 	scroll-behavior: smooth;
+	box-sizing: border-box;
 }
 
 @keyframes zoomIn {

@@ -1,5 +1,4 @@
 .deleteCategory {
-	transform: scale(0.85);
 	border: solid 0.125rem red;
 	background-color: red;
 }

@@ -13,8 +13,8 @@ export default function MainPage() {
 	return (
 		<div className="box-border mainPage">
 			<UserPanel updateNavItem={setSelectedNavItem} />
-			<div className="pb-[0.375rem] pt-[0.55rem] pr-[0.375rem] max-w-[85.5%] min-w-[85.5%] w-[85.5%] max-h-full">
-				<div className="rightPanelCal rounded-lg max-w-full min-h-full max-h-full flex">
+			<div className="pb-[0.75rem] pt-[0.75rem] pr-[0.75rem] max-h-[100vh] min-h-[100vh] min-w-[85.5vw] max-w-[85.5vw]">
+				<div className="rightPanelCal rounded-lg max-w-full min-w-full min-h-full max-h-full flex">
 					{(selectedNavItem === 0 || selectedNavItem === "0") && <CalendarCtrl />}
 					{(selectedNavItem === 1 || selectedNavItem === "1") && <BudgetBuilder />}
 				</div>

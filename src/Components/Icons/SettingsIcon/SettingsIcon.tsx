@@ -1,4 +1,4 @@
-import "./SettingsIcon.css"
+import "./SettingsIcon.css";
 import React, { useRef, useState, Key } from "react";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 
@@ -29,8 +29,8 @@ export default function SettingsIcon({ openAcctModal, openDelAcctModal }: { open
 					onMouseLeave={() => hoverSwitch()}
 					fill={hover ? "#6EC4A7" : "#ffffff"}
 					className="acctOptIcon"
-					width="13px"
-					height="13px"
+					width="0.813rem"
+					height="0.813rem"
 					viewBox="0 0 1920 1920"
 					xmlns="http://www.w3.org/2000/svg">
 					<path

@@ -1,21 +1,12 @@
-import "./Calendar.css"
-import {MutableRefObject, ReactNode, Ref, useCallback, useContext, useEffect, useRef, useState} from "react";
+import "./Calendar.css";
+import { MutableRefObject, ReactNode, Ref, useCallback, useContext, useEffect, useRef, useState, useMemo } from "react";
 import MonthBox from "../MonthBox/MonthBox.tsx";
-import {
-	calcDailyBalances,
-	focusToday
-} from "../../Utilities/UtilityFuncs.tsx";
-import {LocalMonth, MonthComponentInfo} from "../../Types/CalendarTypes.tsx";
-import {TransactionAPIData} from "../../Types/APIDataTypes.tsx";
-import {
-	_getCurrMonth,
-	calcInitMonth,
-	calcInputMonths, getTotalNumberOfDays,
-} from "./CalendarExports.tsx";
-import {CalendarContext, MonthRange} from "../CalendarCtrl/CalendarCtrlExports.tsx"
-import {dayBoxHeight} from "../../Utilities/GlobalVariables.tsx";
-
-
+import { calcDailyBalances, focusToday } from "../../Utilities/UtilityFuncs.tsx";
+import { LocalMonth, MonthComponentInfo } from "../../Types/CalendarTypes.tsx";
+import { TransactionAPIData } from "../../Types/APIDataTypes.tsx";
+import { _getCurrMonth, calcInitMonth, calcInputMonths, getTotalNumberOfDays } from "./CalendarExports.tsx";
+import { CalendarContext, MonthRange } from "../CalendarCtrl/CalendarCtrlExports.tsx";
+import { dayBoxHeightPercent } from "../../Utilities/GlobalVariables.tsx";
 
 export default function Calendar({
 	transactions,
@@ -29,6 +20,17 @@ export default function Calendar({
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth >= 1024 ? "lg" : window.innerWidth >= 768 ? "md" : "sm");
 	const [monthComps, setMonthComps] = useState<MonthComponentInfo[]>([]);
 	const { dailyBalancesMap, dateTransactionsMap, setNumberOfDays } = useContext(CalendarContext);
+	const [calChartWrapHeight, setCalChartWrapHeight] = useState<number>(0);
+	//Watching screen size to trigger rerender if device scaling changes
+	const [screenWidth, setScreenWidth] = useState<number>(screen.width);
+
+	useEffect(() => {
+		const calChartWrapElement = document.getElementById("calChartWrap");
+
+		if (calChartWrapElement) {
+			setCalChartWrapHeight(calChartWrapElement.clientHeight);
+		}
+	}, []);
 
 	const getTransactionData = useCallback(() => {
 		dateTransactionsMap.current = transactions;
@@ -52,11 +54,11 @@ export default function Calendar({
 			setNumberOfDays(getTotalNumberOfDays(monthArr));
 			setMonthComps(monthArr);
 		} else {
-			const monthArr = calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1"))
-			setNumberOfDays(getTotalNumberOfDays(monthArr))
+			const monthArr = calcInputMonths(new Date(monthRange.startMonth + "-1"), new Date(monthRange.endMonth + "-1"));
+			setNumberOfDays(getTotalNumberOfDays(monthArr));
 			setMonthComps(monthArr);
 		}
-	}, [dailyBalancesMap, dateTransactionsMap, transactions, monthRange]);
+	}, [dailyBalancesMap, dateTransactionsMap, transactions, monthRange, setNumberOfDays]);
 
 	useEffect(() => {
 		getTransactionData();
@@ -89,17 +91,14 @@ export default function Calendar({
 		}
 	}, []);
 
-	function calcCalendarHeight(): number {
-		if (monthComps.length === 0) return 0;
+	function calcCalendarHeight() {
+		const calElement = document.getElementById("calendar");
+		const monthDivArr = document.getElementsByClassName("monthBox");
+		const lastMonthDiv = monthDivArr[monthDivArr.length - 1];
 
-		const initCalHt: number = monthComps.reduce((prevMCHt, nextMC) => {
-			const firstDayOfWk: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month - 1, 1).getDay();
-			const monthLength: number = new Date(nextMC.monthObj.year, nextMC.monthObj.month, 0).getDate();
-			const mnthHt: number = calcMnthHt(firstDayOfWk, monthLength);
-			return prevMCHt + mnthHt;
-		}, 0);
+		if (!calElement || !lastMonthDiv) return 0;
 
-		return initCalHt - monthComps[monthComps.length - 1].monthObj.styleYtransition + 1;
+		return calElement.clientHeight - (calElement.getBoundingClientRect().bottom - lastMonthDiv.getBoundingClientRect().bottom);
 	}
 
 	function handleWindowResize() {
@@ -112,12 +111,24 @@ export default function Calendar({
 
 	window.addEventListener("resize", handleWindowResize);
 
+	useEffect(() => {
+		const checkForZoomChange = setInterval(() => {
+			if (screenWidth !== screen.width) {
+				console.log("Should run");
+				setScreenWidth(screen.width);
+			}
+		}, 1000);
+
+		return () => clearInterval(checkForZoomChange);
+	}, [setScreenWidth, screenWidth]);
+
 	return (
-		<div key="Calendar" id="calendar" className="row-start-2 grid-column-3">
-			<div className="calMonthsContainer" style={{ maxHeight: `${calcCalendarHeight() - 1.25}vh` }}>
+		<div key="Calendar" id="calendar" className={`row-start-2 grid-column-3`}>
+			<div className={`calMonthsContainer`} style={{ maxHeight: `${calcCalendarHeight() / 16}rem` }}>
 				{monthComps.map((monthBoxObj) => {
 					return (
 						<MonthBox
+							calChartWrapHeight={calChartWrapHeight}
 							transactions={transactions}
 							windowWidth={windowWidth}
 							monthObj={monthBoxObj?.monthObj}
@@ -132,25 +143,27 @@ export default function Calendar({
 	);
 }
 
-function calcMnthHt(monStDayOfWk: number, lengthOfMnth: number): number {
+function calcMnthHt(monStDayOfWk: number, lengthOfMnth: number, calWrapHeight: number): number {
+	const dayBoxHeightPx: number = (calWrapHeight * dayBoxHeightPercent) / 100;
+
 	if (monStDayOfWk === 0) {
 		if (lengthOfMnth === 28) {
-			return dayBoxHeight * 4;
+			return dayBoxHeightPx * 4;
 		} else {
-			return dayBoxHeight * 5;
+			return dayBoxHeightPx * 5;
 		}
 	} else if (monStDayOfWk === 1 || (monStDayOfWk > 1 && monStDayOfWk < 4) || monStDayOfWk === 4) {
-		return dayBoxHeight * 5;
+		return dayBoxHeightPx * 5;
 	} else if (monStDayOfWk === 5) {
 		if (lengthOfMnth <= 30) {
-			return dayBoxHeight * 5;
+			return dayBoxHeightPx * 5;
 		} else {
-			return dayBoxHeight * 6;
+			return dayBoxHeightPx * 6;
 		}
 	} else {
 		if (lengthOfMnth <= 29) {
-			return dayBoxHeight * 5;
+			return dayBoxHeightPx * 5;
 		}
-		return dayBoxHeight * 6;
+		return dayBoxHeightPx * 6;
 	}
 }
