@@ -127,7 +127,7 @@ function BudgetBuilder() {
 
 	return (
 		<>
-			<div className="min-h-full min-w-full rounded-md grid grid-rows-11 gap-3.5">
+			<div className="min-h-full min-w-full rounded-md grid grid-rows-11 gap-[1.25vh]">
 				<div className="row-span-1 h-full w-full flex justify-between pl-12">
 					<span className="text-white self-center pl-2 text-4xl">Budget Setup</span>
 					<div className="w-[45%] flex justify-around bg-[#333333] rounded-md">
@@ -168,24 +168,24 @@ function BudgetBuilder() {
 				</div>
 				<div className="row-span-4 h-full w-full bg-[var(--mainWhite)] rounded-md relative z-50 flex" id="budgetIncome">
 					<div className="flex-col h-full">
-						<div className="flex h-10">
+						<div className="flex h-[9.5%]">
 							<div className="w-40 h-full bg-[var(--mainGray)] rounded-br-md relative flex z-50">
 								<div className="w-1 h-1 bg-[var(--mainGray)] budgetTitleSection absolute right-0 translate-x-[100%]"></div>
 								<span className="text-white font-semibold text-2xl self-center w-full text-center">Income</span>
 								<div className="w-1 h-1 budgetTitleSection bg-[var(--mainGray)] absolute bottom-0 translate-y-[100%]"></div>
 							</div>
 							<div className="h-full">
-								<Button onPress={(e) => addCategory("Income")} className="border-[var(--mainWhite)] border-t-4 border-l-4 border-r-4 bg-[var(--greenLogo)] font-semibold" radius="sm">
+								<Button onPress={(e) => addCategory("Income")} className="border-[var(--mainWhite)] h-full w-full border-t-4 border-l-4 border-r-4 bg-[var(--greenLogo)] font-semibold" radius="sm">
 									Add Line +
 								</Button>
 							</div>
 						</div>
-						<div className="w-full h-[87.5%] p-1">
+						<div className="w-full h-[90.5%] p-1">
 							<div className="bg-[var(--lightBlueLogo)] min-w-full min-h-full rounded-md"></div>
 						</div>
 					</div>
 					<div className="w-full h-full py-1 pr-1">
-						<div className="flex-col w-full h-full budgetCategoryTable">
+						<div className="flex-col w-full h-full budgetCategoryTable rounded-md">
 							<div className="h-[85%] w-full flex-col budgetCategoryList">
 								<div className="flex w-full text-large categoryListTableHeaders h-[14%]">
 									<div>#</div>
@@ -195,7 +195,7 @@ function BudgetBuilder() {
 									<div>Monthly Avg</div>
 									<div>Health</div>
 									<div>Edit/Delete</div>
-									<div className="!w-[5px]"></div>
+									<div className="!w-[0.3125rem]"></div>
 								</div>
 								<div className="w-full flex-col max-h-[86.5%] min-h-[86.5%] overflow-y-auto categoryListScroll pt-1">
 									{selectedBudget?.budgetCategories
@@ -210,30 +210,32 @@ function BudgetBuilder() {
 							</div>
 						</div>
 					</div>
-					<div className="absolute h-20 w-20 bg-[var(--mainGray)] rounded-[50%] bottom-0 right-[50%] translate-y-[58%] flex">
-						<MinusIcon />
+					<div className="absolute h-[7vh] w-[7vh] bottom-0 left-[45%] translate-y-[58%] flex">
+						<div className="rounded-[50%] bg-[var(--mainWhite)] p-1 builderMathIcon border-none">
+							<MinusIcon />
+						</div>
 					</div>
 				</div>
 				<div className="row-span-4 h-full w-full bg-[var(--mainWhite)] rounded-md relative  flex" id="budgetExpense">
 					<div className="flex-col h-full">
-						<div className="flex h-10">
+						<div className="flex h-[9.5%]">
 							<div className="w-40 h-full bg-[var(--mainGray)] rounded-br-md relative flex z-50">
 								<div className="w-1 h-1 bg-[var(--mainGray)] budgetTitleSection absolute right-0 translate-x-[100%]"></div>
 								<span className="text-white font-semibold text-2xl self-center w-full text-center">Expense</span>
 								<div className="w-1 h-1 budgetTitleSection bg-[var(--mainGray)] absolute bottom-0 translate-y-[100%]"></div>
 							</div>
 							<div className="h-full">
-								<Button onPress={(e) => addCategory("Expense")} className="border-[var(--mainWhite)] border-t-4 border-l-4 border-r-4 bg-[var(--greenLogo)] font-semibold" radius="sm">
+								<Button onPress={(e) => addCategory("Expense")} className="border-[var(--mainWhite)] h-full w-full border-t-4 border-l-4 border-r-4 bg-[var(--greenLogo)] font-semibold" radius="sm">
 									Add Line +
 								</Button>
 							</div>
 						</div>
-						<div className="w-full h-[87.5%] p-1">
+						<div className="w-full h-[90.5%] p-1">
 							<div className="bg-[var(--lightBlueLogo)] min-w-full min-h-full rounded-md"></div>
 						</div>
 					</div>
 					<div className="w-full h-full py-1 pr-1">
-						<div className="flex-col w-full h-full budgetCategoryTable">
+						<div className="flex-col w-full h-full budgetCategoryTable rounded-md">
 							<div className="h-[85%] w-full flex-col budgetCategoryList">
 								<div className="flex w-full text-large categoryListTableHeaders h-[14%]">
 									<div>#</div>
@@ -243,7 +245,7 @@ function BudgetBuilder() {
 									<div>Monthly Avg</div>
 									<div>Health</div>
 									<div>Edit/Delete</div>
-									<div className="!w-[5px]"></div>
+									<div className="!w-[0.3125rem]"></div>
 								</div>
 								<div className="w-full max-h-[86.5%] min-h-[86.5%] overflow-y-auto flex-col categoryListScroll pt-1">
 									{selectedBudget?.budgetCategories
@@ -256,8 +258,10 @@ function BudgetBuilder() {
 							<div className="h-[15%] w-full p-1 budgetCategoryTableTotal">{/* To do: Enter Expense total logic*/}</div>
 						</div>
 					</div>
-					<div className="absolute h-20 w-20 bg-[var(--mainGray)] rounded-[50%] bottom-0 right-[50%] translate-y-[58%] flex">
-						<EqualsIcon />
+					<div className="absolute h-[7vh] w-[7vh] bottom-0 left-[45%] translate-y-[58%] flex">
+						<div className="rounded-[50%] bg-[var(--mainWhite)] p-1 builderMathIcon border-none">
+							<EqualsIcon />
+						</div>
 					</div>
 				</div>
 				<div className="row-span-3 h-full w-full bg-[var(--mainWhite)] rounded-md flex-col" id="budgetNetCashFlow">

@@ -100,8 +100,8 @@ export default function CalendarCtrl() {
 	const tabContRef = useRef<HTMLDivElement>(null);
 	const acctScrollCont = useRef<HTMLDivElement>(null);
 
-	//Function for updating acct transactions when submitting trans for a different account than currently chosen
-	const updateAcctTransactions = (arg0: TransactionAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => {
+	//Function for updating acct transactions when trans for a different account than currently on screen
+	const updateFormSelectAcctTransactions = (arg0: TransactionAPIData, updBankAcctStateFunc: (newBAarr: BankAccountAPIData[]) => void) => {
 		const subTransAcctMap: Map<string, TransactionAPIData[]> = bankAccounts.find((acct) => acct.id === arg0.bankAccountId)!.transactions;
 		const updArr = subTransAcctMap.get(arg0.date) ? subTransAcctMap.get(arg0.date) : [arg0];
 		const updAcctsArr: BankAccountAPIData[] = bankAccounts.map((acct: BankAccountAPIData) => {
@@ -352,7 +352,7 @@ export default function CalendarCtrl() {
 						<Calendar monthLabelCntl={cntlMonthLabel} transactions={selectedAccount.transactions} monthRange={monthRange} key="calendar" />
 						{/* <div id="bottomCalBound" onMouseOver={(e, direction = "down") => scrollDrag(direction)} style={{ background: "red" }}></div> */}
 					</div>
-					<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateAcctTransactions} />
+					<TransactionInputDrawer ref={childref} bankAccounts={bankAccounts} currentAcct={selectedAccount} updAcctTrans={updateFormSelectAcctTransactions} />
 				</CalendarContext.Provider>
 				{(addAcctModalOpen || selectedAccount.id == 0) && <AddAccountModal closeModal={closeModal} addNewAcct={addNewAcct} />}
 				{delAcctModalOpen && <DelAccountModal closeModal={closeModal} deleteAcct={delAcct} bankAccounts={removeAddAcctTabHolder()} />}

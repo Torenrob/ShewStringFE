@@ -18,30 +18,31 @@
 
 .budgetCategoryTable {
 	background-color: var(--mainBlackTransparent);
-	border-radius: 0.2rem;
 }
 
-.budgetCategoryTable::before {
+/* White circle around minus and equal icons */
+/* .budgetCategoryTable::before {
 	content: "";
-	width: 5.6rem;
-	height: 5.6rem;
+	width: 8.75vh;
+	height: 8.75vh;
 	bottom: 0;
-	right: 49.725%;
-	transform: translateY(57%);
+	right: 49.78%;
 	border-radius: 50%;
 	position: absolute;
 	background-color: var(--mainWhite);
-}
+	transform: translateY(57%);
+} */
 
-.budgetCategoryTable::after {
+/* Black bar behind minus and equal icons */
+.builderMathIcon::after {
 	content: "";
 	width: 8rem;
-	height: 0.875rem;
+	height: 1.2vh;
 	background-color: var(--mainGray);
 	position: absolute;
-	bottom: 0;
-	right: 49%;
-	transform: translateY(99.5%);
+	top: 42.5%;
+	left: -10%;
+	z-index: 0;
 }
 
 .categoryListTableHeaders {
